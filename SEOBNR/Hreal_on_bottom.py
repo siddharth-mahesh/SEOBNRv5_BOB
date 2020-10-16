@@ -26,7 +26,7 @@ def compute_Hreal(m1=23., m2=10., EMgamma=0.577215664901532860606512090082402431
     e32 = Skerrhat2
     e31 = Skerrhat1
     xi3=e31*n2-e32*n1
-    xi2 = e31*n3 + e33*n1
+    xi2 = -e31*n3 + e33*n1
     xi1 = e32*n3 - e33*n2
     v3=n1*xi2-n2*xi1
     v2 = n3*xi1 - n1*xi3

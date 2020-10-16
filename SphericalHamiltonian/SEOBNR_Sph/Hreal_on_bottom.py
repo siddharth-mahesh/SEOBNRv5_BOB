@@ -81,8 +81,8 @@ def compute_Hreal(m1=23., m2=10., EMgamma=0.577215664901532860606512090082402431
     ##phat3=p3+prT*(1-1/csi1)*n3
     ##phat2 = p2 + prT*(1 - 1/csi1)*n2
     ##phat1 = p1 + prT*(1 - 1/csi1)*n1
-    pdotxir=pphi##Sid:Rewritewithsphericalmomenta
-    #pdotxir = (phat1*xi1 + phat2*xi2 + phat3*xi3)*r
+    #pdotxir=pphi##Sid:Rewritewithsphericalmomenta
+    pdotxir = (phat1*xi1 + phat2*xi2 + phat3*xi3)*r
     pdotn=phat1*n1+phat2*n2+phat3*n3
     pdotvr=(phat1*v1+phat2*v2+phat3*v3)*r
     Qcoeff2=1/(Sigma*sin2thetaBL)

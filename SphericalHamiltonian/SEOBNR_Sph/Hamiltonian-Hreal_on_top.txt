@@ -175,8 +175,8 @@ pdotvr = (phat1*v1 + phat2*v2 + phat3*v3)*r
 
 pdotn = phat1*n1 + phat2*n2 + phat3*n3
 
-#pdotxir = (phat1*xi1 + phat2*xi2 + phat3*xi3)*r
-pdotxir = pphi
+pdotxir = (phat1*xi1 + phat2*xi2 + phat3*xi3)*r
+#pdotxir = pphi
 
 ## Sid: Rewrite with spherical momenta
 ##phat1 = p1 + prT*(1 - 1/csi1)*n1

@@ -275,3 +275,15 @@ def new_compute_dHdp3(m1, m2, eta, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y,
             file.write(lr[i].lhs + " = " + str(lr[i].rhs) + "\n")
         for i in range(len(lhss_deriv_x)):
             file.write(str(lhss_deriv_x[i]).replace("prm", "prm_x") + " = " + replace_numpy_funcs(rhss_deriv_x[i]).replace("prm", "prm_x") + "\n")
+    
+    with open("SEOBNR_Playground_Pycodes/dHdp2.txt", "w") as file:
+        for i in range(len(lr) - 1):
+            file.write(lr[i].lhs + " = " + str(lr[i].rhs) + "\n")
+        for i in range(len(lhss_deriv_p2)):
+            file.write(str(lhss_deriv_p2[i]).replace("prm", "prm_p2") + " = " + replace_numpy_funcs(rhss_deriv_p2[i]).replace("prm", "prm_p2") + "\n")
+
+    with open("SEOBNR_Playground_Pycodes/dHdp3.txt", "w") as file:
+        for i in range(len(lr) - 1):
+            file.write(lr[i].lhs + " = " + str(lr[i].rhs) + "\n")
+        for i in range(len(lhss_deriv_p3)):
+            file.write(str(lhss_deriv_p3[i]).replace("prm", "prm_p3") + " = " + replace_numpy_funcs(rhss_deriv_p3[i]).replace("prm", "prm_p3") + "\n")
