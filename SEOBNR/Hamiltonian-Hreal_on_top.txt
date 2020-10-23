@@ -97,9 +97,11 @@ sigmacoeffTerm2 = eta/(144*r*r)*(-896 + r*(-436*Qminus1 - 96*DrSipn2 + r*(-45*Qm
 sigmacoeffTerm3 = eta*dSO*u*u*u
 dSO = -74.71 - 156.*eta + 627.5*eta*eta
 
-omegar = (Lambdat*omegatildeprm - Lambdatprm*omegatilde)/(Lambdat*Lambdat)
+#omegar = (Lambdat*omegatildeprm - Lambdatprm*omegatilde)/(Lambdat*Lambdat)
+omegar = (Lambdat*omegatildeprime - Lambdatprime*omegatilde)/(Lambdat*Lambdat)
 
-nur = r/Sigma + w2*(w2*Deltatprm - 4*r*Deltat)/(2*Lambdat*Deltat)
+#nur = r/Sigma + w2*(w2*Deltatprm - 4*r*Deltat)/(2*Lambdat*Deltat)
+nur = r/Sigma + w2*(w2*Deltatprime - 4*r*Deltat)/(2*Lambdat*Deltat)
 
 mur = r/Sigma - 1/sp.sqrt(Deltar)
 
@@ -109,9 +111,13 @@ nucostheta = a*a*w2*costheta*(w2 - Deltat)/(Lambdat*Sigma)
 
 mucostheta = a*a*costheta/Sigma
 
-Lambdatprm = 4*(a*a + r*r)*r - 2*a*a*Deltatprm*sin2theta
+#Lambdatprm = 4*(a*a + r*r)*r - 2*a*a*Deltatprm*sin2theta
 
-omegatildeprm = 2*a
+Lambdatprime = 4*(a*a + r*r)*r - 2*a*a*Deltatprime*sin2theta
+
+#omegatildeprm = 2*a
+
+omegatildeprime = 2*a
 
 omega = omegatilde/Lambdat
 
@@ -120,7 +126,9 @@ exp2nu = Deltat*Sigma/Lambdat
 
 Btilde = sp.sqrt(Deltat)
 
-Brtilde = (sp.sqrt(Deltar)*Deltatprm - 2*Deltat)/(2*sp.sqrt(Deltar*Deltat))
+#Brtilde = (sp.sqrt(Deltar)*Deltatprm - 2*Deltat)/(2*sp.sqrt(Deltar*Deltat))
+
+Brtilde = (sp.sqrt(Deltar)*Deltatprime - 2*Deltat)/(2*sp.sqrt(Deltar*Deltat))
 
 expmu = sp.sqrt(exp2mu)
 exp2mu = Sigma
@@ -162,15 +170,24 @@ Deltar = Deltat*Dinv
 
 Deltat = r*r*Deltau
 
-Deltatprm = 2*r*Deltau + r*r*Deltauprm
+#Deltatprm = 2*r*Deltau + r*r*Deltauprm
 
-Deltauprm = Deltaubarprm*Deltaucalib + Deltaubar*Deltaucalibprm
+Deltatprime = 2*r*Deltau + r*r*Deltauprime
+
+#Deltauprm = Deltaubarprm*Deltaucalib + Deltaubar*Deltaucalibprm
+
+Deltauprime = Deltaubarprime*Deltaucalib + Deltaubar*Deltaucalibprime
 Deltau = Deltaubar*Deltaucalib
 
-Deltaubarprm = -2*a*a*u*u*u - 2*u*u/(etaKminus1)
+#Deltaubarprm = -2*a*a*u*u*u - 2*u*u/(etaKminus1)
+
+Deltaubarprime = -2*a*a*u*u*u - 2*u*u/(etaKminus1)
 Deltaubar = a*a*u*u + (2*u + 1/etaKminus1)/etaKminus1
 
-Deltaucalibprm = -eta*u*u*(Delta1 + u*(2*Delta2 + u*(3*Delta3
+#Deltaucalibprm = -eta*u*u*(Delta1 + u*(2*Delta2 + u*(3*Delta3
+#                            + u*(4*Delta4 + u*(5*(Delta5 + Delta5l*sp.log(u)))))))/(1 + logarg)
+
+Deltaucalibprime = -eta*u*u*(Delta1 + u*(2*Delta2 + u*(3*Delta3
                             + u*(4*Delta4 + u*(5*(Delta5 + Delta5l*sp.log(u)))))))/(1 + logarg)
 Deltaucalib = 1 + eta*(Delta0 + sp.log(1 + logarg))
 logarg = u*(Delta1 + u*(Delta2 + u*(Delta3 + u*(Delta4 + u*(Delta5 + Delta5l*sp.log(u))))))
