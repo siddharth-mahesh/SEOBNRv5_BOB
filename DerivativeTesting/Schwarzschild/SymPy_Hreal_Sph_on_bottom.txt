@@ -1,0 +1,4 @@
+u=1/r
+sintheta=sp.sin(theta)
+prT=(pr*pr+ptheta*ptheta*u*u+pphi*pphi*u*u/sintheta)
+Hreal = prT

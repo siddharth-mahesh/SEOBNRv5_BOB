@@ -115,9 +115,11 @@ sigmacoeffTerm2 = eta/(144*r*r)*(-896 + r*(-436*Qminus1 - 96*DrSipn2 + r*(-45*Qm
 sigmacoeffTerm3 = eta*dSO*u*u*u
 dSO = -74.71 - 156.*eta + 627.5*eta*eta
 
-omegar = (Lambdat*omegatildeprm - Lambdatprm*omegatilde)/(Lambdat*Lambdat)
+#omegar = (Lambdat*omegatildeprm - Lambdatprm*omegatilde)/(Lambdat*Lambdat)
+omegar = (Lambdat*omegatildeprime - Lambdatprime*omegatilde)/(Lambdat*Lambdat)
 
-nur = r/Sigma + w2*(w2*Deltatprm - 4*r*Deltat)/(2*Lambdat*Deltat)
+#nur = r/Sigma + w2*(w2*Deltatprm - 4*r*Deltat)/(2*Lambdat*Deltat)
+nur = r/Sigma + w2*(w2*Deltatprime - 4*r*Deltat)/(2*Lambdat*Deltat)
 
 mur = r/Sigma - 1/sp.sqrt(Deltar)
 ## Sid: costhetaBL substitution
@@ -138,9 +140,10 @@ mucostheta = a*a*costhetaBL/Sigma
 ## Sid: sin2thetaBL substitution
 ##Lambdatprm = 4*(a*a + r*r)*r - 2*a*a*Deltatprm*sin2theta
 
-Lambdatprm = 4*(a*a + r*r)*r - 2*a*a*Deltatprm*sin2thetaBL
+Lambdatprime = 4*(a*a + r*r)*r - 2*a*a*Deltatprime*sin2thetaBL
 
-omegatildeprm = 2*a
+#omegatildeprm = 2*a
+omegatildeprime = 2*a
 
 omega = omegatilde/Lambdat
 
@@ -149,7 +152,8 @@ exp2nu = Deltat*Sigma/Lambdat
 
 Btilde = sp.sqrt(Deltat)
 
-Brtilde = (sp.sqrt(Deltar)*Deltatprm - 2*Deltat)/(2*sp.sqrt(Deltar*Deltat))
+#Brtilde = (sp.sqrt(Deltar)*Deltatprm - 2*Deltat)/(2*sp.sqrt(Deltar*Deltat))
+Brtilde = (sp.sqrt(Deltar)*Deltatprime - 2*Deltat)/(2*sp.sqrt(Deltar*Deltat))
 
 expmu = sp.sqrt(exp2mu)
 exp2mu = Sigma
@@ -176,14 +180,12 @@ pdotvr = (phat1*v1 + phat2*v2 + phat3*v3)*r
 pdotn = phat1*n1 + phat2*n2 + phat3*n3
 
 pdotxir = (phat1*xi1 + phat2*xi2 + phat3*xi3)*r
-#pdotxir = pphi
 
 ## Sid: Rewrite with spherical momenta
 ##phat1 = p1 + prT*(1 - 1/csi1)*n1
 ##phat2 = p2 + prT*(1 - 1/csi1)*n2
 ##phat3 = p3 + prT*(1 - 1/csi1)*n3
 
-sintheta = sp.sin(theta)
 phat1 = pr + prT*(1 - 1/csi1)*n1
 phat2 = ptheta/r + prT*(1 - 1/csi1)*n2
 phat3 = pphi/r/sintheta + prT*(1 - 1/csi1)*n3
@@ -208,15 +210,20 @@ Deltar = Deltat*Dinv
 
 Deltat = r*r*Deltau
 
-Deltatprm = 2*r*Deltau + r*r*Deltauprm
+#Deltatprm = 2*r*Deltau + r*r*Deltauprm
+Deltatprime = 2*r*Deltau + r*r*Deltauprime
 
-Deltauprm = Deltaubarprm*Deltaucalib + Deltaubar*Deltaucalibprm
+#Deltauprm = Deltaubarprm*Deltaucalib + Deltaubar*Deltaucalibprm
+Deltauprime = Deltaubarprime*Deltaucalib + Deltaubar*Deltaucalibprime
 Deltau = Deltaubar*Deltaucalib
 
-Deltaubarprm = -2*a*a*u*u*u - 2*u*u/(etaKminus1)
+#Deltaubarprm = -2*a*a*u*u*u - 2*u*u/(etaKminus1)
+Deltaubarprime = -2*a*a*u*u*u - 2*u*u/(etaKminus1)
 Deltaubar = a*a*u*u + (2*u + 1/etaKminus1)/etaKminus1
 
-Deltaucalibprm = -eta*u*u*(Delta1 + u*(2*Delta2 + u*(3*Delta3
+#Deltaucalibprm = -eta*u*u*(Delta1 + u*(2*Delta2 + u*(3*Delta3
+#                            + u*(4*Delta4 + u*(5*(Delta5 + Delta5l*sp.log(u)))))))/(1 + logarg)
+Deltaucalibprime = -eta*u*u*(Delta1 + u*(2*Delta2 + u*(3*Delta3
                             + u*(4*Delta4 + u*(5*(Delta5 + Delta5l*sp.log(u)))))))/(1 + logarg)
 Deltaucalib = 1 + eta*(Delta0 + sp.log(1 + logarg))
 logarg = u*(Delta1 + u*(Delta2 + u*(Delta3 + u*(Delta4 + u*(Delta5 + Delta5l*sp.log(u))))))

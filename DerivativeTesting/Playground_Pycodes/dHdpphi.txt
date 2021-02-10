@@ -1,0 +1,5 @@
+u = 1/r
+sintheta = sin(theta)
+prT = (pr*pr+ptheta*ptheta*u*u+pphi*pphi*u*u/sintheta)
+prTprm_pphi = 2*pphi*u**2/sintheta
+Hrealprm_pphi = prTprm_pphi

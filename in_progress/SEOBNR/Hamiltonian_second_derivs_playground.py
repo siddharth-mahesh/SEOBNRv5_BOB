@@ -97,9 +97,8 @@ def replace_numpy_funcs(expression):
 # output_H_and_derivs() is the main wrapper function for computing the SEONBRv3 Hamiltonian H and the twelve first
 # partial derivatives of H with respect to x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z.
 # TylerK: for now, only outputs dHdx, dHdpy, and dHdpz for initial condition root-finding!
-def output_H_sec_derivs():
-    # Open and read the file of numerical expressions (written in SymPy syntax) computing the SEOBNRv3 Hamiltonian.
-    #f = open("SEOBNR/Hamstring.txt", 'r')
+def output_H_sec_derivs():    
+    
     f = open("SEOBNR_Playground_Pycodes/dHdx.txt", 'r')
     Hamstring = str(f.read())
     f.close()
@@ -186,8 +185,8 @@ def output_H_sec_derivs():
                                                 #p3prm=0, S1xprm=0, S1yprm=0, S1zprm=0, S2xprm=0, S2yprm=0, S2zprm=0)
     lhss_deriv_p2, rhss_deriv_p2 = deriv_onevar(lhss_deriv, rhss_deriv, xprm=0, yprm=0, zprm=0, p1prm=0, p2prm=1,
                                                 p3prm=0, S1xprm=0, S1yprm=0, S1zprm=0, S2xprm=0, S2yprm=0, S2zprm=0)
-    #lhss_deriv_p3, rhss_deriv_p3 = deriv_onevar(lhss_deriv, rhss_deriv, xprm=0, yprm=0, zprm=0, p1prm=0, p2prm=0,
-                                                #p3prm=1, S1xprm=0, S1yprm=0, S1zprm=0, S2xprm=0, S2yprm=0, S2zprm=0)
+    lhss_deriv_p3, rhss_deriv_p3 = deriv_onevar(lhss_deriv, rhss_deriv, xprm=0, yprm=0, zprm=0, p1prm=0, p2prm=0,
+                                                p3prm=1, S1xprm=0, S1yprm=0, S1zprm=0, S2xprm=0, S2yprm=0, S2zprm=0)
     #lhss_deriv_S1x, rhss_deriv_S1x = deriv_onevar(lhss_deriv, rhss_deriv, xprm=0, yprm=0, zprm=0, p1prm=0, p2prm=0,
                                                   #p3prm=0, S1xprm=1, S1yprm=0, S1zprm=0, S2xprm=0, S2yprm=0, S2zprm=0)
     #lhss_deriv_S1y, rhss_deriv_S1y = deriv_onevar(lhss_deriv, rhss_deriv, xprm=0, yprm=0, zprm=0, p1prm=0, p2prm=0,
@@ -241,7 +240,18 @@ def compute_d2Hdxdp2(m1, m2, eta, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, 
         for i in range(len(lhss_deriv_p2)):
             file.write("    " + str(lhss_deriv_p2[i]).replace("prm", "prm_p2") + " = " + replace_numpy_funcs(rhss_deriv_p2[i]).replace("prm", "prm_p2").replace("sp.sqrt(","np.sqrt(").replace("sp.log(","np.log(").replace("sp.sign(","np.sign(").replace("sp.Abs(", "np.abs(") + "\n")
         file.write("    return np.array([Hreal_xprm_p2])")
-    
+
+    with open("SEOBNR_Playground_Pycodes/d2Hdxdp3.py", "w") as file:
+        file.write("""from __future__ import division
+import numpy as np
+def compute_d2Hdxdp3(m1, m2, eta, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z, KK, k0, k1, dSO, dSS, tortoise, EMgamma):
+""")
+        for i in range(len(lr) - 1):
+            file.write("    " + lr[i].lhs + " = " + str(lr[i].rhs).replace("Rational(", "np.true_divide(").replace("sqrt(", "np.sqrt(").replace("log(", "np.log(").replace("sign(", "np.sign(").replace("Abs(", "np.abs(").replace("pi", "np.pi") + "\n")
+        for i in range(len(lhss_deriv_p3)):
+            file.write("    " + str(lhss_deriv_p3[i]).replace("prm", "prm_p3") + " = " + replace_numpy_funcs(rhss_deriv_p3[i]).replace("prm", "prm_p3").replace("sp.sqrt(","np.sqrt(").replace("sp.log(","np.log(").replace("sp.sign(","np.sign(").replace("sp.Abs(", "np.abs(") + "\n")
+        file.write("    return np.array([Hreal_xprm_p3])")
+
     f = open("SEOBNR_Playground_Pycodes/dHdp2.txt", 'r')
     Hamstring = str(f.read())
     f.close()
