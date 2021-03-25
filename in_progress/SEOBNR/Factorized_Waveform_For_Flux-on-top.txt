@@ -1,0 +1,36 @@
+
+hF_lm = hNe_lm*Se_eff*T_lm*rholmpowl
+
+hNe_lm = eta*ne_lm*c_lpluse*Vl_Phi*Ylminuse_minusm
+
+ne_lm = aux.Newtonian_n(m1,m2,l,m)
+
+c_lpluse = aux.Newtonian_c(m1,m2,l,m)
+
+Ylminuse_minusm = aux.AbsSphericalHarmonicAtPiOver2(l-epsilon,-m)
+
+Vl_Phi = np.power(vPhi,l+epsilon)
+
+vPhi = Omega*aux.vPhiNonKeplerian(m1,m2,EMgamma,tortoise,q,p,S1,S2)
+
+T_lm = lfactorialinv*Tlmprefac*np.sqrt(Tlmprodfac)
+
+Tlmprodfac = aux.Tlmprodfac(l,hathatk)
+
+Tlmprefac = np.sqrt( pihathatk4 / ( 1 - np.exp( -pihathatk4 ) ) )
+
+pihathatk4 = 4*np.pi*hathatk
+
+hathatk = m*Hreal*Omega
+
+Omega = np.power(v,3)
+
+lfactorialinv = 1/np.math.factorial(l)
+
+Se_eff = aux.Se_eff(l,m,Hreal,v,q,p,eta)
+
+rholmpowl = aux.rholmpowl(m1,m2,l,m,chiA,chiS,v,EMgamma)
+
+epsilon = (l+m)%2
+
+eta = m1*m2/(m1+m2)/(m1+m2)

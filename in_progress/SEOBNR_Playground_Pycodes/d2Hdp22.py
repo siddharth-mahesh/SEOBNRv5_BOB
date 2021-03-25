@@ -1,6 +1,6 @@
 from __future__ import division
 import numpy as np
-def compute_d2Hdp22(m1, m2, eta, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z, KK, k0, k1, dSO, dSS, tortoise, EMgamma):
+def compute_d2Hdp22(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z):
     M = m1+m2
     mu = m1*m2/M
     eta = mu/M
@@ -174,7 +174,7 @@ def compute_d2Hdp22(m1, m2, eta, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S
     HdsumTerm2_p2 = 6*Sstardotn*Sstardotn_p2
     HdsumTerm1_p2 = 2*Sstar1*Sstar1_p2+2*Sstar2*Sstar2_p2+2*Sstar3*Sstar3_p2
     Hdsum_p2 = HdsumTerm1_p2-HdsumTerm2_p2
-    Q4_p2 = 8*eta*prT**3*prT_p2*u**2*(-3*eta+4)
+    Q4_p2 = 8*eta*prT**3*prT_p2*u**2*(4-3*eta)
     gammappsum_p2 = 2*Deltar*pdotn*pdotn_p2/Sigma+2*pdotvr*pdotvr_p2/(Sigma*sin2theta)+2*Sigma*pdotxir*pdotxir_p2/(Lambt*sin2theta)
     Hnsradicand_p2 = Q4_p2+gammappsum_p2
     betapsum_p2 = omegatilde*pphi_p2/Lambt
@@ -229,7 +229,7 @@ def compute_d2Hdp22(m1, m2, eta, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S
     HdsumTerm2prm_p2 = 6*Sstardotn*Sstardotnprm_p2
     HdsumTerm1prm_p2 = 2*Sstar1*Sstar1prm_p2 + 2*Sstar2*Sstar2prm_p2 + 2*Sstar3*Sstar3prm_p2
     Hdsumprm_p2 = HdsumTerm1prm_p2 - HdsumTerm2prm_p2
-    Q4prm_p2 = 8*eta*prT**3*prTprm_p2*u**2*(-3*eta + 4)
+    Q4prm_p2 = 8*eta*prT**3*prTprm_p2*u**2*(4 - 3*eta)
     gammappsumprm_p2 = 2*Deltar*pdotn*pdotnprm_p2/Sigma + 2*pdotvr*pdotvrprm_p2/(Sigma*sin2theta) + 2*Sigma*pdotxir*pdotxirprm_p2/(Lambt*sin2theta)
     Hnsradicandprm_p2 = Q4prm_p2 + gammappsumprm_p2
     betapsumprm_p2 = omegatilde*pphiprm_p2/Lambt
@@ -276,7 +276,7 @@ def compute_d2Hdp22(m1, m2, eta, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S
     HdsumTerm2_p2prm_p2 = 6*Sstardotn*Sstardotn_p2prm_p2 + 6*Sstardotn_p2*Sstardotnprm_p2
     HdsumTerm1_p2prm_p2 = 2*Sstar1*Sstar1_p2prm_p2 + 2*Sstar1_p2*Sstar1prm_p2 + 2*Sstar2*Sstar2_p2prm_p2 + 2*Sstar2_p2*Sstar2prm_p2 + 2*Sstar3*Sstar3_p2prm_p2 + 2*Sstar3_p2*Sstar3prm_p2
     Hdsum_p2prm_p2 = HdsumTerm1_p2prm_p2 - HdsumTerm2_p2prm_p2
-    Q4_p2prm_p2 = 24*eta*prT**2*prT_p2*prTprm_p2*u**2*(-3*eta + 4)
+    Q4_p2prm_p2 = 24*eta*prT**2*prT_p2*prTprm_p2*u**2*(4 - 3*eta)
     gammappsum_p2prm_p2 = 2*Deltar*pdotn_p2*pdotnprm_p2/Sigma + 2*pdotvr_p2*pdotvrprm_p2/(Sigma*sin2theta) + 2*Sigma*pdotxir_p2*pdotxirprm_p2/(Lambt*sin2theta)
     Hnsradicand_p2prm_p2 = Q4_p2prm_p2 + gammappsum_p2prm_p2
     HssTerm3_p2prm_p2 = Btilde**2*(Sdotn*exp2mu*xisq*(-Q_p2prm_p2 - Q_p2prm_p2/(2*np.sqrt(Q)) + Q_p2*Qprm_p2/(4*Q**(3/2))) + Sdotn_p2*exp2mu*xisq*(-Qprm_p2 - Qprm_p2/(2*np.sqrt(Q))) + Sdotn_p2prm_p2*exp2mu*xisq*(-np.sqrt(Q) - Q) + Sdotnprm_p2*exp2mu*xisq*(-Q_p2 - Q_p2/(2*np.sqrt(Q))) + pdotvr*(-Jtilde*Sdotv_p2*pdotnprm_p2 - Jtilde*Sdotv_p2prm_p2*pdotn - Jtilde*Sdotvprm_p2*pdotn_p2 + Sdotn_p2*pdotvrprm_p2 + Sdotn_p2prm_p2*pdotvr + Sdotnprm_p2*pdotvr_p2) + pdotvr_p2*(-Jtilde*Sdotv*pdotnprm_p2 - Jtilde*Sdotvprm_p2*pdotn + Sdotn*pdotvrprm_p2 + Sdotnprm_p2*pdotvr) + pdotvrprm_p2*(-Jtilde*Sdotv*pdotn_p2 - Jtilde*Sdotv_p2*pdotn + Sdotn*pdotvr_p2 + Sdotn_p2*pdotvr)) + expmu*expnu*pdotxir*(Btilde*Jtilde*Sdotxi_p2*pdotnprm_p2 + Btilde*Jtilde*Sdotxi_p2prm_p2*pdotn + Btilde*Jtilde*Sdotxiprm_p2*pdotn_p2 - Sdotn_p2*expmu*expnu*pdotxirprm_p2 - Sdotn_p2prm_p2*expmu*expnu*pdotxir - Sdotnprm_p2*expmu*expnu*pdotxir_p2) + expmu*expnu*pdotxir_p2*(Btilde*Jtilde*Sdotxi*pdotnprm_p2 + Btilde*Jtilde*Sdotxiprm_p2*pdotn - Sdotn*expmu*expnu*pdotxirprm_p2 - Sdotnprm_p2*expmu*expnu*pdotxir) + expmu*expnu*pdotxirprm_p2*(Btilde*Jtilde*Sdotxi*pdotn_p2 + Btilde*Jtilde*Sdotxi_p2*pdotn - Sdotn*expmu*expnu*pdotxir_p2 - Sdotn_p2*expmu*expnu*pdotxir)

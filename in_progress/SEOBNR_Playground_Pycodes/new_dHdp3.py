@@ -1,6 +1,6 @@
 from __future__ import division
 import numpy as np
-def new_compute_dHdp3(m1, m2, eta, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z, KK, k0, k1, dSO, dSS, tortoise, EMgamma):
+def new_compute_dHdp3(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z):
     M = m1+m2
     mu = m1*m2/M
     eta = mu/M
@@ -174,7 +174,7 @@ def new_compute_dHdp3(m1, m2, eta, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y,
     HdsumTerm2prm_p3 = 6*Sstardotn*Sstardotnprm_p3
     HdsumTerm1prm_p3 = 2*Sstar1*Sstar1prm_p3 + 2*Sstar2*Sstar2prm_p3 + 2*Sstar3*Sstar3prm_p3
     Hdsumprm_p3 = HdsumTerm1prm_p3 - HdsumTerm2prm_p3
-    Q4prm_p3 = 8*eta*prT**3*prTprm_p3*u**2*(-3*eta + 4)
+    Q4prm_p3 = 8*eta*prT**3*prTprm_p3*u**2*(4 - 3*eta)
     gammappsumprm_p3 = 2*Deltar*pdotn*pdotnprm_p3/Sigma + 2*pdotvr*pdotvrprm_p3/(Sigma*sin2theta) + 2*Sigma*pdotxir*pdotxirprm_p3/(Lambt*sin2theta)
     Hnsradicandprm_p3 = Q4prm_p3 + gammappsumprm_p3
     betapsumprm_p3 = omegatilde*pphiprm_p3/Lambt

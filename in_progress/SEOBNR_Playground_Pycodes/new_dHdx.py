@@ -1,6 +1,6 @@
 from __future__ import division
 import numpy as np
-def new_compute_dHdx(m1, m2, eta, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z, KK, k0, k1, dSO, dSS, tortoise, EMgamma):
+def new_compute_dHdx(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z):
     M = m1+m2
     mu = m1*m2/M
     eta = mu/M
@@ -156,7 +156,7 @@ def new_compute_dHdx(m1, m2, eta, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, 
     xisqprm_x = sin2thetaprm_x
     w2prm_x = 2*r*rprm_x
     Sigmaprm_x = 2*a**2*costheta*costhetaprm_x + 2*r*rprm_x
-    Dinvprm_x = (3*eta*u**2*uprm_x*(-6*eta + 52) + 12*eta*u*uprm_x)/(eta*u**3*(-6*eta + 52) + 6*eta*u**2 + 1)
+    Dinvprm_x = (3*eta*u**2*uprm_x*(52 - 6*eta) + 12*eta*u*uprm_x)/(eta*u**3*(52 - 6*eta) + 6*eta*u**2 + 1)
     omegatildeprm_x = 2*a*rprm_x
     logargprm_x = u*(u*(u*(u*(Delta5l*uprm_x + uprm_x*(Delta5 + Delta5l*np.log(u))) + uprm_x*(Delta4 + u*(Delta5 + Delta5l*np.log(u)))) + uprm_x*(Delta3 + u*(Delta4 + u*(Delta5 + Delta5l*np.log(u))))) + uprm_x*(Delta2 + u*(Delta3 + u*(Delta4 + u*(Delta5 + Delta5l*np.log(u)))))) + uprm_x*(Delta1 + u*(Delta2 + u*(Delta3 + u*(Delta4 + u*(Delta5 + Delta5l*np.log(u))))))
     Deltaucalibprm_x = eta*logargprm_x/(logarg + 1)
@@ -170,8 +170,8 @@ def new_compute_dHdx(m1, m2, eta, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, 
     Deltarprm_x = Deltat*Dinvprm_x + Deltatprm_x*Dinv
     Lambtprm_x = -Deltat*a**2*sin2thetaprm_x - Deltatprm_x*a**2*sin2theta + 2*w2*w2prm_x
     csiprm_x = -w2prm_x*np.sqrt(Deltar*Deltat)/w2**2 + np.sqrt(Deltar*Deltat)*(Deltar*Deltatprm_x/2 + Deltarprm_x*Deltat/2)/(Deltar*Deltat*w2)
-    csi1prm_x = csiprm_x*(-abs(-tortoise + 1) + 1)
-    csi2prm_x = csiprm_x*(-np.sign(-tortoise + 3/2)/2 + 1/2)
+    csi1prm_x = csiprm_x*(1 - abs(1 - tortoise))
+    csi2prm_x = csiprm_x*(1/2 - np.sign(3/2 - tortoise)/2)
     prTprm_x = csi2*(n1prm_x*p1 + n2prm_x*p2 + n3prm_x*p3) + csi2prm_x*(n1*p1 + n2*p2 + n3*p3)
     phat3prm_x = n3*prTprm_x*(1 - 1/csi1) + n3prm_x*prT*(1 - 1/csi1) + csi1prm_x*n3*prT/csi1**2
     phat2prm_x = n2*prTprm_x*(1 - 1/csi1) + n2prm_x*prT*(1 - 1/csi1) + csi1prm_x*n2*prT/csi1**2
@@ -225,7 +225,7 @@ def new_compute_dHdx(m1, m2, eta, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, 
     HdsumTerm1prm_x = 2*Sstar1*Sstar1prm_x + 2*Sstar2*Sstar2prm_x + 2*Sstar3*Sstar3prm_x
     Hdsumprm_x = HdsumTerm1prm_x - HdsumTerm2prm_x
     Hdcoeffprm_x = -3*rprm_x/(2*r**4)
-    Q4prm_x = 4*eta*prT**4*u*uprm_x*(-3*eta + 4) + 8*eta*prT**3*prTprm_x*u**2*(-3*eta + 4)
+    Q4prm_x = 4*eta*prT**4*u*uprm_x*(4 - 3*eta) + 8*eta*prT**3*prTprm_x*u**2*(4 - 3*eta)
     gammappsumprm_x = 2*Deltar*pdotn*pdotnprm_x/Sigma - Deltar*Sigmaprm_x*pdotn**2/Sigma**2 + Deltarprm_x*pdotn**2/Sigma - pdotvr**2*sin2thetaprm_x/(Sigma*sin2theta**2) + 2*pdotvr*pdotvrprm_x/(Sigma*sin2theta) - Sigmaprm_x*pdotvr**2/(Sigma**2*sin2theta) - Sigma*pdotxir**2*sin2thetaprm_x/(Lambt*sin2theta**2) + 2*Sigma*pdotxir*pdotxirprm_x/(Lambt*sin2theta) + Sigmaprm_x*pdotxir**2/(Lambt*sin2theta) - Lambtprm_x*Sigma*pdotxir**2/(Lambt**2*sin2theta)
     Hnsradicandprm_x = Q4prm_x + gammappsumprm_x
     alphaprm_x = Lambt*np.sqrt(Deltat*Sigma/Lambt)*(Deltat*Sigmaprm_x/(2*Lambt) - Deltat*Lambtprm_x*Sigma/(2*Lambt**2) + Deltatprm_x*Sigma/(2*Lambt))/(Deltat*Sigma)

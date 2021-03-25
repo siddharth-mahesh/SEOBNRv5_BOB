@@ -177,12 +177,12 @@ def output_H_and_derivs():
     # Generate partial derivatives with respect to each of the twelve input variables
     lhss_deriv_x, rhss_deriv_x = deriv_onevar(lhss_deriv, rhss_deriv, xprm=1, yprm=0, zprm=0, p1prm=0, p2prm=0, p3prm=0,
                                               S1xprm=0, S1yprm=0, S1zprm=0, S2xprm=0, S2yprm=0, S2zprm=0)
-    #lhss_deriv_y, rhss_deriv_y = deriv_onevar(lhss_deriv, rhss_deriv, xprm=0, yprm=1, zprm=0, p1prm=0, p2prm=0, p3prm=0,
-                                               #S1xprm=0, S1yprm=0, S1zprm=0, S2xprm=0, S2yprm=0, S2zprm=0)
-    #lhss_deriv_z, rhss_deriv_z = deriv_onevar(lhss_deriv, rhss_deriv, xprm=0, yprm=0, zprm=1, p1prm=0, p2prm=0, p3prm=0,
-                                               #S1xprm=0, S1yprm=0, S1zprm=0, S2xprm=0, S2yprm=0, S2zprm=0)
-    #lhss_deriv_p1, rhss_deriv_p1 = deriv_onevar(lhss_deriv, rhss_deriv, xprm=0, yprm=0, zprm=0, p1prm=1, p2prm=0,
-                                                #p3prm=0, S1xprm=0, S1yprm=0, S1zprm=0, S2xprm=0, S2yprm=0, S2zprm=0)
+    lhss_deriv_y, rhss_deriv_y = deriv_onevar(lhss_deriv, rhss_deriv, xprm=0, yprm=1, zprm=0, p1prm=0, p2prm=0, p3prm=0,
+                                               S1xprm=0, S1yprm=0, S1zprm=0, S2xprm=0, S2yprm=0, S2zprm=0)
+    lhss_deriv_z, rhss_deriv_z = deriv_onevar(lhss_deriv, rhss_deriv, xprm=0, yprm=0, zprm=1, p1prm=0, p2prm=0, p3prm=0,
+                                               S1xprm=0, S1yprm=0, S1zprm=0, S2xprm=0, S2yprm=0, S2zprm=0)
+    lhss_deriv_p1, rhss_deriv_p1 = deriv_onevar(lhss_deriv, rhss_deriv, xprm=0, yprm=0, zprm=0, p1prm=1, p2prm=0,
+                                                p3prm=0, S1xprm=0, S1yprm=0, S1zprm=0, S2xprm=0, S2yprm=0, S2zprm=0)
     lhss_deriv_p2, rhss_deriv_p2 = deriv_onevar(lhss_deriv, rhss_deriv, xprm=0, yprm=0, zprm=0, p1prm=0, p2prm=1,
                                                 p3prm=0, S1xprm=0, S1yprm=0, S1zprm=0, S2xprm=0, S2yprm=0, S2zprm=0)
     lhss_deriv_p3, rhss_deriv_p3 = deriv_onevar(lhss_deriv, rhss_deriv, xprm=0, yprm=0, zprm=0, p1prm=0, p2prm=0,
