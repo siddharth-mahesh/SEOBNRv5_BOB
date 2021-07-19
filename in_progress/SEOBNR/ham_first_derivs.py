@@ -5,6 +5,13 @@ from outputC import outputC,lhrh,superfast_uniq  # NRPy+: Core C code output mod
 import sympy as sp      # SymPy: The Python computer algebra package upon which NRPy+ depends
 import sys              # Python module for multiplatform OS-related functions
 
+# As of April 2021, "sp.sympify("Q+1")" fails because Q is a reserved keyword.
+#   This is the workaround, courtesy Ken Sible.
+custom_global_dict = {}
+exec('from sympy import *', custom_global_dict)
+del custom_global_dict['Q']
+custom_parse_expr = lambda expr: sp.parse_expr(expr, global_dict=custom_global_dict)
+
 # simplify_deriv() simplifies derivative expressions by removing terms equal to zero.
 def simplify_deriv(lhss_deriv, rhss_deriv):
     # Create 'simp' arrays to store and manipulate derivative expressions.
@@ -129,8 +136,11 @@ def output_H_and_derivs():
     # of the numerical expressions.
     for i in range(len(lr)):
         func.append(sp.sympify(sp.Function(lr[i].lhs)(xx)))
-        lhss.append(sp.sympify(lr[i].lhs))
-        rhss.append(sp.sympify(lr[i].rhs))
+        #lhss.append(sp.sympify(lr[i].lhs))
+        #rhss.append(sp.sympify(lr[i].rhs))
+        lhss.append(custom_parse_expr(lr[i].lhs))
+        rhss.append(custom_parse_expr(lr[i].rhs))
+        
     # Creat array for and generate a list of all the "free symbols" in the right-hand side expressions.
     full_symbol_list_with_dups = []
     for i in range(len(lr)):
@@ -166,9 +176,11 @@ def output_H_and_derivs():
     rhss_deriv = []
     # Differentiate with respect to xx, remove '(xx)', and replace xx with 'prm' notation.
     for i in range(len(rhss)):
-        lhss_deriv.append(sp.sympify(str(lhss[i]) + "prm"))
-        newrhs = sp.sympify(
-            str(sp.diff(rhss[i], xx)).replace("(xx)", "").replace(", xx", "prm").replace("Derivative", ""))
+        #lhss_deriv.append(sp.sympify(str(lhss[i]) + "prm"))
+        #newrhs = sp.sympify(
+        #    str(sp.diff(rhss[i], xx)).replace("(xx)", "").replace(", xx", "prm").replace("Derivative", ""))
+        lhss_deriv.append(custom_parse_expr(str(lhss[i])+"prm"))
+        newrhs = custom_parse_expr(str(sp.diff(rhss[i],xx)).replace("(xx)","").replace(", xx","prm").replace("Derivative",""))
         rhss_deriv.append(newrhs)
     # Simplify derivative expressions with simplify_deriv()
     lhss_deriv_simp, rhss_deriv_simp = simplify_deriv(lhss_deriv, rhss_deriv)
@@ -187,19 +199,21 @@ def output_H_and_derivs():
                                                 p3prm=0, S1xprm=0, S1yprm=0, S1zprm=0, S2xprm=0, S2yprm=0, S2zprm=0)
     lhss_deriv_p3, rhss_deriv_p3 = deriv_onevar(lhss_deriv, rhss_deriv, xprm=0, yprm=0, zprm=0, p1prm=0, p2prm=0,
                                                 p3prm=1, S1xprm=0, S1yprm=0, S1zprm=0, S2xprm=0, S2yprm=0, S2zprm=0)
-    #lhss_deriv_S1x, rhss_deriv_S1x = deriv_onevar(lhss_deriv, rhss_deriv, xprm=0, yprm=0, zprm=0, p1prm=0, p2prm=0,
-                                                  #p3prm=0, S1xprm=1, S1yprm=0, S1zprm=0, S2xprm=0, S2yprm=0, S2zprm=0)
-    #lhss_deriv_S1y, rhss_deriv_S1y = deriv_onevar(lhss_deriv, rhss_deriv, xprm=0, yprm=0, zprm=0, p1prm=0, p2prm=0,
-                                                  #p3prm=0, S1xprm=0, S1yprm=1, S1zprm=0, S2xprm=0, S2yprm=0, S2zprm=0)
-    #lhss_deriv_S1z, rhss_deriv_S1z = deriv_onevar(lhss_deriv, rhss_deriv, xprm=0, yprm=0, zprm=0, p1prm=0, p2prm=0,
-                                                  #p3prm=0, S1xprm=0, S1yprm=0, S1zprm=1, S2xprm=0, S2yprm=0, S2zprm=0)
-    #lhss_deriv_S2x, rhss_deriv_S2x = deriv_onevar(lhss_deriv, rhss_deriv, xprm=0, yprm=0, zprm=0, p1prm=0, p2prm=0,
-                                                  #p3prm=0, S1xprm=0, S1yprm=0, S1zprm=0, S2xprm=1, S2yprm=0, S2zprm=0)
-    #lhss_deriv_S2y, rhss_deriv_S2y = deriv_onevar(lhss_deriv, rhss_deriv, xprm=0, yprm=0, zprm=0, p1prm=0, p2prm=0,
-                                                  #p3prm=0, S1xprm=0, S1yprm=0, S1zprm=0, S2xprm=0, S2yprm=1, S2zprm=0)
-    #lhss_deriv_S2z, rhss_deriv_S2z = deriv_onevar(lhss_deriv, rhss_deriv, xprm=0, yprm=0, zprm=0, p1prm=0, p2prm=0,
-                                                  #p3prm=0, S1xprm=0, S1yprm=0, S1zprm=0, S2xprm=0, S2yprm=0, S2zprm=1)
-
+    lhss_deriv_S1x, rhss_deriv_S1x = deriv_onevar(lhss_deriv, rhss_deriv, xprm=0, yprm=0, zprm=0, p1prm=0, p2prm=0,
+                                                  p3prm=0, S1xprm=1, S1yprm=0, S1zprm=0, S2xprm=0, S2yprm=0, S2zprm=0)
+    lhss_deriv_S1y, rhss_deriv_S1y = deriv_onevar(lhss_deriv, rhss_deriv, xprm=0, yprm=0, zprm=0, p1prm=0, p2prm=0,
+                                                  p3prm=0, S1xprm=0, S1yprm=1, S1zprm=0, S2xprm=0, S2yprm=0, S2zprm=0)
+    lhss_deriv_S1z, rhss_deriv_S1z = deriv_onevar(lhss_deriv, rhss_deriv, xprm=0, yprm=0, zprm=0, p1prm=0, p2prm=0,
+                                                  p3prm=0, S1xprm=0, S1yprm=0, S1zprm=1, S2xprm=0, S2yprm=0, S2zprm=0)
+    lhss_deriv_S2x, rhss_deriv_S2x = deriv_onevar(lhss_deriv, rhss_deriv, xprm=0, yprm=0, zprm=0, p1prm=0, p2prm=0,
+                                                  p3prm=0, S1xprm=0, S1yprm=0, S1zprm=0, S2xprm=1, S2yprm=0, S2zprm=0)
+    lhss_deriv_S2y, rhss_deriv_S2y = deriv_onevar(lhss_deriv, rhss_deriv, xprm=0, yprm=0, zprm=0, p1prm=0, p2prm=0,
+                                                  p3prm=0, S1xprm=0, S1yprm=0, S1zprm=0, S2xprm=0, S2yprm=1, S2zprm=0)
+    lhss_deriv_S2z, rhss_deriv_S2z = deriv_onevar(lhss_deriv, rhss_deriv, xprm=0, yprm=0, zprm=0, p1prm=0, p2prm=0,
+                                                  p3prm=0, S1xprm=0, S1yprm=0, S1zprm=0, S2xprm=0, S2yprm=0, S2zprm=1)
+    
+    ## functions for initial conditions and waveforms outputted separately
+    
     with open("SEOBNR_Playground_Pycodes/new_dHdx.py", "w") as file:
         file.write("""from __future__ import division
 import numpy as np
@@ -210,7 +224,8 @@ def new_compute_dHdx(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S
         for i in range(len(lhss_deriv_x)):
             file.write("    " + str(lhss_deriv_x[i]).replace("prm", "prm_x") + " = " + replace_numpy_funcs(rhss_deriv_x[i]).replace("prm", "prm_x").replace("sp.sqrt(","np.sqrt(").replace("sp.log(","np.log(").replace("sp.sign(","np.sign(").replace("sp.Abs(", "np.abs(") + "\n")
         file.write("    return np.array([Hrealprm_x])")
-
+                                                  
+                                                  
     with open("SEOBNR_Playground_Pycodes/new_dHdp1.py", "w") as file:
         file.write("""from __future__ import division
 import numpy as np
@@ -244,6 +259,138 @@ def new_compute_dHdp3(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, 
             file.write("    " + str(lhss_deriv_p3[i]).replace("prm", "prm_p3") + " = " + replace_numpy_funcs(rhss_deriv_p3[i]).replace("prm", "prm_p3").replace("sp.sqrt(","np.sqrt(").replace("sp.log(","np.log(").replace("sp.sign(","np.sign(").replace("sp.Abs(", "np.abs(") + "\n")
         file.write("    return np.array([Hrealprm_p3])")
 
+    
+    ## functions for the integrations go straight into one file
+    
+    with open("SEOBNR_Playground_Pycodes/new_dH.py", "w") as file:
+        file.write("""from __future__ import division
+import numpy as np
+def new_compute_dHdx(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z):
+""")
+        for i in range(len(lr) - 1):
+            file.write("    " + lr[i].lhs + " = " + str(lr[i].rhs).replace("Rational(", "np.true_divide(").replace("sqrt(", "np.sqrt(").replace("log(", "np.log(").replace("sign(", "np.sign(").replace("Abs(", "np.abs(").replace("pi", "np.pi") + "\n")
+        for i in range(len(lhss_deriv_x)):
+            file.write("    " + str(lhss_deriv_x[i]).replace("prm", "prm_x") + " = " + replace_numpy_funcs(rhss_deriv_x[i]).replace("prm", "prm_x").replace("sp.sqrt(","np.sqrt(").replace("sp.log(","np.log(").replace("sp.sign(","np.sign(").replace("sp.Abs(", "np.abs(") + "\n")
+        file.write("    return np.array([Hrealprm_x, csiprm_x])\n")
+    
+    with open("SEOBNR_Playground_Pycodes/new_dH.py", "a") as file:
+        file.write("""def new_compute_dHdy(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z):
+""")
+        for i in range(len(lr) - 1):
+            file.write("    " + lr[i].lhs + " = " + str(lr[i].rhs).replace("Rational(", "np.true_divide(").replace("sqrt(", "np.sqrt(").replace("log(", "np.log(").replace("sign(", "np.sign(").replace("Abs(", "np.abs(").replace("pi", "np.pi") + "\n")
+        for i in range(len(lhss_deriv_y)):
+            file.write("    " + str(lhss_deriv_y[i]).replace("prm", "prm_y") + " = " + replace_numpy_funcs(rhss_deriv_y[i]).replace("prm", "prm_y").replace("sp.sqrt(","np.sqrt(").replace("sp.log(","np.log(").replace("sp.sign(","np.sign(").replace("sp.Abs(", "np.abs(") + "\n")
+        file.write("    return np.array([Hrealprm_y, csiprm_y])\n")
+
+    with open("SEOBNR_Playground_Pycodes/new_dH.py", "a") as file:
+        file.write("""def new_compute_dHdz(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z):
+""")
+        for i in range(len(lr) - 1):
+            file.write("    " + lr[i].lhs + " = " + str(lr[i].rhs).replace("Rational(", "np.true_divide(").replace("sqrt(", "np.sqrt(").replace("log(", "np.log(").replace("sign(", "np.sign(").replace("Abs(", "np.abs(").replace("pi", "np.pi") + "\n")
+        for i in range(len(lhss_deriv_z)):
+            file.write("    " + str(lhss_deriv_z[i]).replace("prm", "prm_z") + " = " + replace_numpy_funcs(rhss_deriv_y[i]).replace("prm", "prm_z").replace("sp.sqrt(","np.sqrt(").replace("sp.log(","np.log(").replace("sp.sign(","np.sign(").replace("sp.Abs(", "np.abs(") + "\n")
+        file.write("    return np.array([Hrealprm_z, csiprm_z])\n")
+        
+    with open("SEOBNR_Playground_Pycodes/new_dH.py", "a") as file:
+        file.write("""def new_compute_dHdp1(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z):
+""")
+        for i in range(len(lr) - 1):
+            file.write("    " + lr[i].lhs + " = " + str(lr[i].rhs).replace("Rational(", "np.true_divide(").replace("sqrt(", "np.sqrt(").replace("log(", "np.log(").replace("sign(", "np.sign(").replace("Abs(", "np.abs(").replace("pi", "np.pi") + "\n")
+        for i in range(len(lhss_deriv_p1)):
+            file.write("    " + str(lhss_deriv_p1[i]).replace("prm", "prm_p1") + " = " + replace_numpy_funcs(rhss_deriv_p1[i]).replace("prm", "prm_p1").replace("sp.sqrt(","np.sqrt(").replace("sp.log(","np.log(").replace("sp.sign(","np.sign(").replace("sp.Abs(", "np.abs(") + "\n")
+        file.write("    return np.array([Hrealprm_p1])\n")        
+        
+    with open("SEOBNR_Playground_Pycodes/new_dH.py", "a") as file:
+        file.write("""def new_compute_dHdp2(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z):
+""")
+        for i in range(len(lr) - 1):
+            file.write("    " + lr[i].lhs + " = " + str(lr[i].rhs).replace("Rational(", "np.true_divide(").replace("sqrt(", "np.sqrt(").replace("log(", "np.log(").replace("sign(", "np.sign(").replace("Abs(", "np.abs(").replace("pi", "np.pi") + "\n")
+        for i in range(len(lhss_deriv_p2)):
+            file.write("    " + str(lhss_deriv_p2[i]).replace("prm", "prm_p2") + " = " + replace_numpy_funcs(rhss_deriv_p2[i]).replace("prm", "prm_p2").replace("sp.sqrt(","np.sqrt(").replace("sp.log(","np.log(").replace("sp.sign(","np.sign(").replace("sp.Abs(", "np.abs(") + "\n")
+        file.write("    return np.array([Hrealprm_p2])\n")
+
+    with open("SEOBNR_Playground_Pycodes/new_dH.py", "a") as file:
+        file.write("""def new_compute_dHdp3(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z):
+""")
+        for i in range(len(lr) - 1):
+            file.write("    " + lr[i].lhs + " = " + str(lr[i].rhs).replace("Rational(", "np.true_divide(").replace("sqrt(", "np.sqrt(").replace("log(", "np.log(").replace("sign(", "np.sign(").replace("Abs(", "np.abs(").replace("pi", "np.pi") + "\n")
+        for i in range(len(lhss_deriv_p3)):
+            file.write("    " + str(lhss_deriv_p3[i]).replace("prm", "prm_p3") + " = " + replace_numpy_funcs(rhss_deriv_p3[i]).replace("prm", "prm_p3").replace("sp.sqrt(","np.sqrt(").replace("sp.log(","np.log(").replace("sp.sign(","np.sign(").replace("sp.Abs(", "np.abs(") + "\n")
+        file.write("    return np.array([Hrealprm_p3])\n")
+        
+    with open("SEOBNR_Playground_Pycodes/new_dH.py", "a") as file:
+        file.write("""def new_compute_dHdS1x(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z):
+""")
+        for i in range(len(lr) - 1):
+            file.write("    " + lr[i].lhs + " = " + str(lr[i].rhs).replace("Rational(", "np.true_divide(").replace("sqrt(", "np.sqrt(").replace("log(", "np.log(").replace("sign(", "np.sign(").replace("Abs(", "np.abs(").replace("pi", "np.pi") + "\n")
+        for i in range(len(lhss_deriv_S1x)):
+            file.write("    " + str(lhss_deriv_S1x[i]).replace("prm", "prm_S1x") + " = " + replace_numpy_funcs(rhss_deriv_S1x[i]).replace("prm", "prm_S1x").replace("sp.sqrt(","np.sqrt(").replace("sp.log(","np.log(").replace("sp.sign(","np.sign(").replace("sp.Abs(", "np.abs(") + "\n")
+        file.write("    return np.array([Hrealprm_S1x])\n")
+    
+    with open("SEOBNR_Playground_Pycodes/new_dH.py", "a") as file:
+        file.write("""def new_compute_dHdS1y(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z):
+""")
+        for i in range(len(lr) - 1):
+            file.write("    " + lr[i].lhs + " = " + str(lr[i].rhs).replace("Rational(", "np.true_divide(").replace("sqrt(", "np.sqrt(").replace("log(", "np.log(").replace("sign(", "np.sign(").replace("Abs(", "np.abs(").replace("pi", "np.pi") + "\n")
+        for i in range(len(lhss_deriv_S1y)):
+            file.write("    " + str(lhss_deriv_S1y[i]).replace("prm", "prm_S1y") + " = " + replace_numpy_funcs(rhss_deriv_S1y[i]).replace("prm", "prm_S1y").replace("sp.sqrt(","np.sqrt(").replace("sp.log(","np.log(").replace("sp.sign(","np.sign(").replace("sp.Abs(", "np.abs(") + "\n")
+        file.write("    return np.array([Hrealprm_S1y])\n")
+    
+    with open("SEOBNR_Playground_Pycodes/new_dH.py", "a") as file:
+        file.write("""def new_compute_dHdS1z(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z):
+""")
+        for i in range(len(lr) - 1):
+            file.write("    " + lr[i].lhs + " = " + str(lr[i].rhs).replace("Rational(", "np.true_divide(").replace("sqrt(", "np.sqrt(").replace("log(", "np.log(").replace("sign(", "np.sign(").replace("Abs(", "np.abs(").replace("pi", "np.pi") + "\n")
+        for i in range(len(lhss_deriv_S1z)):
+            file.write("    " + str(lhss_deriv_S1z[i]).replace("prm", "prm_S1z") + " = " + replace_numpy_funcs(rhss_deriv_S1z[i]).replace("prm", "prm_S1z").replace("sp.sqrt(","np.sqrt(").replace("sp.log(","np.log(").replace("sp.sign(","np.sign(").replace("sp.Abs(", "np.abs(") + "\n")
+        file.write("    return np.array([Hrealprm_S1z])\n")
+    
+    with open("SEOBNR_Playground_Pycodes/new_dH.py", "a") as file:
+        file.write("""def new_compute_dHdS2x(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z):
+""")
+        for i in range(len(lr) - 1):
+            file.write("    " + lr[i].lhs + " = " + str(lr[i].rhs).replace("Rational(", "np.true_divide(").replace("sqrt(", "np.sqrt(").replace("log(", "np.log(").replace("sign(", "np.sign(").replace("Abs(", "np.abs(").replace("pi", "np.pi") + "\n")
+        for i in range(len(lhss_deriv_S2x)):
+            file.write("    " + str(lhss_deriv_S2x[i]).replace("prm", "prm_S2x") + " = " + replace_numpy_funcs(rhss_deriv_S2x[i]).replace("prm", "prm_S2x").replace("sp.sqrt(","np.sqrt(").replace("sp.log(","np.log(").replace("sp.sign(","np.sign(").replace("sp.Abs(", "np.abs(") + "\n")
+        file.write("    return np.array([Hrealprm_S2x])\n")
+    
+    with open("SEOBNR_Playground_Pycodes/new_dH.py", "a") as file:
+        file.write("""def new_compute_dHdS2y(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z):
+""")
+        for i in range(len(lr) - 1):
+            file.write("    " + lr[i].lhs + " = " + str(lr[i].rhs).replace("Rational(", "np.true_divide(").replace("sqrt(", "np.sqrt(").replace("log(", "np.log(").replace("sign(", "np.sign(").replace("Abs(", "np.abs(").replace("pi", "np.pi") + "\n")
+        for i in range(len(lhss_deriv_S2y)):
+            file.write("    " + str(lhss_deriv_S2y[i]).replace("prm", "prm_S2y") + " = " + replace_numpy_funcs(rhss_deriv_S2y[i]).replace("prm", "prm_S2y").replace("sp.sqrt(","np.sqrt(").replace("sp.log(","np.log(").replace("sp.sign(","np.sign(").replace("sp.Abs(", "np.abs(") + "\n")
+        file.write("    return np.array([Hrealprm_S2y])\n")
+    
+    with open("SEOBNR_Playground_Pycodes/new_dH.py", "a") as file:
+        file.write("""def new_compute_dHdS2z(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z):
+""")
+        for i in range(len(lr) - 1):
+            file.write("    " + lr[i].lhs + " = " + str(lr[i].rhs).replace("Rational(", "np.true_divide(").replace("sqrt(", "np.sqrt(").replace("log(", "np.log(").replace("sign(", "np.sign(").replace("Abs(", "np.abs(").replace("pi", "np.pi") + "\n")
+        for i in range(len(lhss_deriv_S2z)):
+            file.write("    " + str(lhss_deriv_S2z[i]).replace("prm", "prm_S2z") + " = " + replace_numpy_funcs(rhss_deriv_S2z[i]).replace("prm", "prm_S2z").replace("sp.sqrt(","np.sqrt(").replace("sp.log(","np.log(").replace("sp.sign(","np.sign(").replace("sp.Abs(", "np.abs(") + "\n")
+        file.write("    return np.array([Hrealprm_S2z])\n")
+
+### create a functions that calls and returns all derivatives for integrations
+
+    with open("SEOBNR_Playground_Pycodes/new_dH.py", "a") as file:
+        file.write("""def compute_Hreal_and_csi_derivatives(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z):
+    dHdx = new_compute_dHdx(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z)
+    dHdy = new_compute_dHdy(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z)
+    dHdz = new_compute_dHdz(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z)
+    dHdpx = new_compute_dHdp1(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z)
+    dHdpy = new_compute_dHdp2(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z)
+    dHdpz = new_compute_dHdp3(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z)
+    dHdS1x = new_compute_dHdS1x(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z)
+    dHdS1y = new_compute_dHdS1y(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z)
+    dHdS1z = new_compute_dHdS1z(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z)
+    dHdS2x = new_compute_dHdS2x(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z)
+    dHdS2y = new_compute_dHdS2y(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z)
+    dHdS2z = new_compute_dHdS2z(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z)
+    return np.array([dHdx[0],dHdy[0],dHdz[0],dHdpx[0],dHdpy[0],dHdpz[0],dHdS1x[0],dHdS1y[0],dHdS1z[0],dHdS2x[0],dHdS2y[0],dHdS2z[0],dHdx[1],dHdy[1],dHdz[1]])
+""")
+    
     # TylerK: now create a text file listing only the terms so we can take a second derivative!
 
     with open("SEOBNR_Playground_Pycodes/dHdx.txt", "w") as file:

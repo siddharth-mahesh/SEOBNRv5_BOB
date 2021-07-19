@@ -5,6 +5,12 @@ from outputC import outputC,lhrh,superfast_uniq  # NRPy+: Core C code output mod
 import sympy as sp      # SymPy: The Python computer algebra package upon which NRPy+ depends
 import sys              # Python module for multiplatform OS-related functions
 
+# As of April 2021, "sp.sympify("Q+1")" fails because Q is a reserved keyword.
+#   This is the workaround, courtesy Ken Sible.
+custom_global_dict = {}
+exec('from sympy import *', custom_global_dict)
+del custom_global_dict['Q']
+custom_parse_expr = lambda expr: sp.parse_expr(expr, global_dict=custom_global_dict)
 
 # simplify_deriv() simplifies derivative expressions by removing terms equal to zero.
 def simplify_deriv(lhss_deriv, rhss_deriv):
@@ -129,8 +135,10 @@ def output_H_sec_derivs():
     # of the numerical expressions.
     for i in range(len(lr)):
         func.append(sp.sympify(sp.Function(lr[i].lhs)(xx)))
-        lhss.append(sp.sympify(lr[i].lhs))
-        rhss.append(sp.sympify(lr[i].rhs))
+        #lhss.append(sp.sympify(lr[i].lhs))
+        #rhss.append(sp.sympify(lr[i].rhs))
+        lhss.append(custom_parse_expr(lr[i].lhs))
+        rhss.append(custom_parse_expr(lr[i].rhs))
     # Creat array for and generate a list of all the "free symbols" in the right-hand side expressions.
     full_symbol_list_with_dups = []
     for i in range(len(lr)):
@@ -166,9 +174,11 @@ def output_H_sec_derivs():
     rhss_deriv = []
     # Differentiate with respect to xx, remove '(xx)', and replace xx with 'prm' notation.
     for i in range(len(rhss)):
-        lhss_deriv.append(sp.sympify(str(lhss[i]) + "prm"))
-        newrhs = sp.sympify(
-            str(sp.diff(rhss[i], xx)).replace("(xx)", "").replace(", xx", "prm").replace("Derivative", ""))
+        #lhss_deriv.append(sp.sympify(str(lhss[i]) + "prm"))
+        #newrhs = sp.sympify(
+        #    str(sp.diff(rhss[i], xx)).replace("(xx)", "").replace(", xx", "prm").replace("Derivative", ""))
+        lhss_deriv.append(custom_parse_expr(str(lhss[i])+"prm"))
+        newrhs = custom_parse_expr(str(sp.diff(rhss[i],xx)).replace("(xx)","").replace(", xx","prm").replace("Derivative",""))
         rhss_deriv.append(newrhs)
     # Simplify derivative expressions with simplify_deriv()
     lhss_deriv_simp, rhss_deriv_simp = simplify_deriv(lhss_deriv, rhss_deriv)
@@ -263,8 +273,10 @@ def compute_d2Hdxdp3(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S
     # of the numerical expressions.
     for i in range(len(lr)):
         func.append(sp.sympify(sp.Function(lr[i].lhs)(xx)))
-        lhss.append(sp.sympify(lr[i].lhs))
-        rhss.append(sp.sympify(lr[i].rhs))
+        #lhss.append(sp.sympify(lr[i].lhs))
+        #rhss.append(sp.sympify(lr[i].rhs))
+        lhss.append(custom_parse_expr(lr[i].lhs))
+        rhss.append(custom_parse_expr(lr[i].rhs))
     # Creat array for and generate a list of all the "free symbols" in the right-hand side expressions.
     full_symbol_list_with_dups = []
     for i in range(len(lr)):
@@ -300,9 +312,11 @@ def compute_d2Hdxdp3(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S
     rhss_deriv = []
     # Differentiate with respect to xx, remove '(xx)', and replace xx with 'prm' notation.
     for i in range(len(rhss)):
-        lhss_deriv.append(sp.sympify(str(lhss[i]) + "prm"))
-        newrhs = sp.sympify(
-            str(sp.diff(rhss[i], xx)).replace("(xx)", "").replace(", xx", "prm").replace("Derivative", ""))
+        #lhss_deriv.append(sp.sympify(str(lhss[i]) + "prm"))
+        #newrhs = sp.sympify(
+        #    str(sp.diff(rhss[i], xx)).replace("(xx)", "").replace(", xx", "prm").replace("Derivative", ""))
+        lhss_deriv.append(custom_parse_expr(str(lhss[i])+"prm"))
+        newrhs = custom_parse_expr(str(sp.diff(rhss[i],xx)).replace("(xx)","").replace(", xx","prm").replace("Derivative",""))
         rhss_deriv.append(newrhs)
     # Simplify derivative expressions with simplify_deriv()
     lhss_deriv_simp, rhss_deriv_simp = simplify_deriv(lhss_deriv, rhss_deriv)
@@ -397,8 +411,10 @@ def compute_d2Hdp2dp3(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, 
     # of the numerical expressions.
     for i in range(len(lr)):
         func.append(sp.sympify(sp.Function(lr[i].lhs)(xx)))
-        lhss.append(sp.sympify(lr[i].lhs))
-        rhss.append(sp.sympify(lr[i].rhs))
+        #lhss.append(sp.sympify(lr[i].lhs))
+        #rhss.append(sp.sympify(lr[i].rhs))
+        lhss.append(custom_parse_expr(lr[i].lhs))
+        rhss.append(custom_parse_expr(lr[i].rhs))
     # Creat array for and generate a list of all the "free symbols" in the right-hand side expressions.
     full_symbol_list_with_dups = []
     for i in range(len(lr)):
@@ -434,9 +450,11 @@ def compute_d2Hdp2dp3(m1, m2, EMgamma, tortoise, x, y, z, p1, p2, p3, S1x, S1y, 
     rhss_deriv = []
     # Differentiate with respect to xx, remove '(xx)', and replace xx with 'prm' notation.
     for i in range(len(rhss)):
-        lhss_deriv.append(sp.sympify(str(lhss[i]) + "prm"))
-        newrhs = sp.sympify(
-            str(sp.diff(rhss[i], xx)).replace("(xx)", "").replace(", xx", "prm").replace("Derivative", ""))
+        #lhss_deriv.append(sp.sympify(str(lhss[i]) + "prm"))
+        #newrhs = sp.sympify(
+        #    str(sp.diff(rhss[i], xx)).replace("(xx)", "").replace(", xx", "prm").replace("Derivative", ""))
+        lhss_deriv.append(custom_parse_expr(str(lhss[i])+"prm"))
+        newrhs = custom_parse_expr(str(sp.diff(rhss[i],xx)).replace("(xx)","").replace(", xx","prm").replace("Derivative",""))
         rhss_deriv.append(newrhs)
     # Simplify derivative expressions with simplify_deriv()
     lhss_deriv_simp, rhss_deriv_simp = simplify_deriv(lhss_deriv, rhss_deriv)
