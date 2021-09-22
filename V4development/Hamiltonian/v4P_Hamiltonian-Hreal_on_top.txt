@@ -99,9 +99,9 @@ sigmacoeffTerm3 = eta*dSO*u*u*u
 dSO = 147.481*chi*chi*chi*eta*eta - 568.651*chi*chi*chi*eta + 66.1987*chi*chi*chi - 343.313*chi*chi*eta
     + 2495.29*chi*eta*eta - 44.5324
 
-omegar = (Lambdat*omegatildeprm - Lambdatprm*omegatilde)/(Lambdat*Lambdat)
+omegar = (Lambdat*omegatildeprime - Lambdatprime*omegatilde)/(Lambdat*Lambdat)
 
-nur = r/Sigma + w2*(w2*Deltatprm - 4*r*Deltat)/(2*Lambdat*Deltat)
+nur = r/Sigma + w2*(w2*Deltatprime - 4*r*Deltat)/(2*Lambdat*Deltat)
 
 mur = r/Sigma - 1/sp.sqrt(Deltar)
 
@@ -111,9 +111,9 @@ nucostheta = a*a*w2*costheta*(w2 - Deltat)/(Lambdat*Sigma)
 
 mucostheta = a*a*costheta/Sigma
 
-Lambdatprm = 4*(a*a + r*r)*r - 2*a*a*Deltatprm*sin2theta
+Lambdatprime = 4*(a*a + r*r)*r - 2*a*a*Deltatprime*sin2theta
 
-omegatildeprm = 2*a
+omegatildeprime = 2*a
 
 omega = omegatilde/Lambdat
 
@@ -122,7 +122,7 @@ exp2nu = Deltat*Sigma/Lambdat
 
 Btilde = sp.sqrt(Deltat)
 
-Brtilde = (sp.sqrt(Deltar)*Deltatprm - 2*Deltat)/(2*sp.sqrt(Deltar*Deltat))
+Brtilde = (sp.sqrt(Deltar)*Deltatprime - 2*Deltat)/(2*sp.sqrt(Deltar*Deltat))
 
 expmu = sp.sqrt(exp2mu)
 exp2mu = Sigma
@@ -164,15 +164,15 @@ Deltar = Deltat*Dinv
 
 Deltat = r*r*Deltau
 
-Deltatprm = 2*r*Deltau + r*r*Deltauprm
+Deltatprime = 2*r*Deltau + r*r*Deltauprime
 
-Deltauprm = Deltaubarprm*Deltaucalib + Deltaubar*Deltaucalibprm
+Deltauprime = Deltaubarprime*Deltaucalib + Deltaubar*Deltaucalibprime
 Deltau = Deltaubar*Deltaucalib
 
-Deltaubarprm = -2*a*a*u*u*u - 2*u*u/(etaKminus1)
+Deltaubarprime = -2*a*a*u*u*u - 2*u*u/(etaKminus1)
 Deltaubar = a*a*u*u + (2*u + 1/etaKminus1)/etaKminus1
 
-Deltaucalibprm = -eta*u*u*(Delta1 + u*(2*Delta2 + u*(3*Delta3
+Deltaucalibprime = -eta*u*u*(Delta1 + u*(2*Delta2 + u*(3*Delta3
                             + u*(4*Delta4 + u*(5*(Delta5 + Delta5l*sp.log(u)))))))/(1 + logarg)
 Deltaucalib = 1 + eta*(Delta0 + sp.log(1 + logarg))
 logarg = u*(Delta1 + u*(Delta2 + u*(Delta3 + u*(Delta4 + u*(Delta5 + Delta5l*sp.log(u))))))
