@@ -146,9 +146,14 @@ pdotn = phat1*n1 + phat2*n2 + phat3*n3
 
 pdotxir = (phat1*xi1 + phat2*xi2 + phat3*xi3)*r
 
-phat1 = p1 + prT*(1 - 1/csi1)*n1
-phat2 = p2 + prT*(1 - 1/csi1)*n2
-phat3 = p3 + prT*(1 - 1/csi1)*n3
+#phat1 = p1 + prT*(1 - 1/csi1)*n1
+#phat2 = p2 + prT*(1 - 1/csi1)*n2
+#phat3 = p3 + prT*(1 - 1/csi1)*n3
+
+phat1 = p1 - prT*(1 - 1/csi1)*n1
+phat2 = p2 - prT*(1 - 1/csi1)*n2
+phat3 = p3 - prT*(1 - 1/csi1)*n3
+
 
 prT = csi2*(p1*n1 + p2*n2 + p3*n3)
 
@@ -158,7 +163,7 @@ csi1 = 1 + (1 - sp.Abs(1-tortoise))*(csi - 1)
 
 csi = sp.sqrt(Deltar*Deltat)/w2
 
-Lambdat = w2*w2 - a*a*Deltat*sin2theta
+Lambdat = sp.Abs(w2*w2 - a*a*Deltat*sin2theta)
 
 Deltar = Deltat*Dinv
 
@@ -167,7 +172,7 @@ Deltat = r*r*Deltau
 Deltatprime = 2*r*Deltau + r*r*Deltauprime
 
 Deltauprime = Deltaubarprime*Deltaucalib + Deltaubar*Deltaucalibprime
-Deltau = Deltaubar*Deltaucalib
+Deltau = sp.Abs(Deltaubar*Deltaucalib)
 
 Deltaubarprime = -2*a*a*u*u*u - 2*u*u/(etaKminus1)
 Deltaubar = a*a*u*u + (2*u + 1/etaKminus1)/etaKminus1
@@ -230,7 +235,8 @@ v2 = n3*xi1 - n1*xi3
 v3 = n1*xi2 - n2*xi1
 
 xi1 = e32*n3 - e33*n2
-xi2 = e31*n3 + e33*n1
+#xi2 = e31*n3 + e33*n1
+xi2 = -e31*n3 + e33*n1
 xi3 = e31*n2 - e32*n1
 
 e31 = Skerrhat1

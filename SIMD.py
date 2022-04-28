@@ -1,37 +1,47 @@
-from sympy import Integer,Symbol,symbols,simplify,Rational,sign,Function,srepr,sin,cos,exp,log,Abs,Add,Mul,Pow,preorder_traversal,N,Float,S,var,sympify
-import NRPy_param_funcs as par
-import re
-import sys
+""" Convert Expression to SIMD Compiler Intrinsics """
+# Authors: Ken Sible & Zachariah Etienne
+# Emails: ksible *at* outlook *dot** com
+#         zachetie *at* gmail *dot** com
 
-# For debugging purposes, Part 1:
-# Basic arithmetic operations
+from sympy import (Integer, Rational, Float, Function, Symbol,
+    Add, Mul, Pow, Abs, S, sign, srepr, simplify,
+    var, sin, cos, exp, log, preorder_traversal)
+from expr_tree import ExprTree
+from cse_helpers import cse_preprocess
+
+# Basic Arithmetic Operations (Debugging)
 def ConstSIMD_check(a):
-    return Float(a,34)
+    return Float(a, 34)
 def AbsSIMD_check(a):
     return Abs(a)
-def AddSIMD_check(a,b):
-    return a+b
-def SubSIMD_check(a,b):
-    return a-b
-def MulSIMD_check(a,b):
-    return a*b
-def FusedMulAddSIMD_check(a,b,c):
+def nrpyAbsSIMD_check(a):
+    return Abs(a)
+def AddSIMD_check(a, b):
+    return a + b
+def SubSIMD_check(a, b):
+    return a - b
+def MulSIMD_check(a, b):
+    return a * b
+def FusedMulAddSIMD_check(a, b, c):
     return a*b + c
-def FusedMulSubSIMD_check(a,b,c):
+def FusedMulSubSIMD_check(a, b, c):
     return a*b - c
-def DivSIMD_check(a,b):
-    return a/b
+def NegFusedMulAddSIMD_check(a, b, c):
+    return -a*b + c
+def NegFusedMulSubSIMD_check(a, b, c):
+    return -a*b - c
+def DivSIMD_check(a, b):
+    return a / b
 def signSIMD_check(a):
     return sign(a)
 
-# For debugging purposes, Part 2:
-# Transcendental operations
+# Transcendental Operations (Debugging)
 def PowSIMD_check(a, b):
     return a**b
 def SqrtSIMD_check(a):
-    return a**(Rational(1,2))
+    return a**(Rational(1, 2))
 def CbrtSIMD_check(a):
-    return a**(Rational(1,3))
+    return a**(Rational(1, 3))
 def ExpSIMD_check(a):
     return exp(a)
 def LogSIMD_check(a):
@@ -41,284 +51,460 @@ def SinSIMD_check(a):
 def CosSIMD_check(a):
     return cos(a)
 
-# Input: SymPy expression.
-# Return value: SymPy expression containing all needed SIMD compiler intrinsics
-# Complication: SIMD functions require numerical constants to be stored in SIMD arrays
-# Resolution: This function extends lists "SIMD_const_varnms" and "SIMD_const_values",
-#             which store the name of each constant SIMD array (e.g., _Integer_1) and
-#             the value of each variable (e.g., 1.0).
-def expr_convert_to_SIMD_intrins(expr,  SIMD_const_varnms,SIMD_const_values,SIMD_const_suffix="",debug="False"):
+def expr_convert_to_SIMD_intrins(expr, map_sym_to_rat=None, prefix="", SIMD_find_more_FMAsFMSs="True", debug="False"):
+    """ Convert expression to SIMD compiler intrinsics
 
-    # Declare all variables, so we can eval them in the next (AddSIMD & MulSIMD) step
+        :arg:    SymPy expression
+        :arg:    symbol to rational dictionary
+        :arg:    option to find more FMA/FMS patterns
+        :arg:    back-substitute and check difference
+        :return: expression containing SIMD compiler intrinsics
+
+        >>> from sympy.abc import a, b, c, d
+        >>> from cse_helpers import cse_preprocess
+        >>> convert = expr_convert_to_SIMD_intrins
+
+        >>> convert(a**2)
+        MulSIMD(a, a)
+
+        >>> convert(a**(-2))
+        DivSIMD(_Integer_1, MulSIMD(a, a))
+
+        >>> convert(a**(1/2))
+        SqrtSIMD(a)
+
+        >>> convert(a**(-1/2))
+        DivSIMD(1, SqrtSIMD(a))
+
+        >>> from sympy import Rational
+        >>> convert(a**Rational(1, 3))
+        CbrtSIMD(a)
+
+        >>> convert(a**b)
+        PowSIMD(a, b)
+
+        >>> convert(a - b)
+        SubSIMD(a, b)
+
+        >>> convert(a + b - c)
+        AddSIMD(b, SubSIMD(a, c))
+
+        >>> convert(a + b + c)
+        AddSIMD(a, AddSIMD(b, c))
+
+        >>> convert(a + b + c + d)
+        AddSIMD(AddSIMD(a, b), AddSIMD(c, d))
+
+        >>> convert(a*b*c)
+        MulSIMD(a, MulSIMD(b, c))
+
+        >>> convert(a*b*c*d)
+        MulSIMD(MulSIMD(a, b), MulSIMD(c, d))
+
+        >>> convert(a/b)
+        DivSIMD(a, b)
+
+        >>> convert(a*b + c)
+        FusedMulAddSIMD(a, b, c)
+
+        >>> convert(a*b - c)
+        FusedMulSubSIMD(a, b, c)
+
+        >>> convert(-a*b + c)
+        NegFusedMulAddSIMD(a, b, c)
+
+        >>> convert(-a*b - c)
+        NegFusedMulSubSIMD(a, b, c)
+    """
     for item in preorder_traversal(expr):
-        for i in range(len(item.args)):
-            if isinstance(item.args[i],Symbol):
-                var(str(item.args[i]))
+        for arg in item.args:
+            if isinstance(arg, Symbol):
+                var(str(arg))
 
-    expr_orig = expr
+    def lookup_rational(arg):
+        if arg.func == Symbol:
+            try: arg = map_sym_to_rat[arg]
+            except KeyError: pass
+        return arg
 
-    AbsSIMD = Function("AbsSIMD")
-    AddSIMD = Function("AddSIMD")
-    SubSIMD = Function("SubSIMD")
-    MulSIMD = Function("MulSIMD")
+    if map_sym_to_rat is None:
+        expr, map_sym_to_rat = cse_preprocess(expr)
+
+    map_rat_to_sym = {map_sym_to_rat[v]:v for v in map_sym_to_rat}
+
+    expr_orig, tree = expr, ExprTree(expr)
+
+    AbsSIMD  = Function("AbsSIMD")
+    AddSIMD  = Function("AddSIMD")
+    SubSIMD  = Function("SubSIMD")
+    MulSIMD  = Function("MulSIMD")
     FusedMulAddSIMD = Function("FusedMulAddSIMD")
     FusedMulSubSIMD = Function("FusedMulSubSIMD")
-    DivSIMD = Function("DivSIMD")
+    NegFusedMulAddSIMD = Function("NegFusedMulAddSIMD")
+    NegFusedMulSubSIMD = Function("NegFusedMulSubSIMD")
+    DivSIMD  = Function("DivSIMD")
     SignSIMD = Function("SignSIMD")
 
-    PowSIMD = Function("PowSIMD")
+    PowSIMD  = Function("PowSIMD")
     SqrtSIMD = Function("SqrtSIMD")
     CbrtSIMD = Function("CbrtSIMD")
-    ExpSIMD = Function("ExpSIMD")
-    LogSIMD = Function("LogSIMD")
-    SinSIMD = Function("SinSIMD")
-    CosSIMD = Function("CosSIMD")
+    ExpSIMD  = Function("ExpSIMD")
+    LogSIMD  = Function("LogSIMD")
+    SinSIMD  = Function("SinSIMD")
+    CosSIMD  = Function("CosSIMD")
 
-    # Step 1: Replace transcendental, power, and division functions with SIMD equivalents
-    #         Note that due to how SymPy expresses rational numbers, the following does not
-    #         affect fractional expressions of integers
-    for item in preorder_traversal(expr):
-        if item.func == Abs:
-            expr = expr.xreplace({item: AbsSIMD(item.args[0])})
-        elif item.func == exp:
-            expr = expr.xreplace({item: ExpSIMD(item.args[0])})
-        elif item.func == log:
-            expr = expr.xreplace({item: LogSIMD(item.args[0])})
-        elif item.func == sin:
-            expr = expr.xreplace({item: SinSIMD(item.args[0])})
-        elif item.func == cos:
-            expr = expr.xreplace({item: CosSIMD(item.args[0])})
-        elif item.func == sign:
-            expr = expr.xreplace({item: SignSIMD(item.args[0])})
+    # Step 1: Replace transcendental functions, power functions, and division expressions.
+    #   Note: SymPy does not represent fractional integers as rationals since
+    #         those are explicitly declared using the rational class, and hence
+    #         the following algorithm does not affect fractional integers.
+    #         SymPy: srepr(a**(-2)) = Pow(a, -2)
+    #         NRPy:  srepr(a**(-2)) = DivSIMD(1, MulSIMD(a, a))
+    for subtree in tree.preorder():
+        func = subtree.expr.func
+        args = subtree.expr.args
+        if   func == Abs:
+            subtree.expr = AbsSIMD(args[0])
+        elif func == exp:
+            subtree.expr = ExpSIMD(args[0])
+        elif func == log:
+            subtree.expr = LogSIMD(args[0])
+        elif func == sin:
+            subtree.expr = SinSIMD(args[0])
+        elif func == cos:
+            subtree.expr = CosSIMD(args[0])
+        elif func == sign:
+            subtree.expr = SignSIMD(args[0])
+    tree.reconstruct()
 
-    # Fun little recursive function for constructing integer powers:
     def IntegerPowSIMD(a, n):
+        # Recursive Helper Function: Construct Integer Powers
         if n == 2:
             return MulSIMD(a, a)
-        elif n > 2:
+        if n > 2:
             return MulSIMD(IntegerPowSIMD(a, n - 1), a)
-        elif n <= -2:
-            return DivSIMD(1, IntegerPowSIMD(a, -n))
-        elif n == -1:
-            return DivSIMD(1, a)
+        if n <= -2:
+            one = Symbol(prefix + '_Integer_1')
+            try: map_rat_to_sym[1]
+            except KeyError:
+                map_sym_to_rat[one], map_rat_to_sym[1] = S.One, one
+            return DivSIMD(one, IntegerPowSIMD(a, -n))
+        if n == -1:
+            one = Symbol(prefix + '_Integer_1')
+            try: map_rat_to_sym[1]
+            except KeyError:
+                map_sym_to_rat[one], map_rat_to_sym[1] = S.One, one
+            return DivSIMD(one, a)
 
-    for item in preorder_traversal(expr):
-        if item.func == Pow:
-            if item.args[1] == 0.5:
-                expr = expr.xreplace({item: SqrtSIMD(item.args[0])})
-            elif item.args[1] == -0.5:
-                expr = expr.xreplace({item: DivSIMD(1,SqrtSIMD(item.args[0]))})
-            elif item.args[1] == Rational(1,3):
-                expr = expr.xreplace({item: CbrtSIMD(item.args[0])})
-            elif item.args[1] == int(item.args[1]):
-                expr = expr.xreplace({item: IntegerPowSIMD(item.args[0], item.args[1])})
+    for subtree in tree.preorder():
+        func = subtree.expr.func
+        args = subtree.expr.args
+        if func == Pow:
+            exponent = lookup_rational(args[1])
+            if   exponent == 0.5:
+                subtree.expr = SqrtSIMD(args[0])
+                subtree.children.pop(1)
+            elif exponent == -0.5:
+                subtree.expr = DivSIMD(1, SqrtSIMD(args[0]))
+                tree.build(subtree)
+            elif exponent == Rational(1, 3):
+                subtree.expr = CbrtSIMD(args[0])
+                subtree.children.pop(1)
+            elif isinstance(exponent, Integer):
+                subtree.expr = IntegerPowSIMD(args[0], exponent)
+                tree.build(subtree)
             else:
-                expr = expr.xreplace({item:        PowSIMD(item.args[0], item.args[1])})
+                subtree.expr = PowSIMD(*args)
+    tree.reconstruct()
 
-    # Step 2: Replace all rational numbers (expressed as Rational(a,b))
-    #         and integers with the new functions RationalTMP and
-    #         IntegerTMP, where Rational(a,b) -> RationalTMP(a,b)
-    #         and Integer(a) -> IntegerTMP(a)
-    RationalTMP = Function("RationalTMP")
-    IntegerTMP = Function("IntegerTMP")
+    # Step 2: Replace subtraction expressions.
+    #   Note: SymPy: srepr(a - b) = Add(a, Mul(-1, b))
+    #         NRPy:  srepr(a - b) = SubSIMD(a, b)
+    for subtree in tree.preorder():
+        func = subtree.expr.func
+        args = list(subtree.expr.args)
+        if func == Add:
+            try:
+                # Find the first occurrence of a negative product inside the addition
+                i = next(i for i, arg in enumerate(args) if arg.func == Mul and \
+                        any(lookup_rational(arg) == -1 for arg in args[i].args))
+                # Find the first occurrence of a negative symbol inside the product
+                j = next(j for j, arg in enumerate(args[i].args) if lookup_rational(arg) == -1)
+                # Find the first non-negative argument of the product
+                k = next(k for k in range(len(args)) if k != i)
+                # Remove the negative symbol from the product
+                subargs = list(args[i].args); subargs.pop(j)
+                # Build the subtraction expression for replacement
+                subexpr = SubSIMD(args[k], Mul(*subargs))
+                args = [arg for arg in args if arg not in (args[i], args[k])]
+                if len(args) > 0:
+                    subexpr = Add(subexpr, *args)
+                subtree.expr = subexpr
+                tree.build(subtree)
+            except StopIteration: pass
+    tree.reconstruct()
 
-    string = str(srepr(expr))
-    string2 = re.sub('Integer\(([+\-0-9]+)\)',
-                     "(Function('IntegerTMP')('\\1'))", string)
-    expr = eval(string2)
-
-    string = str(srepr(expr))
-    string2 = re.sub('Rational\(([0-9]+), ([0-9]+)\)',
-                     "(Function('RationalTMP')(('\\1'),('\\2')))", string)
-    expr = eval(string2)
-
-    # Step 3: The pattern Mul(-1,Rational(a,b)) is often seen. Replace with Rational(-a,b).
-    for item in preorder_traversal(expr):
-        if item.func == Mul:
-            idx_has_Negative1 = -10
-            for i in range(len(item.args)):
-                if item.args[i].func == IntegerTMP and item.args[i].args[0] == -1:
-                    idx_has_Negative1 = i
-            if idx_has_Negative1 >= 0:
-                for i in range(len(item.args)):
-                    if item.args[i].func==RationalTMP:
-                        tempitem_orig = Mul(IntegerTMP(-1),RationalTMP(item.args[i].args[0], item.args[i].args[1]))
-                        tempitem_new  = RationalTMP(-item.args[i].args[0], item.args[i].args[1])
-                        expr = expr.subs(tempitem_orig, tempitem_new )
-                        break
-
-    # Step 4: SIMD multiplication and addition compiler intrinsics read in
-    #         only two arguments at once, where SymPy's Mul() and Add()
+    # Step 3: Replace addition and multiplication expressions.
+    #   Note: SIMD addition and multiplication compiler intrinsics can read
+    #         only two arguments at once, whereas SymPy's Mul() and Add()
     #         operators can read an arbitrary number of arguments.
-    #         Here, we split e.g., Mul(a,b,c,d) into
-    #         MulSIMD(a,MulSIMD(b,MulSIMD(c,d))),
-    #         To accomplish this easily, we construct a string
-    #         'MulSIMD(A,MulSIMD(B,...', where MulSIMD(a,b) is some user-
-    #         defined function that takes in only two arguments, and then
-    #         evaluate the string using the eval() function.
-    # Implementation detail: If we did not perform Step 2 above, the eval
-    #         function would automatically evaluate all Rational expressions
-    #         as though they were input as integers: e.g., 1/2 evaluates to 0.
-    #         This is undesirable, so we instead define new, temporary
-    #         functions IntegerTMP and RationalTMP that are undisturbed by
-    #         the eval()
-    for item in preorder_traversal(expr):
-        if item.func == Mul:
-            blahtmp = symbols('blahtmp')
-            tempitem = blahtmp
-            for i in range(len(item.args)-1):
-                tempitem = MulSIMD(item.args[i],tempitem)
-            tempitem = tempitem.xreplace({blahtmp: item.args[len(item.args)-1]})
-            expr = expr.xreplace({item: tempitem})
-    for item in preorder_traversal(expr):
-        if item.func == Add:
-            blahtmp = symbols('blahtmp')
-            tempitem = blahtmp
-            for i in range(len(item.args)-1):
-                tempitem = AddSIMD(item.args[i],tempitem)
-            tempitem = tempitem.xreplace({blahtmp: item.args[len(item.args)-1]})
-            expr = expr.xreplace({item: tempitem})
+    #         SymPy: srepr(a*b*c*d) = Mul(a, b, c, d)
+    #         NRPy:  srepr(a*b*c*d) = MulSIMD(MulSIMD(a, b), MulSIMD(c, d))
+    for subtree in tree.preorder():
+        func = subtree.expr.func
+        args = subtree.expr.args
+        if func in (Mul, Add):
+            func = MulSIMD if func == Mul else AddSIMD
+            subexpr = func(*args[-2:])
+            args, N = args[:-2], len(args) - 2
+            for i in range(0, N, 2):
+                if N - i > 1:
+                    tmpexpr = func(args[i], args[i + 1])
+                    subexpr = func(tmpexpr, subexpr, evaluate=False)
+                else:
+                    subexpr = func(args[i], subexpr, evaluate=False)
+            subtree.expr = subexpr
+            tree.build(subtree)
+    tree.reconstruct()
 
-    # Step 5: Simplification patterns:
-    # Step 5a: Replace the pattern Mul(Div(1,b),a) or Mul(a,Div(1,b)) with Div(a,b):
-    for item in preorder_traversal(expr):
-        if item.func == MulSIMD:
-            if item.func == MulSIMD and (item.args[0].func == DivSIMD and item.args[0].args[0].func == IntegerTMP and item.args[0].args[0].args[0] == 1):
-                expr = expr.xreplace({item: DivSIMD(item.args[1],item.args[0].args[1])})
-            if item.func == MulSIMD and (item.args[1].func == DivSIMD and item.args[1].args[0].func == IntegerTMP and item.args[1].args[0].args[0] == 1):
-                expr = expr.xreplace({item: DivSIMD(item.args[0],item.args[1].args[1])})
+    # Step 4: Replace the pattern Mul(Div(1, b), a) or Mul(a, Div(1, b)) with Div(a, b).
+    for subtree in tree.preorder():
+        func = subtree.expr.func
+        args = subtree.expr.args
+        # MulSIMD(DivSIMD(1, b), a) >> DivSIMD(a, b)
+        if   func == MulSIMD and args[0].func == DivSIMD and \
+                lookup_rational(args[0].args[0]) == 1:
+            subtree.expr = DivSIMD(args[1], args[0].args[1])
+            tree.build(subtree)
+        # MulSIMD(a, DivSIMD(1, b)) >> DivSIMD(a, b)
+        elif func == MulSIMD and args[1].func == DivSIMD and \
+                lookup_rational(args[1].args[0]) == 1:
+            subtree.expr = DivSIMD(args[0], args[1].args[1])
+            tree.build(subtree)
+    tree.reconstruct()
 
-    # Step 5: Subtraction intrinsics. SymPy replaces all a-b with a + (-b) = Add(a,Mul(-1,b))
-    #         Here, we replace
-    #         a) AddSIMD(a,MulSIMD(-1,b)),
-    #         b) AddSIMD(a,MulSIMD(b,-1)),
-    #         c) AddSIMD(MulSIMD(-1,b),a), and
-    #         d) AddSIMD(MulSIMD(b,-1),a)
-    #         with SubSIMD(a,b)
-    for item in preorder_traversal(expr):
-        tempitem = item
-        # First match patterns a) and b): AddSIMD(a,MULSIMD(.,.)):
-        if item.func == AddSIMD and item.args[1].func == MulSIMD:
-            # Pattern a) AddSIMD(a,MulSIMD(-1,b)) --> SubSIMD(a,b):
-            if item.args[1].args[0].func == IntegerTMP and item.args[1].args[0].args[0] == -1:
-                tempitem = SubSIMD(item.args[0],item.args[1].args[1])
-            # Pattern b) AddSIMD(a,MulSIMD(b,-1)) --> SubSIMD(a,b):
-            elif item.args[1].args[1].func == IntegerTMP and item.args[1].args[1].args[0] == -1:
-                tempitem = SubSIMD(item.args[0],item.args[1].args[0])
-        # Next match patterns c) and d): AddSIMD(MulSIMD(.,.),a):
-        elif item.func == AddSIMD and item.args[0].func == MulSIMD:
-            # Pattern c) AddSIMD(MulSIMD(-1,b),a) --> SubSIMD(a,b):
-            if item.args[0].args[0].func == IntegerTMP and item.args[0].args[0].args[0] == -1:
-                tempitem = SubSIMD(item.args[1],item.args[0].args[1])
-            # Pattern d) AddSIMD(MulSIMD(b,-1,a)) --> SubSIMD(a,b):
-            elif item.args[0].args[1].func == IntegerTMP and item.args[0].args[1].args[0] == -1:
-                tempitem = SubSIMD(item.args[1],item.args[0].args[0])
-        expr = expr.subs(item,tempitem)
-
-    # Step 6: Now that all multiplication and addition functions only take two
-    #         arguments, we can now easily define fused-multiply-add functions,
-    #         where AddSIMD(a,MulSIMD(b,c)) = b*c + a = FusedMulAddSIMD(b,c,a),
-    #         or    AddSIMD(MulSIMD(b,c),a) = b*c + a = FusedMulAddSIMD(b,c,a).
-    # Fused multiply add (FMA3) is standard on Intel CPUs with the AVX2
+    # Step 5: Now that all multiplication and addition functions only take two
+    #         arguments, we can define fused-multiply-add functions,
+    #         where AddSIMD(a, MulSIMD(b, c)) = b*c + a = FusedMulAddSIMD(b, c, a),
+    #         or    AddSIMD(MulSIMD(b, c), a) = b*c + a = FusedMulAddSIMD(b, c, a).
+    #   Note: Fused-multiply-add (FMA3) is standard on Intel CPUs with the AVX2
     #         instruction set, starting with Haswell processors in 2013:
     #         https://en.wikipedia.org/wiki/Haswell_(microarchitecture)
-    for item in preorder_traversal(expr):
-        tempitem = item
-        # If the pattern is a*b + c, replace with FMA(a,b,c)
-        if item.func == AddSIMD and item.args[0].func == MulSIMD:
-            tempitem = FusedMulAddSIMD(item.args[0].args[0],item.args[0].args[1],item.args[1])
-        # If the pattern is c + a*b, replace with FMA(a,b,c)
-        if item.func == AddSIMD and item.args[1].func == MulSIMD:
-            tempitem = FusedMulAddSIMD(item.args[1].args[0],item.args[1].args[1],item.args[0])
 
-        # If the pattern is a*b - c, replace with FMS(a,b,c)
-        if item.func == SubSIMD and item.args[0].func == MulSIMD:
-            tempitem = FusedMulSubSIMD(item.args[0].args[0],item.args[0].args[1],item.args[1])
+    # Step 5.a: Find double FMA patterns first [e.g. FMA(a, b, FMA(c, d, e))].
+    #   Note: Double FMA simplifications do not guarantee a significant performance impact when solving BSSN equations
+    if SIMD_find_more_FMAsFMSs == "True":
+        for subtree in tree.preorder():
+            func = subtree.expr.func
+            args = subtree.expr.args
+            # a + b*c + d*e -> FMA(b,c,FMA(d,e,a))
+            # AddSIMD(a, AddSIMD(MulSIMD(b,c), MulSIMD(d,e))) >> FusedMulAddSIMD(b, c, FusedMulAddSIMD(d,e,a))
+            # Validate:
+            # x = a + b*c + d*e
+            # outputC(x,"x", params="enable_SIMD=True,SIMD_debug=True")
+            if  (func == AddSIMD and args[1].func == AddSIMD and args[1].args[0].func == MulSIMD and args[1].args[1].func == MulSIMD):
+                subtree.expr = FusedMulAddSIMD(                args[1].args[0].args[0], args[1].args[0].args[1],
+                                               FusedMulAddSIMD(args[1].args[1].args[0], args[1].args[1].args[1],
+                                                               args[0]))
+                tree.build(subtree)
+            # b*c + d*e + a -> FMA(b,c,FMA(d,e,a))
+            # Validate:
+            # x = b*c + d*e + a
+            # outputC(x,"x", params="enable_SIMD=True,SIMD_debug=True")
+            # AddSIMD(AddSIMD(MulSIMD(b,c), MulSIMD(d,e)),a) >> FusedMulAddSIMD(b, c, FusedMulAddSIMD(d,e,a))
+            elif func == AddSIMD and args[0].func == AddSIMD and args[0].args[0].func == MulSIMD and args[0].args[1].func == MulSIMD:
+                subtree.expr = FusedMulAddSIMD(                args[0].args[0].args[0], args[0].args[0].args[1],
+                                               FusedMulAddSIMD(args[0].args[1].args[0], args[0].args[1].args[1],
+                                                               args[1]))
+                tree.build(subtree)
+        tree.reconstruct()
 
-        if item != tempitem: expr = expr.subs(item, tempitem)
+    # Step 5.b: Find single FMA patterns.
+    for subtree in tree.preorder():
+        func = subtree.expr.func
+        args = subtree.expr.args
+        # AddSIMD(MulSIMD(b, c), a) >> FusedMulAddSIMD(b, c, a)
+        if   func == AddSIMD and args[0].func == MulSIMD:
+            subtree.expr = FusedMulAddSIMD(args[0].args[0], args[0].args[1], args[1])
+            tree.build(subtree)
+        # AddSIMD(a, MulSIMD(b, c)) >> FusedMulAddSIMD(b, c, a)
+        elif func == AddSIMD and args[1].func == MulSIMD:
+            subtree.expr = FusedMulAddSIMD(args[1].args[0], args[1].args[1], args[0])
+            tree.build(subtree)
+        # SubSIMD(MulSIMD(b, c), a) >> FusedMulSubSIMD(b, c, a)
+        elif func == SubSIMD and args[0].func == MulSIMD:
+            subtree.expr = FusedMulSubSIMD(args[0].args[0], args[0].args[1], args[1])
+            tree.build(subtree)
+        # SubSIMD(a, MulSIMD(b, c)) >> NegativeFusedMulAddSIMD(b, c, a)
+        elif func == SubSIMD and args[1].func == MulSIMD:
+            subtree.expr = NegFusedMulAddSIMD(args[1].args[0], args[1].args[1], args[0])
+            tree.build(subtree)
+        # FMS(-1, MulSIMD(a, b), c) >> NegativeFusedMulSubSIMD(b, c, a)
+        func = subtree.expr.func
+        args = subtree.expr.args
+        if func == FusedMulSubSIMD and args[1].func == MulSIMD and lookup_rational(args[0]) == -1:
+            subtree.expr = NegFusedMulSubSIMD(args[1].args[0], args[1].args[1], args[2])
+            tree.build(subtree)
+    tree.reconstruct()
 
-    # Step 7: SIMD intrinsics cannot take integers or rational numbers as arguments.
-    #         Therefore we must declare all integers & rational numbers as
-    #         const vector doubles (e.g., const _m256d ...). To make the code
-    #         more human readable, we adopt the convention
-    #         RationalTMP(1,3) = 1/3 = "Rational_1_3
-    #         RationalTMP(-1,3) = -1/3 = "Rational_m1_3
-    # TODO: Keep track of all integers and rationals, so repeats are not computed?
+    # Step 5.c: Remaining double FMA patterns that previously in Step 5.a were difficult to find.
+    #   Note: Double FMA simplifications do not guarantee a significant performance impact when solving BSSN equations
+    if SIMD_find_more_FMAsFMSs == "True":
+        for subtree in tree.preorder():
+            func = subtree.expr.func
+            args = subtree.expr.args
+            # (b*c - d*e) + a -> AddSIMD(a, FusedMulSubSIMD(b, c, MulSIMD(d, e))) >> FusedMulSubSIMD(b, c, FusedMulSubSIMD(d,e,a))
+            # Validate:
+            # x = (b*c - d*e) + a
+            # outputC(x,"x", params="enable_SIMD=True,SIMD_debug=True")
+            if func == AddSIMD and args[1].func == FusedMulSubSIMD and args[1].args[2].func == MulSIMD:
+                subtree.expr = FusedMulSubSIMD(                args[1].args[0]        ,args[1].args[1],
+                                               FusedMulSubSIMD(args[1].args[2].args[0],args[1].args[2].args[1],
+                                                               args[0]))
+                tree.build(subtree)
+            # b*c - (a - d*e) -> SubSIMD(FusedMulAddSIMD(b, c, MulSIMD(d, e)), a) >> FMA(b,c,FMS(d,e,a))
+            # Validate:
+            # x = b * c - (a - d * e)
+            # outputC(x, "x", params="enable_SIMD=True,SIMD_debug=True")
+            elif func == SubSIMD and args[0].func == FusedMulAddSIMD and args[0].args[2].func == MulSIMD:
+                subtree.expr = FusedMulAddSIMD(args[0].args[0], args[0].args[1],
+                                               FusedMulSubSIMD(args[0].args[2].args[0], args[0].args[2].args[1],
+                                                               args[1]))
+                tree.build(subtree)
+            # (b*c - d*e) - a -> SubSIMD(FusedMulSubSIMD(b, c, MulSIMD(d, e)), a) >> FMS(b,c,FMA(d,e,a))
+            # Validate:
+            # x = (b*c - d*e) - a
+            # outputC(x,"x", params="enable_SIMD=True,SIMD_debug=True")
+            elif func == SubSIMD and args[0].func == FusedMulSubSIMD and args[0].args[2].func == MulSIMD:
+                subtree.expr = FusedMulSubSIMD(args[0].args[0], args[0].args[1],
+                                               FusedMulAddSIMD(args[0].args[2].args[0], args[0].args[2].args[1],
+                                                               args[1]))
+                tree.build(subtree)
+        tree.reconstruct()
 
-    # Step 7a: Set all variable names and corresponding values.
-    for item in preorder_traversal(expr):
-        if item.func == RationalTMP:
-            # Set variable name
-            if item.args[0]*item.args[1] < 0:
-                SIMD_const_varnms.extend(["_Rational_m"+str(abs(item.args[0]))+"_"+str(abs(item.args[1]))+SIMD_const_suffix])
-            elif item.args[0] > 0 and item.args[1] > 0:
-                SIMD_const_varnms.extend(["_Rational_"+str(item.args[0])+"_"+str(item.args[1])+SIMD_const_suffix])
-            else:
-                # E.g., doesn't make sense to have -1/-3. SymPy should have simplified this.
-                print("Found a weird Rational(a,b) expression, where a<0 and b<0. Report to SymPy devels")
-                print("Specifically, found that a="+str(item.args[0])+" and b="+str(item.args[1]))
-                sys.exit(1)
-            # Set variable value, to 34 digits of precision
-            SIMD_const_values.extend([str(N(Float(item.args[0],34)/Float(item.args[1],34),34))])
-        elif item.func == IntegerTMP:
-            # Set variable name
-            if item.args[0] < 0:
-                SIMD_const_varnms.extend(["_Integer_m"+str(-item.args[0])+SIMD_const_suffix])
-            else:
-                SIMD_const_varnms.extend(["_Integer_" + str(item.args[0])+SIMD_const_suffix])
-            # Set variable value, to 34 digits of precision
-            SIMD_const_values.extend([str((Float(item.args[0],34)))])
+    # Step 5.d: NegFusedMulAddSIMD(a,b,c) = -a*b + c:
+    for subtree in tree.preorder():
+        func = subtree.expr.func
+        args = subtree.expr.args
+        # FMA(a,Mul(-1,b),c) >> NFMA(a,b,c)
+        if   func == FusedMulAddSIMD and args[1].func == MulSIMD and \
+             lookup_rational(args[1].args[0]) == -1:
+            subtree.expr = NegFusedMulAddSIMD(args[0],args[1].args[1],args[2])
+            tree.build(subtree)
+        # FMA(a,Mul(b,-1),c) >> NFMA(a,b,c)
+        elif func == FusedMulAddSIMD and args[1].func == MulSIMD and \
+             lookup_rational(args[1].args[1]) == -1:
+            subtree.expr = NegFusedMulAddSIMD(args[0],args[1].args[0],args[2])
+            tree.build(subtree)
+        # FMA(Mul(-1,a), b,c) >> NFMA(a,b,c)
+        elif func == FusedMulAddSIMD and args[0].func == MulSIMD and \
+             lookup_rational(args[0].args[0]) == -1:
+            subtree.expr = NegFusedMulAddSIMD(args[0].args[1],args[1],args[2])
+            tree.build(subtree)
+        # FMA(Mul(a,-1), b,c) >> NFMA(a,b,c)
+        elif func == FusedMulAddSIMD and args[0].func == MulSIMD and \
+             lookup_rational(args[0].args[1]) == -1:
+            subtree.expr = NegFusedMulAddSIMD(args[0].args[0],args[1],args[2])
+            tree.build(subtree)
+    tree.reconstruct()
 
-    # Step 7b: Replace all integers and rationals with the appropriate variable names:
-    for item in preorder_traversal(expr):
-        tempitem = item
-        if item.func == RationalTMP:
-            if item.args[0]*item.args[1] < 0:
-                tempitem = var("_Rational_m" + str(abs(item.args[0])) + "_" + str(abs(item.args[1]))+SIMD_const_suffix)
-            elif item.args[0] > 0 and item.args[1] > 0:
-                tempitem = var("_Rational_" + str(item.args[0]) + "_" + str(item.args[1])+SIMD_const_suffix)
-            else:
-                # E.g., doesn't make sense to have -1/-3. SymPy should have simplified this.
-                print("Found a weird Rational(a,b) expression, where a<0 and b<0. Report to SymPy devels")
-                print("Specifically, found that a=" + str(item.args[0]) + " and b=" + str(item.args[1]))
-                sys.exit(1)
-        elif item.func == IntegerTMP:
-            if item.args[0] < 0:
-                tempitem = var("_Integer_m" + str(-item.args[0])+SIMD_const_suffix)
-            else:
-                tempitem = var("_Integer_" + str(item.args[0])+SIMD_const_suffix)
-        if item != tempitem: expr = expr.subs(item, tempitem)
+    # Step 5.e: Replace e.g., FMA(-1,b,c) with SubSIMD(c,b) and similar patterns
+    for subtree in tree.preorder():
+        func = subtree.expr.func
+        args = subtree.expr.args
+        # FMA(-1,b,c) >> SubSIMD(c,b)
+        if   func == FusedMulAddSIMD and lookup_rational(args[0]) == -1:
+            subtree.expr = SubSIMD(args[2], args[1])
+            tree.build(subtree)
+        # FMA(a,-1,c) >> SubSIMD(c,a)
+        elif func == FusedMulAddSIMD and lookup_rational(args[1]) == -1:
+            subtree.expr = SubSIMD(args[2], args[0])
+            tree.build(subtree)
+        # FMS(a,-1,c) >> MulSIMD(-1,AddSIMD(a,c))
+        elif func == FusedMulSubSIMD and lookup_rational(args[1]) == -1:
+            subtree.expr = MulSIMD(args[1], AddSIMD(args[0], args[2]))
+            tree.build(subtree)
+        # FMS(-1,b,c) >> MulSIMD(-1,AddSIMD(b,c))
+        elif func == FusedMulSubSIMD and lookup_rational(args[0]) == -1:
+            subtree.expr = MulSIMD(args[0], AddSIMD(args[1], args[2]))
+            tree.build(subtree)
+    tree.reconstruct()
 
-    def lookup_name_output_idx(name, list_of_names):
-        for i in range(len(list_of_names)):
-            if list_of_names[i] == name:
-                return i
-        print("I SHOULDN'T BE HERE!",name,list_of_names)
-        sys.exit(1)
+    # Step 5.f: NegFusedMulSubSIMD(a,b,c) = -a*b - c:
+    for subtree in tree.preorder():
+        func = subtree.expr.func
+        args = subtree.expr.args
+        # NFMA(a,b,Mul(-1,c)) >> NFMS(a,b,c)
+        if   func == NegFusedMulAddSIMD and args[2].func == MulSIMD and \
+             lookup_rational(args[2].args[0]) == -1:
+            subtree.expr = NegFusedMulSubSIMD(args[0],args[1],args[2].args[1])
+            tree.build(subtree)
+        # NFMA(a,b,Mul(c,-1)) >> NFMS(a,b,c)
+        elif func == NegFusedMulAddSIMD and args[2].func == MulSIMD and \
+             lookup_rational(args[2].args[1]) == -1:
+            subtree.expr = NegFusedMulSubSIMD(args[0],args[1],args[2].args[0])
+            tree.build(subtree)
+        # FMS(a,Mul(-1,b),c) >> NFMS(a,b,c)
+        elif func == FusedMulSubSIMD and args[1].func == MulSIMD and \
+             lookup_rational(args[1].args[0]) == -1:
+            subtree.expr = NegFusedMulSubSIMD(args[0],args[1].args[1],args[2])
+            tree.build(subtree)
+        # FMS(a,Mul(b,-1),c) >> NFMS(a,b,c)
+        elif func == FusedMulSubSIMD and args[1].func == MulSIMD and \
+             lookup_rational(args[1].args[1]) == -1:
+            subtree.expr = NegFusedMulSubSIMD(args[0],args[1].args[0],args[2])
+            tree.build(subtree)
+        # FMS(a,Mul([something],Mul(-1,b)),c) >> NFMS(a,Mul([something],b),c)
+        elif func == FusedMulSubSIMD and args[1].func == MulSIMD and \
+             args[1].args[1].func == MulSIMD and lookup_rational(args[1].args[1].args[0]) == -1:
+            subtree.expr = NegFusedMulSubSIMD(args[0], MulSIMD(args[1].args[0],args[1].args[1].args[1]), args[2])
+            tree.build(subtree)
+        # FMS(a,Mul([something],Mul(b,-1)),c) >> NFMS(a,Mul([something],b),c)
+        elif func == FusedMulSubSIMD and args[1].func == MulSIMD and \
+             args[1].args[1].func == MulSIMD and lookup_rational(args[1].args[1].args[1]) == -1:
+            subtree.expr = NegFusedMulSubSIMD(args[0], MulSIMD(args[1].args[0],args[1].args[1].args[0]), args[2])
+            tree.build(subtree)
+    tree.reconstruct()
 
-    if debug=="True":
-        expr_check = expr
-        if "SIMD" in str(expr):
-            expr_check = eval(str(expr).replace("SIMD","SIMD_check"))
+    # Step 5.g: Find single FMA patterns again, as some new ones might be found.
+    for subtree in tree.preorder():
+        func = subtree.expr.func
+        args = subtree.expr.args
+        # AddSIMD(MulSIMD(b, c), a) >> FusedMulAddSIMD(b, c, a)
+        if   func == AddSIMD and args[0].func == MulSIMD:
+            subtree.expr = FusedMulAddSIMD(args[0].args[0], args[0].args[1], args[1])
+            tree.build(subtree)
+        # AddSIMD(a, MulSIMD(b, c)) >> FusedMulAddSIMD(b, c, a)
+        elif func == AddSIMD and args[1].func == MulSIMD:
+            subtree.expr = FusedMulAddSIMD(args[1].args[0], args[1].args[1], args[0])
+            tree.build(subtree)
+        # SubSIMD(MulSIMD(b, c), a) >> FusedMulSubSIMD(b, c, a)
+        elif func == SubSIMD and args[0].func == MulSIMD:
+            subtree.expr = FusedMulSubSIMD(args[0].args[0], args[0].args[1], args[1])
+            tree.build(subtree)
+    expr = tree.reconstruct()
 
-        for item in preorder_traversal(expr_check):
-            tempitem = item
-            if item.is_Symbol and str(item)[0]=="_":
-                if str(item)[:9]=="_Integer_" or str(item)[:10]=="_Rational_":
-                    tempitem = SIMD_const_values[lookup_name_output_idx(str(item), SIMD_const_varnms)]
-            if item != tempitem: expr_check = expr_check.subs(item, tempitem)
+    if debug == "True":
+        expr_check = eval(str(expr).replace("SIMD", "SIMD_check"))
+        expr_check = expr_check.subs(-1, Symbol('_NegativeOne_'))
 
         expr_diff = expr_check - expr_orig
-        # Some variables do not want to cancel in SymPy ~0.7.4. The eval(str(srepr())) below normalizes the expression.
+        # The eval(str(srepr())) below normalizes the expression,
+        # fixing a cancellation issue in SymPy ~0.7.4.
         expr_diff = eval(str(srepr(expr_diff)))
-        for item in preorder_traversal(expr_diff):
-            if item.func == Float:
-                if abs(item - Integer(item)) < 1.0e-14:
-                    expr_diff = expr_diff.xreplace({item:Integer(item)})
+        tree_diff = ExprTree(expr_diff)
+        for subtree in tree_diff.preorder():
+            subexpr = subtree.expr
+            if subexpr.func == Float:
+                if abs(subexpr - Integer(subexpr)) < 1.0e-14*subexpr:
+                    subtree.expr = Integer(subexpr)
+        expr_diff = tree_diff.reconstruct()
 
-        # Only simplify if expr_diff != 0:
         if expr_diff != 0:
             simp_expr_diff = simplify(expr_diff)
             if simp_expr_diff != 0:
-                print("Warning: found possible diff",(simp_expr_diff))
+                raise Warning('Expression Difference: ' + str(simp_expr_diff))
     return(expr)
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

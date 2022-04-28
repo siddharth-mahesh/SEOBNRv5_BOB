@@ -1,15 +1,57 @@
-import NRPy_param_funcs as par
-import re
-import sys
-from SIMD import expr_convert_to_SIMD_intrins
+# As documented in the NRPy+ tutorial module
+#   Tutorial-Coutput__Parameter_Interface.ipynb
+#   this core NRPy+ module is used for
+#   generating C code and functions.
 
-from collections import namedtuple
+# Authors: Zachariah B. Etienne; zachetie **at** gmail **dot* com
+#          Ken Sible; ksible **at** outlook **dot* com
+
+# Step 0.a: Define __all__, which is the complete
+#           list of symbols imported when
+#           "from outputC import *" is called.
+__all__ = ['lhrh', 'outCparams', 'nrpyAbs', 'superfast_uniq', 'check_if_string__error_if_not',
+           'outputC','parse_outCparams_string',
+           'outC_NRPy_basic_defines_h_dict',
+           'outC_function_prototype_dict', 'outC_function_dict', 'Cfunction', 'add_to_Cfunction_dict', 'outCfunction']
+
+import loop as lp                             # NRPy+: C code loop interface
+import NRPy_param_funcs as par                # NRPy+: parameter interface
+from SIMD import expr_convert_to_SIMD_intrins # NRPy+: SymPy expression => SIMD intrinsics interface
+from cse_helpers import cse_preprocess,cse_postprocess  # NRPy+: CSE preprocessing and postprocessing
+import sympy as sp                            # SymPy: The Python computer algebra package upon which NRPy+ depends
+import re, sys, os, stat                      # Standard Python: regular expressions, system, and multiplatform OS funcs
+from collections import namedtuple            # Standard Python: Enable namedtuple data type
+
 lhrh = namedtuple('lhrh', 'lhs rhs')
-outCparams = namedtuple('outCparams', 'preindent includebraces declareoutputvars outCfileaccess outCverbose CSE_enable CSE_varprefix SIMD_enable SIMD_const_suffix SIMD_debug enable_TYPE')
+outCparams = namedtuple('outCparams', 'preindent includebraces declareoutputvars outCfileaccess outCverbose CSE_enable CSE_varprefix CSE_sorting CSE_preprocess enable_SIMD SIMD_find_more_subs SIMD_find_more_FMAsFMSs SIMD_debug enable_TYPE gridsuffix')
+
+# Sometimes SymPy has problems evaluating complicated expressions involving absolute
+#    values, resulting in hangs. So instead of using sp.Abs(), if we instead use
+#    nrpyAbs, we can sidestep the internal SymPy evaluation and force the C
+#    codegen to output our desired fabs().
+nrpyAbs = sp.Function('nrpyAbs')
+custom_functions_for_SymPy_ccode = {
+    "nrpyAbs": "fabs",
+    'Pow': [(lambda b, e: e == 0.5, lambda b, e: 'sqrt(%s)'     % (b)),
+            (lambda b, e: e ==-0.5, lambda b, e: '(1.0/sqrt(%s))'     % (b)),
+            (lambda b, e: e == sp.S.One/3, lambda b, e: 'cbrt(%s)' % (b)),
+            (lambda b, e: e ==-sp.S.One/3, lambda b, e: '(1.0/cbrt(%s))' % (b)),
+            (lambda b, e: e == 2, lambda b, e: '((%s)*(%s))'                % (b,b)),
+            (lambda b, e: e == 3, lambda b, e: '((%s)*(%s)*(%s))'           % (b,b,b)),
+            (lambda b, e: e == 4, lambda b, e: '((%s)*(%s)*(%s)*(%s))'      % (b,b,b,b)),
+            (lambda b, e: e == 5, lambda b, e: '((%s)*(%s)*(%s)*(%s)*(%s))' % (b,b,b,b,b)),
+            (lambda b, e: e ==-1, lambda b, e: '(1.0/(%s))'                       % (b)),
+            (lambda b, e: e ==-2, lambda b, e: '(1.0/((%s)*(%s)))'                % (b,b)),
+            (lambda b, e: e ==-3, lambda b, e: '(1.0/((%s)*(%s)*(%s)))'           % (b,b,b)),
+            (lambda b, e: e ==-4, lambda b, e: '(1.0/((%s)*(%s)*(%s)*(%s)))'      % (b,b,b,b)),
+            (lambda b, e: e ==-5, lambda b, e: '(1.0/((%s)*(%s)*(%s)*(%s)*(%s)))' % (b,b,b,b,b)),
+            (lambda b, e: e !=-5, 'pow')]
+##    (lambda b, e: e != 2, 'pow')]
+}
 
 # Parameter initialization is called once, within nrpy.py.
 par.initialize_param(par.glb_param("char", __name__, "PRECISION", "double")) # __name__ = "outputC", this module's name.
-# par.initialize_param(par.glb_param("bool", thismodule, "SIMD_enable", False))
+# par.initialize_param(par.glb_param("bool", thismodule, "enable_SIMD", False))
 
 # super fast 'uniq' function:
 # f8() function from https://www.peterbe.com/plog/uniqifiers-benchmark
@@ -18,8 +60,19 @@ def superfast_uniq(seq): # Author: Dave Kirby
     seen = set()
     return [x for x in seq if x not in seen and not seen.add(x)]
 
-def check_if_string__error_if_not(allegedstring,stringdesc):
-    import sys
+
+def indent_Ccode(Ccode, indent="  "):
+    Ccodesplit = Ccode.splitlines()
+    outstring = ""
+    for i in range(len(Ccodesplit)):
+        if Ccodesplit[i] != "":
+            outstring += str(indent + Ccodesplit[i] + '\n')
+        else:
+            outstring += '\n'  # Avoid adding trailing whitespace
+    return outstring
+
+
+def check_if_string__error_if_not(allegedstring, stringdesc):
     if sys.version_info[0] == 3:
         string_types = str
     else:
@@ -27,6 +80,7 @@ def check_if_string__error_if_not(allegedstring,stringdesc):
     if not isinstance(allegedstring, string_types):
         print("ERROR: "+str(stringdesc)+" =="+str(allegedstring)+" not a string!")
         sys.exit(1)
+
 
 def ccode_postproc(string):
     PRECISION = par.parval_from_str("PRECISION")
@@ -47,7 +101,7 @@ def ccode_postproc(string):
         sys.exit(1)
     # ... then we append the above suffix to standard C math library functions:
     for func in ['pow', 'sqrt', 'sin', 'cos', 'tan', 'sinh', 'cosh', 'tanh', 'exp', 'log', 'fabs']:
-        string2 = re.sub(func+'\(', func + cmathsuffix+"(", string); string = string2
+        string2 = re.sub(func+r'\(', func + cmathsuffix+"(", string); string = string2
 
     # Finally, SymPy prefers to output Rationals as long-double fractions.
     #  E.g., Rational(1,3) is output as 1.0L/3.0L.
@@ -55,7 +109,7 @@ def ccode_postproc(string):
     #  and strictly speaking it is useless when we're in double precision.
     # So here we get rid of the "L" suffix on floating point numbers:
     if PRECISION!="long double":
-        string2 = re.sub('([0-9.]+)L/([0-9.]+)L', '(\\1 / \\2)', string); string = string2
+        string2 = re.sub(r'([0-9.]+)L/([0-9.]+)L', '(\\1 / \\2)', string); string = string2
 
     return string
 
@@ -67,68 +121,100 @@ def parse_outCparams_string(params):
     outCfileaccess = "w"
     outCverbose = "True"
     CSE_enable = "True"
+    CSE_sorting = "canonical"
     CSE_varprefix = "tmp"
-    SIMD_enable = "False"
-    SIMD_const_suffix = ""
+    CSE_preprocess = "False"
+    enable_SIMD = "False"
+    SIMD_find_more_subs = "False"
+    SIMD_find_more_FMAsFMSs = "True" # Finding too many FMAs/FMSs can degrade performance; currently tuned to optimize BSSN
     SIMD_debug = "False"
     enable_TYPE = "True"
+    gridsuffix = ""
 
     if params != "":
         params2 = re.sub("^,","",params)
         params = params2.strip()
-        splitstring = re.split("=|,", params)
+        split_string = re.split("=|,", params)
 
-        if len(splitstring) % 2 != 0:
+        if len(split_string) % 2 != 0:
             print("outputC: Invalid params string: "+params)
             sys.exit(1)
 
         parnm = []
         value = []
-        for i in range(int(len(splitstring)/2)):
-            parnm.append(splitstring[2*i])
-            value.append(splitstring[2*i+1])
+        for i in range(int(len(split_string)/2)):
+            parnm.append(split_string[2*i])
+            value.append(split_string[2*i+1])
 
-        for i in range(len(parnm)):
+        for i, parname in enumerate(parnm):
             # Clean the string
             if value[i] == "true":
                 value[i] = "True"
             if value[i] == "false":
                 value[i] = "False"
-            if parnm[i] == "preindent":
+            if parname == "preindent":
                 if not value[i].isdigit():
                     print("Error: preindent must be set to an integer (corresponding to the number of tab stops). ")
                     print(value[i]+" is not an integer.")
                     sys.exit(1)
                 preindent = ""
-                for i in range(int(value[i])):
-                    preindent += "   "
-            elif parnm[i] == "includebraces":
+                for _j in range(int(value[i])):  # _j is unused
+                    preindent += "  "
+            elif parname == "includebraces":
                 includebraces = value[i]
-            elif parnm[i] == "declareoutputvars":
+            elif parname == "declareoutputvars":
                 declareoutputvars = value[i]
-            elif parnm[i] == "outCfileaccess":
+            elif parname == "outCfileaccess":
                 outCfileaccess = value[i]
-            elif parnm[i] == "outCverbose":
+            elif parname == "outCverbose":
                 outCverbose = value[i]
-            elif parnm[i] == "CSE_enable":
+            elif parname == "CSE_enable":
                 CSE_enable = value[i]
-            elif parnm[i] == "CSE_varprefix":
+            elif parname == "CSE_varprefix":
                 CSE_varprefix = value[i]
-            elif parnm[i] == "SIMD_enable":
-                SIMD_enable = value[i]
-            elif parnm[i] == "SIMD_const_suffix":
-                SIMD_const_suffix = value[i]
-            elif parnm[i] == "SIMD_debug":
+            elif parname == "CSE_sorting":
+                CSE_sorting = value[i]
+            elif parname == "CSE_preprocess":
+                CSE_preprocess = value[i]
+            elif parname == "enable_SIMD":
+                enable_SIMD = value[i]
+            elif parname == "SIMD_find_more_subs":
+                SIMD_find_more_subs = value[i]
+            elif parname == "SIMD_find_more_FMAsFMSs":
+                SIMD_find_more_FMAsFMSs = value[i]
+            elif parname == "SIMD_debug":
                 SIMD_debug = value[i]
-            elif parnm[i] == "enable_TYPE":
+            elif parname == "enable_TYPE":
                 enable_TYPE = value[i]
+            elif parname == "GoldenKernelsEnable" and value[i] == "True":
+                # GoldenKernelsEnable==True enables the most optimized kernels,
+                #   at the expense of ~3x longer codegen runtimes.
+                CSE_preprocess          = "True"
+                SIMD_find_more_subs     = "True"
+                SIMD_find_more_FMAsFMSs = "True"
+            elif parname == "GoldenKernelsEnable" and value[i] == "False":
+                pass # Do nothing; just allow user to set GoldenKernelsEnable="False".
+            elif parname == "gridsuffix":
+                gridsuffix = value[i]
             else:
-                print("Error: outputC parameter name \""+parnm[i]+"\" unrecognized.")
+                print("Error: outputC parameter name \""+parname+"\" unrecognized.")
                 sys.exit(1)
 
-    return outCparams(preindent,includebraces,declareoutputvars,outCfileaccess,outCverbose,CSE_enable,CSE_varprefix,SIMD_enable,SIMD_const_suffix,SIMD_debug,enable_TYPE)
+            # CSE preprocessing does not work with SymPy < 1.3. Error out if this is chosen.
+            if CSE_preprocess == "True":
+                sympy_version = sp.__version__.replace('rc', '...').replace('b', '...')
+                sympy_major_version = int(sympy_version.split(".")[0])
+                sympy_minor_version = int(sympy_version.split(".")[1])
+                if sympy_major_version < 1 or (sympy_major_version == 1 and sympy_minor_version < 3):
+                    print('Warning: SymPy version', sympy_version, 'does not support CSE preprocessing. Disabling...')
+                    # print('         Please update your SymPy version, or disable CSE preprocessing/GoldenKernels.')
+                    CSE_preprocess = "False"
 
-import sympy as sp
+    return outCparams(preindent,includebraces,declareoutputvars,outCfileaccess,outCverbose,
+                      CSE_enable,CSE_varprefix,CSE_sorting,CSE_preprocess,
+                      enable_SIMD,SIMD_find_more_subs,SIMD_find_more_FMAsFMSs,SIMD_debug,
+                      enable_TYPE,gridsuffix)
+
 # Input: sympyexpr = a single SymPy expression *or* a list of SymPy expressions
 #        output_varname_str = a single output variable name *or* a list of output
 #                             variable names, one per sympyexpr.
@@ -140,7 +226,7 @@ def outputC(sympyexpr, output_varname_str, filename = "stdout", params = "", pre
 
     if outCparams.enable_TYPE == "False":
         TYPE = ""
-    
+
     # Step 0: Initialize
     #  commentblock: comment block containing the input SymPy string,
     #                set only if outCverbose==True
@@ -148,26 +234,24 @@ def outputC(sympyexpr, output_varname_str, filename = "stdout", params = "", pre
     commentblock = ""
     outstring = ""
 
-    # Step 1: If SIMD_enable==True, then check if TYPE=="double". If not, error out.
+    # Step 1: If enable_SIMD==True, then check if TYPE=="double". If not, error out.
     #         Otherwise set TYPE="REAL_SIMD_ARRAY", which should be #define'd
     #         within the C code. For example for AVX-256, the C code should have
     #         #define REAL_SIMD_ARRAY __m256d
-    if outCparams.SIMD_enable == "True":
-        if not (TYPE == "double" or TYPE == ""):
+    if outCparams.enable_SIMD == "True":
+        if TYPE not in ('double', ''):
             print("SIMD output currently only supports double precision or typeless. Sorry!")
             sys.exit(1)
         if TYPE == "double":
             TYPE = "REAL_SIMD_ARRAY"
-        else:
-            TYPE = ""
 
     # Step 2a: Apply sanity checks when either sympyexpr or
     #          output_varname_str is a list.
-    if type(output_varname_str) is list and type(sympyexpr) is not list:
+    if isinstance(output_varname_str, list) and not isinstance(sympyexpr, list):
         print("Error: Provided a list of output variable names, but only one SymPy expression.")
         sys.exit(1)
-    if type(sympyexpr) is list:
-        if type(output_varname_str) is not list:
+    if isinstance(sympyexpr, list):
+        if not isinstance(output_varname_str, list):
             print("Error: Provided a list of SymPy expressions, but no corresponding list of output variable names")
             sys.exit(1)
         elif len(output_varname_str) != len(sympyexpr):
@@ -177,11 +261,12 @@ def outputC(sympyexpr, output_varname_str, filename = "stdout", params = "", pre
     # Step 2b: If sympyexpr and output_varname_str are not lists,
     #          convert them to lists of one element each, to
     #          simplify proceeding code.
-    if type(output_varname_str) is not list and type(sympyexpr) is not list:
+    if not isinstance(output_varname_str, list) and not isinstance(sympyexpr, list):
         output_varname_strtmp = [output_varname_str]
         output_varname_str = output_varname_strtmp
         sympyexprtmp = [sympyexpr]
         sympyexpr = sympyexprtmp
+    sympyexpr = sympyexpr[:]  # pass-by-value (copy list)
 
 
     # Step 3: If outCparams.verbose = True, then output the original SymPy
@@ -191,17 +276,17 @@ def outputC(sympyexpr, output_varname_str, filename = "stdout", params = "", pre
         if len(output_varname_str)>1:
             commentblock += "s"
         commentblock += ":\n"
-        for i in range(len(output_varname_str)):
-            if i==0:
-                if len(output_varname_str)!=1:
+        for i, varname in enumerate(output_varname_str):
+            if i == 0:
+                if len(output_varname_str) != 1:
                     commentblock += preindent+" *  \"["
                 else:
                     commentblock += preindent+" *  \""
             else:
                 commentblock += preindent+" *    "
-            commentblock += output_varname_str[i] + " = " + str(sympyexpr[i])
-            if i==len(output_varname_str)-1:
-                if len(output_varname_str)!=1:
+            commentblock += varname + " = " + str(sympyexpr[i])
+            if i == len(output_varname_str)-1:
+                if len(output_varname_str) != 1:
                     commentblock += "]\"\n"
                 else:
                     commentblock += "\"\n"
@@ -211,7 +296,7 @@ def outputC(sympyexpr, output_varname_str, filename = "stdout", params = "", pre
 
     # Step 4: Add proper indentation of C code:
     if outCparams.includebraces == "True":
-        indent = outCparams.preindent+"   "
+        indent = outCparams.preindent+"  "
     else:
         indent = outCparams.preindent+""
 
@@ -219,21 +304,22 @@ def outputC(sympyexpr, output_varname_str, filename = "stdout", params = "", pre
     #         If so, start output line with e.g., "double outvar "
     outtypestring = ""
     if outCparams.declareoutputvars == "True":
-        outtypestring = outCparams.preindent+indent+TYPE + " "
+        outtypestring = indent+TYPE + " "
     else:
-        outtypestring = outCparams.preindent+indent
+        outtypestring = indent
 
     # Step 6a: If common subexpression elimination (CSE) disabled, then
     #         just output the SymPy string in the most boring way,
     #         nearly consistent with SymPy's ccode() function,
     #         though with support for float & long double types
     #         as well.
-    SIMD_decls = ""
+    SIMD_RATIONAL_decls = RATIONAL_decls = ""
 
     if outCparams.CSE_enable == "False":
         # If CSE is disabled:
         for i in range(len(sympyexpr)):
-            outstring += outtypestring + ccode_postproc(sp.ccode(sympyexpr[i], output_varname_str[i]))+"\n"
+            outstring += outtypestring + ccode_postproc(sp.ccode(sympyexpr[i], output_varname_str[i],
+                                                                 user_functions=custom_functions_for_SymPy_ccode))+"\n"
     # Step 6b: If CSE enabled, then perform CSE using SymPy and then
     #          resulting C code.
     else:
@@ -241,28 +327,67 @@ def outputC(sympyexpr, output_varname_str, filename = "stdout", params = "", pre
         SIMD_const_varnms = []
         SIMD_const_values = []
 
-        CSE_results = sp.cse(sympyexpr, sp.numbered_symbols(outCparams.CSE_varprefix), order='canonical')
+        varprefix = '' if outCparams.CSE_varprefix == 'tmp' else outCparams.CSE_varprefix
+        if outCparams.CSE_preprocess == "True" or outCparams.enable_SIMD == "True":
+            # If CSE_preprocess == True, then perform partial factorization
+            # If enable_SIMD == True, then declare _NegativeOne_ in preprocessing
+            factor_negative = eval(outCparams.enable_SIMD) and eval(outCparams.SIMD_find_more_subs)
+            sympyexpr, map_sym_to_rat = cse_preprocess(sympyexpr, prefix=varprefix,
+                declare=eval(outCparams.enable_SIMD), negative=factor_negative, factor=eval(outCparams.CSE_preprocess))
+            for v in map_sym_to_rat:
+                p, q = float(map_sym_to_rat[v].p), float(map_sym_to_rat[v].q)
+                if outCparams.enable_SIMD == "False":
+                    RATIONAL_decls += indent + 'const double ' + str(v) + ' = '
+                    # Since Integer is a subclass of Rational in SymPy, we need only check whether
+                    # the denominator q = 1 to determine if a rational is an integer.
+                    if q != 1: RATIONAL_decls += str(p) + '/' + str(q) + ';\n'
+                    else:      RATIONAL_decls += str(p) + ';\n'
+
+        sympy_version = sp.__version__.replace('rc', '...').replace('b', '...')
+        sympy_major_version = int(sympy_version.split(".")[0])
+        sympy_minor_version = int(sympy_version.split(".")[1])
+        if sympy_major_version < 1 or (sympy_major_version == 1 and sympy_minor_version < 3):
+            print('Warning: SymPy version', sympy_version, 'does not support CSE postprocessing.')
+            CSE_results = sp.cse(sympyexpr, sp.numbered_symbols(outCparams.CSE_varprefix + '_'),
+                                 order=outCparams.CSE_sorting)
+        else:
+            CSE_results = cse_postprocess(sp.cse(sympyexpr, sp.numbered_symbols(outCparams.CSE_varprefix + '_'),
+                                                 order=outCparams.CSE_sorting))
+
         for commonsubexpression in CSE_results[0]:
             FULLTYPESTRING = "const " + TYPE + " "
             if outCparams.enable_TYPE == "False":
                 FULLTYPESTRING = ""
 
-            if outCparams.SIMD_enable == "True":
-                outstring += outCparams.preindent + indent + FULLTYPESTRING + str(commonsubexpression[0]) + " = " + \
-                             str(expr_convert_to_SIMD_intrins(commonsubexpression[1],SIMD_const_varnms,SIMD_const_values,outCparams.SIMD_const_suffix,outCparams.SIMD_debug)) + ";\n"
+            if outCparams.enable_SIMD == "True":
+                outstring += indent + FULLTYPESTRING + str(commonsubexpression[0]) + " = " + \
+                             str(expr_convert_to_SIMD_intrins(commonsubexpression[1],map_sym_to_rat,varprefix,outCparams.SIMD_find_more_FMAsFMSs)) + ";\n"
             else:
-                outstring += outCparams.preindent+indent+FULLTYPESTRING+ccode_postproc(sp.ccode(commonsubexpression[1],commonsubexpression[0]))+"\n"
-        for i,result in enumerate(CSE_results[1]):
-            if outCparams.SIMD_enable == "True":
-                outstring += outtypestring + output_varname_str[i] + " = " + \
-                             str(expr_convert_to_SIMD_intrins(result,SIMD_const_varnms,SIMD_const_values,outCparams.SIMD_const_suffix,outCparams.SIMD_debug)) + ";\n"
-            else:
-                outstring += outtypestring+ccode_postproc(sp.ccode(result,output_varname_str[i]))+"\n"
+                outstring += indent + FULLTYPESTRING + ccode_postproc(sp.ccode(commonsubexpression[1], commonsubexpression[0],
+                                                                user_functions=custom_functions_for_SymPy_ccode)) + "\n"
 
-        # Step 6b.i: If SIMD_enable == True , and
-        #            there is at least one SIMD const variable, 
+        for i, result in enumerate(CSE_results[1]):
+            if outCparams.enable_SIMD == "True":
+                outstring += outtypestring + output_varname_str[i] + " = " + \
+                             str(expr_convert_to_SIMD_intrins(result,map_sym_to_rat,varprefix,outCparams.SIMD_find_more_FMAsFMSs)) + ";\n"
+            else:
+                outstring += outtypestring+ccode_postproc(sp.ccode(result,output_varname_str[i],
+                                                                   user_functions=custom_functions_for_SymPy_ccode))+"\n"
+        # Complication: SIMD functions require numerical constants to be stored in SIMD arrays
+        # Resolution: This function extends lists "SIMD_const_varnms" and "SIMD_const_values",
+        #             which store the name of each constant SIMD array (e.g., _Integer_1) and
+        #             the value of each variable (e.g., 1.0).
+        if outCparams.enable_SIMD == "True":
+            for v in map_sym_to_rat:
+                p, q = float(map_sym_to_rat[v].p), float(map_sym_to_rat[v].q)
+                SIMD_const_varnms.extend([str(v)])
+                if q != 1: SIMD_const_values.extend([str(p) + '/' + str(q)])
+                else:      SIMD_const_values.extend([str(p)])
+
+        # Step 6b.i: If enable_SIMD == True , and
+        #            there is at least one SIMD const variable,
         #            then declare the SIMD_const_varnms and SIMD_const_values arrays
-        if outCparams.SIMD_enable == "True" and len(SIMD_const_varnms) != 0:
+        if outCparams.enable_SIMD == "True" and len(SIMD_const_varnms) != 0:
             # Step 6a) Sort the list of definitions. Idea from:
             # https://stackoverflow.com/questions/9764298/is-it-possible-to-sort-two-listswhich-reference-each-other-in-the-exact-same-w
             SIMD_const_varnms, SIMD_const_values = \
@@ -278,18 +403,18 @@ def outputC(sympyexpr, output_varname_str, filename = "stdout", params = "", pre
 
             for i in range(len(SIMD_const_varnms)):
                 if outCparams.enable_TYPE == "False":
-                    SIMD_decls += outCparams.preindent + indent + SIMD_const_varnms[i] + " = " + SIMD_const_values[i]+";"
+                    SIMD_RATIONAL_decls += indent + SIMD_const_varnms[i] + " = " + SIMD_const_values[i]+";"
                 else:
-                    SIMD_decls += outCparams.preindent + indent + "const double " + outCparams.CSE_varprefix + SIMD_const_varnms[i] + " = " + SIMD_const_values[i] + ";\n"
-                    SIMD_decls += outCparams.preindent+indent+ "const REAL_SIMD_ARRAY " + SIMD_const_varnms[i] + " = ConstSIMD("+ outCparams.CSE_varprefix + SIMD_const_varnms[i] + ");\n"
-                SIMD_decls += "\n"
+                    SIMD_RATIONAL_decls += indent + "const double " + "tmp" + SIMD_const_varnms[i] + " = " + SIMD_const_values[i] + ";\n"
+                    SIMD_RATIONAL_decls += indent + "const REAL_SIMD_ARRAY " + SIMD_const_varnms[i] + " = ConstSIMD(" + "tmp" + SIMD_const_varnms[i] + ");\n"
+                SIMD_RATIONAL_decls += "\n"
 
     # Step 7: Construct final output string
     final_Ccode_output_str = commentblock
     # Step 7a: Output C code in indented curly brackets if
     #          outCparams.includebraces = True
     if outCparams.includebraces == "True": final_Ccode_output_str += outCparams.preindent+"{\n"
-    final_Ccode_output_str += prestring + SIMD_decls + outstring + poststring
+    final_Ccode_output_str += prestring + RATIONAL_decls + SIMD_RATIONAL_decls + outstring + poststring
     if outCparams.includebraces == "True": final_Ccode_output_str += outCparams.preindent+"}\n"
 
     # Step 8: If filename == "stdout", then output
@@ -310,3 +435,326 @@ def outputC(sympyexpr, output_varname_str, filename = "stdout", params = "", pre
         elif outCparams.outCfileaccess == "w":
             successstr = "Wrote "
         print(successstr + "to file \"" + filename + "\"")
+
+
+outC_NRPy_basic_defines_h_dict = {}
+
+outC_function_prototype_dict = {}
+outC_function_dict           = {}
+outC_function_outdir_dict    = {}
+
+def Cfunction(includes=None, prefunc="", desc="", c_type="void", name=None, params=None, preloop="", body=None,
+              loopopts="", postloop="", enableCparameters=True, rel_path_to_Cparams=os.path.join("./"), uses_rfm=False):
+    if name is None or params is None or body is None: # use "is None" instead of "==None", as the former is more correct.
+        print("Cfunction() error: strings must be provided for function name, parameters, and body")
+        sys.exit(1)
+    func_prototype = c_type+" "+name+"("+params+")"
+
+    include_Cparams_str = ""
+    if enableCparameters:
+        if "enable_SIMD" in loopopts:
+            include_Cparams_str = "#include \"" + os.path.join(rel_path_to_Cparams, "set_Cparameters-SIMD.h") + "\"\n"
+        else:
+            include_Cparams_str = "#include \"" + os.path.join(rel_path_to_Cparams, "set_Cparameters.h") + "\"\n"
+
+    complete_func = ""
+    if includes is not None:
+        if not isinstance(includes, list):
+            print("Error in Cfunction(name="+name+"): includes must be set to a list of strings")
+            print("e.g., includes=[\"stdio.h\",\"stdlib.h\"] ;  or None (default)")
+            print("Found includes = " + str(includes))
+            sys.exit(1)
+        for inc in includes:
+            if "<" in inc:  # for C++ style code e.g., #include <cstdio>
+                complete_func += "#include " + inc + "\n"
+            else:
+                complete_func += "#include \"" + inc + "\"\n"
+        complete_func += "\n"
+
+    if prefunc != "":
+        complete_func += prefunc + "\n"
+
+    def indent_Ccode(indent, Ccode):
+        Ccodesplit = Ccode.splitlines()
+        outstring = ""
+        for i in range(len(Ccodesplit)):
+            outstring += indent + Ccodesplit[i] + '\n'
+        return outstring
+
+    if desc != "":
+        complete_func += "/*\n" + indent_Ccode(" * ", desc) + " */\n"
+    complete_func += func_prototype + " {\n"+include_Cparams_str+preloop+"\n"+lp.simple_loop(loopopts, body)+postloop+"}\n"
+
+    return func_prototype+";", complete_func
+
+def add_to_Cfunction_dict(includes=None, prefunc="", desc="", c_type="void", name=None, params=None,
+                          preloop="", body=None, loopopts="", postloop="",
+                          path_from_rootsrcdir_to_this_Cfunc="default", enableCparameters=True,
+                          rel_path_to_Cparams=os.path.join("./"), uses_rfm=False):
+    outC_function_outdir_dict[name] = path_from_rootsrcdir_to_this_Cfunc
+    outC_function_prototype_dict[name], outC_function_dict[name] = \
+        Cfunction(includes, prefunc, desc, c_type, name, params, preloop, body, loopopts, postloop,
+                  enableCparameters, rel_path_to_Cparams, uses_rfm)
+
+def outCfunction(outfile="", includes=None, prefunc="", desc="",
+                 c_type="void", name=None, params=None, preloop="", body=None, loopopts="", postloop="",
+                 enableCparameters=True, rel_path_to_Cparams=os.path.join("./"), uses_rfm=False):
+    _ignoreprototype,Cfunc = Cfunction(includes, prefunc, desc, c_type, name, params, preloop, body,
+                                       loopopts, postloop, enableCparameters, rel_path_to_Cparams, uses_rfm)
+    if outfile == "returnstring":
+        return Cfunc
+    with open(outfile, "w") as file:
+        file.write(Cfunc)
+        print("Output C function "+name+"() to file "+outfile)
+
+def construct_Makefile_from_outC_function_dict(Ccodesrootdir, exec_name, uses_free_parameters_h=False,
+                                               compiler_opt_option="fastdebug", addl_CFLAGS=None,
+                                               addl_libraries=None, mkdir_Ccodesrootdir=True, use_make=True, CC="gcc"):
+    if "main" not in outC_function_dict:
+        print("construct_Makefile_from_outC_function_dict() error: C codes will not compile if main() function not defined!")
+        print("    Make sure that the main() function registered to outC_function_dict has name \"main\".")
+        sys.exit(1)
+
+    if not os.path.isdir(Ccodesrootdir):
+        if not mkdir_Ccodesrootdir:
+            print("Error (in construct_Makefile_from_outC_function_dict): Directory \"" + Ccodesrootdir + "\" does not exist.")
+            sys.exit(1)
+        else:
+            import cmdline_helper as cmd
+            cmd.mkdir(Ccodesrootdir)
+
+    Makefile_list_of_files = []
+    def add_to_Makefile(Ccodesrootdir, path_and_file):
+        Makefile_list_of_files.append(path_and_file)
+        return os.path.join(Ccodesrootdir, path_and_file)
+
+    for key, item in outC_function_dict.items():
+        # Convention: Output all C files ending in _gridN into the gridN/ subdirectory.
+        if "grid" in key.split("_")[-1] and not "grids" in key:
+            subdir = key.split("_")[-1]
+            with open(add_to_Makefile(Ccodesrootdir, os.path.join(subdir, key+".c")), "w") as file:
+                file.write(item)
+        elif outC_function_outdir_dict[key] != "default":
+            subdir = outC_function_outdir_dict[key]
+            with open(add_to_Makefile(Ccodesrootdir, os.path.join(subdir, key+".c")), "w") as file:
+                file.write(item)
+        else:
+            with open(add_to_Makefile(Ccodesrootdir, os.path.join(key+".c")), "w") as file:
+                file.write(item)
+    CFLAGS      = " -O2 -march=native -g -fopenmp -Wall -Wno-unused-variable"
+    DEBUGCFLAGS = " -O2 -g -Wall -Wno-unused-variable -Wno-unknown-pragmas"  # OpenMP requires -fopenmp, and when disabling
+                                                                             # -fopenmp, unknown pragma warnings appear.
+                                                                             # -Wunknown-pragmas silences these warnings
+    FASTCFLAGS  = "  -O2 -march=native -fopenmp -Wall -Wno-unused-variable"
+    if CC == "gcc":
+        CFLAGS      += " -std=gnu99"
+        DEBUGCFLAGS += " -std=gnu99"
+        FASTCFLAGS   += " -std=gnu99"
+    CHOSEN_CFLAGS = CFLAGS
+    if compiler_opt_option == "debug":
+        CHOSEN_CFLAGS = DEBUGCFLAGS
+    elif compiler_opt_option == "fast":
+        CHOSEN_CFLAGS = FASTCFLAGS
+    if addl_CFLAGS is not None:
+        if not isinstance(addl_CFLAGS, list):
+            print("Error: construct_Makefile_from_outC_function_dict(): addl_CFLAGS must be a list!")
+            sys.exit(1)
+        for FLAG in addl_CFLAGS:
+            CHOSEN_CFLAGS += " "+FLAG
+    all_str = exec_name + " "
+    dep_list = []
+    compile_list = []
+    for c_file in Makefile_list_of_files:
+        object_file = c_file.replace(".c", ".o")
+        all_str += " " + object_file
+        addl_headers = ""
+        if uses_free_parameters_h:
+            if c_file == "main.c":
+                addl_headers += " free_parameters.h"
+        dep_list.append(object_file + ": " + c_file + addl_headers)
+        compile_list.append("\t$(CC) $(CFLAGS)  -c " + c_file + " -o " + object_file)
+
+    linked_libraries = " -lm"
+    if addl_libraries is not None:
+        if not isinstance(addl_libraries, list):
+            print("Error: construct_Makefile_from_outC_function_dict(): addl_libraries must be a list!")
+            sys.exit(1)
+        for lib in addl_libraries:
+            linked_libraries += " " + lib
+
+    if use_make:
+        with open(os.path.join(Ccodesrootdir, "Makefile"), "w") as Makefile:
+            Makefile.write("""CC     = """ + CC + """
+CFLAGS = """ + CHOSEN_CFLAGS + """
+#CFLAGS = """ + CFLAGS + """
+#CFLAGS = """ + DEBUGCFLAGS + """
+#CFLAGS = """ + FASTCFLAGS + "\n")
+            Makefile.write("all: " + all_str + "\n")
+            for idx, dep in enumerate(dep_list):
+                Makefile.write(dep + "\n")
+                Makefile.write(compile_list[idx] + "\n\n")
+            Makefile.write(exec_name + ": " + all_str.replace(exec_name, "") + "\n")
+            Makefile.write("\t$(CC) $(CFLAGS) main.c " + all_str.replace(exec_name, "").replace("main.o", "") + " -o " + exec_name + linked_libraries + "\n")
+            Makefile.write("\nclean:\n\trm -f *.o */*.o *~ */*~ ./#* *.txt *.dat *.avi *.png " + exec_name + "\n")
+    else:
+        with open(os.path.join(Ccodesrootdir, "backup_script_nomake.sh"), "w") as backup:
+            for compile_line in compile_list:
+                backup.write(compile_line.replace("$(CC)", CC).replace("$(CFLAGS)", CFLAGS).replace("\t", "") + "\n")
+            backup.write(CC + " " + CFLAGS + " main.c " + all_str.replace(exec_name, "").replace("main.o", "") + " -o " + exec_name + linked_libraries + "\n")
+        os.chmod(os.path.join(Ccodesrootdir, "backup_script_nomake.sh"), stat.S_IRWXU)
+
+
+def construct_NRPy_basic_defines_h(Ccodesrootdir, enable_SIMD=False, supplemental_dict={}):
+    if not os.path.isdir(Ccodesrootdir):
+        print("Error (in construct_NRPy_basic_defines_h): Directory \"" + Ccodesrootdir + "\" does not exist.")
+        sys.exit(1)
+
+    def output_key(filestream, key, item):
+        filestream.write("\n\n//********************************************\n")
+        filestream.write("// Basic definitions for module " + key + ":\n" + item)
+        filestream.write("//********************************************\n")
+
+    with open(os.path.join(Ccodesrootdir, "NRPy_basic_defines.h"), "w") as file:
+        file.write("""// NRPy+ basic definitions, automatically generated from outC_NRPy_basic_defines_h_dict within outputC,
+//    and populated within NRPy+ modules. DO NOT EDIT THIS FILE BY HAND.\n\n""")
+        if enable_SIMD:
+            file.write("// construct_NRPy_basic_defines_h(...,enable_SIMD=True) was called so we #include SIMD intrinsics:\n")
+            file.write("""#include "SIMD/SIMD_intrinsics.h"\n""")
+        for key in ["outputC", "NRPy_param_funcs", "grid", "finite_difference", "reference_metric", "CurviBoundaryConditions", "MoL"]:
+            if key in outC_NRPy_basic_defines_h_dict:
+                output_key(file, key, outC_NRPy_basic_defines_h_dict[key])
+
+        for key in supplemental_dict:
+            output_key(file, key, supplemental_dict[key])
+
+def construct_NRPy_function_prototypes_h(Ccodesrootdir):
+    if not os.path.isdir(Ccodesrootdir):
+        print("Error (in construct_NRPy_function_prototypes_h): Directory \"" + Ccodesrootdir + "\" does not exist.")
+        sys.exit(1)
+    with open(os.path.join(Ccodesrootdir, "NRPy_function_prototypes.h"), "w") as file:
+        for key, item in outC_function_prototype_dict.items():
+            file.write(item + "\n")
+
+
+def outputC_register_C_functions_and_NRPy_basic_defines():
+    # First register C functions needed by outputC
+
+    # Then set up the dictionary entry for outputC in NRPy_basic_defines
+    Nbd_str  = r"""
+#include "stdio.h"
+#include "stdlib.h"
+#include "math.h"
+#include "string.h" // "string.h Needed for strncmp, etc.
+#include "stdint.h" // "stdint.h" Needed for Windows GCC 6.x compatibility, and for int8_t
+#ifndef M_PI
+#define M_PI 3.141592653589793238462643383279502884L
+#endif
+#ifndef M_SQRT1_2
+#define M_SQRT1_2 0.707106781186547524400844362104849039L
+#endif
+#ifdef __cplusplus
+#define restrict __restrict__
+#endif
+"""
+    Nbd_str += "#define REAL " + par.parval_from_str("outputC::PRECISION") + "\n"
+    outC_NRPy_basic_defines_h_dict["outputC"] = Nbd_str
+
+
+# Must be done here since outputC imports NRPy_param_funcs
+def NRPy_param_funcs_register_C_functions_and_NRPy_basic_defines(directory=os.path.join(".")):
+    # Set up the C function for BSSN basis transformations
+    includes = ["NRPy_basic_defines.h"]
+    desc = "Set Cparameters to default values specified within NRPy+."
+    c_type = "void"
+    name = "set_Cparameters_to_default"
+    params = "paramstruct *restrict params"
+    body = ""
+    for i in range(len(par.glb_Cparams_list)):
+        if par.glb_Cparams_list[i].type != "#define":
+            c_output = "  params->" + par.glb_Cparams_list[i].parname
+            comment = "  // " + par.glb_Cparams_list[i].module + "::" + par.glb_Cparams_list[i].parname
+            if isinstance(par.glb_Cparams_list[i].defaultval, (bool, int, float)):
+                c_output += " = " + str(par.glb_Cparams_list[i].defaultval).lower() + ";" + comment + "\n"
+            elif par.glb_Cparams_list[i].type == "char" and isinstance(par.glb_Cparams_list[i].defaultval, (str)):
+                c_output += " = \"" + str(par.glb_Cparams_list[i].defaultval).lower() + "\";" + comment + "\n"
+            else:
+                c_output += " = " + str(par.glb_Cparams_list[i].defaultval) + ";" + comment + "\n"
+            body += c_output
+    add_to_Cfunction_dict(
+        includes=includes,
+        desc=desc,
+        c_type=c_type, name=name, params=params,
+        body=body,
+        loopopts="",
+        enableCparameters=False)
+
+
+    # Step 4: Generate C code to set C parameter constants
+    #         (i.e., all ints != -12345678 and REALs != 1e300);
+    #         output to filename "set_Cparameters.h" if enable_SIMD==False
+    #         or "set_Cparameters-SIMD.h" if enable_SIMD==True
+    # Step 4.a: Output non-SIMD version, set_Cparameters.h
+    def gen_set_Cparameters(pointerEnable=True):
+        returnstring = ""
+        for i in range(len(par.glb_Cparams_list)):
+            if par.glb_Cparams_list[i].type == "char":
+                c_type = "char *"
+            else:
+                c_type = par.glb_Cparams_list[i].type
+
+            pointer = "->"
+            if pointerEnable==False:
+                pointer = "."
+
+            if not ((c_type == "REAL" and par.glb_Cparams_list[i].defaultval == 1e300) or c_type == "#define"):
+                comment = "  // " + par.glb_Cparams_list[i].module + "::" + par.glb_Cparams_list[i].parname
+                Coutput = "const "+c_type+" "+par.glb_Cparams_list[i].parname+" = "+"params"+pointer+par.glb_Cparams_list[i].parname + ";" + comment + "\n"
+                returnstring += Coutput
+        return returnstring
+
+    # Next output header files for setting C parameters to current values within functions.
+    with open(os.path.join(directory, "set_Cparameters.h"), "w") as file:
+        file.write(gen_set_Cparameters(pointerEnable=True))
+    with open(os.path.join(directory, "set_Cparameters-nopointer.h"), "w") as file:
+        file.write(gen_set_Cparameters(pointerEnable=False))
+
+    # Step 4.b: Output SIMD version, set_Cparameters-SIMD.h
+    with open(os.path.join(directory, "set_Cparameters-SIMD.h"), "w") as file:
+        for i in range(len(par.glb_Cparams_list)):
+            if par.glb_Cparams_list[i].type == "char":
+                c_type = "char *"
+            else:
+                c_type = par.glb_Cparams_list[i].type
+
+            comment = "  // " + par.glb_Cparams_list[i].module + "::" + par.glb_Cparams_list[i].parname
+            parname = par.glb_Cparams_list[i].parname
+            if c_type == "REAL" and par.glb_Cparams_list[i].defaultval != 1e300:
+                c_output =  "const REAL            NOSIMD" + parname + " = " + "params->" + par.glb_Cparams_list[i].parname + ";"+comment+"\n"
+                c_output += "const REAL_SIMD_ARRAY " + parname + " = ConstSIMD(NOSIMD" + parname + ");"+comment+"\n"
+                file.write(c_output)
+            elif par.glb_Cparams_list[i].defaultval != 1e300 and c_type != "#define":
+                c_output = "const "+c_type+" "+parname + " = " + "params->" + par.glb_Cparams_list[i].parname + ";"+comment+"\n"
+                file.write(c_output)
+
+
+    # Set up the dictionary entry for grid in NRPy_basic_defines
+    # Generate C code to declare C paramstruct;
+    #         output to "declare_Cparameters_struct.h"
+    #         We want the elements of this struct to be *sorted*,
+    #         to ensure that the struct is consistently ordered
+    #         for checkpointing purposes.
+    Nbd_str = "typedef struct __paramstruct__ {\n"
+    CCodelines = []
+    for i in range(len(par.glb_Cparams_list)):
+        if par.glb_Cparams_list[i].type != "#define":
+            if par.glb_Cparams_list[i].type == "char":
+                c_type = "char *"
+            else:
+                c_type = par.glb_Cparams_list[i].type
+            comment = "  // " + par.glb_Cparams_list[i].module + "::" + par.glb_Cparams_list[i].parname
+            CCodelines.append("    " + c_type + " " + par.glb_Cparams_list[i].parname + ";" + comment + "\n")
+    for line in sorted(CCodelines):
+        Nbd_str += line
+    Nbd_str += "} paramstruct;\n"
+
+    outC_NRPy_basic_defines_h_dict["NRPy_param_funcs"] = Nbd_str
