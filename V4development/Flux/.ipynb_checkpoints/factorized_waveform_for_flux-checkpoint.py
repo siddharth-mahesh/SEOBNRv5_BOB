@@ -37,4 +37,6 @@ def compute_hFlm_for_flux(m1, m2, EMgamma, tortoise, q, p, S1, S2, l, m, Hreal, 
     
     hF_lm = hNe_lm*Se_eff*T_lm*rholmpowl
     
+    print("l = ",l," , m = ",m, " , x = %.16e"% (vPhi*vPhi), ",y  = %.16e"% Ylminuse_minusm, ",prefix = %.16e"%(eta*ne_lm*c_lpluse))
+    
     return hF_lm

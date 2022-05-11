@@ -11,7 +11,7 @@ Ylminuse_minusm = aux.AbsSphericalHarmonicAtPiOver2(l-epsilon,-m)
 
 Vl_Phi = np.power(vPhi,l+epsilon)
 
-vPhi = Omega*aux.vPhiNonKeplerian(m1,m2,EMgamma,tortoise,q,p,S1,S2)
+vPhi = r*Omega*np.cbrt(aux.vPhiNonKeplerian(m1,m2,EMgamma,tortoise,q,p,S1,S2))
 
 T_lm = lfactorialinv*Tlmprefac*np.sqrt(Tlmprodfac)
 
@@ -30,6 +30,8 @@ lfactorialinv = 1/np.math.factorial(l)
 Se_eff = aux.Se_eff(l,m,Hreal,v,q,p,eta)
 
 rholmpowl = aux.rholmpowl(m1,m2,l,m,chiA,chiS,v,EMgamma)
+
+r = np.linalg.norm(q)
 
 epsilon = (l+m)%2
 

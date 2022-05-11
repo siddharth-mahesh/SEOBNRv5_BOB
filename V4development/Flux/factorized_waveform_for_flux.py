@@ -5,6 +5,8 @@ def compute_hFlm_for_flux(m1, m2, EMgamma, tortoise, q, p, S1, S2, l, m, Hreal, 
     
     epsilon = (l+m)%2
     
+    r = np.linalg.norm(q)
+    
     rholmpowl = aux.rholmpowl(m1,m2,l,m,chiA,chiS,v,EMgamma)
     
     Se_eff = aux.Se_eff(l,m,Hreal,v,q,p,eta)
@@ -23,7 +25,7 @@ def compute_hFlm_for_flux(m1, m2, EMgamma, tortoise, q, p, S1, S2, l, m, Hreal, 
     
     T_lm = lfactorialinv*Tlmprefac*np.sqrt(Tlmprodfac)
     
-    vPhi = Omega*aux.vPhiNonKeplerian(m1,m2,EMgamma,tortoise,q,p,S1,S2)
+    vPhi = r*Omega*np.cbrt(aux.vPhiNonKeplerian(m1,m2,EMgamma,tortoise,q,p,S1,S2))
     
     Vl_Phi = np.power(vPhi,l+epsilon)
     
