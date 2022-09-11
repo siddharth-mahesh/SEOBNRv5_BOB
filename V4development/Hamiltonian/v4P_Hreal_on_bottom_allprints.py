@@ -92,8 +92,6 @@ def compute_v4P_Hreal(m1=23., m2=10., EMgamma=0.57721566490153286060651209008240
     print('xi3 = %.16e'% xi3)
     xi2 = -e31*n3 + e33*n1
     print('xi2  = %.16e'% xi2 )
-    #xi2 = e31*n3 + e33*n1
-    print('#xi2  = %.16e'% #xi2 )
     xi1 = e32*n3 - e33*n2
     print('xi1  = %.16e'% xi1 )
     v3=n1*xi2-n2*xi1
@@ -174,12 +172,6 @@ def compute_v4P_Hreal(m1=23., m2=10., EMgamma=0.57721566490153286060651209008240
     print('phat2  = %.16e'% phat2 )
     phat1 = p1 - prT*(1 - 1/csi1)*n1
     print('phat1  = %.16e'% phat1 )
-    #phat3=p3+prT*(1-1/csi1)*n3
-    print('#phat3 = %.16e'% #phat3)
-    #phat2 = p2 + prT*(1 - 1/csi1)*n2
-    print('#phat2  = %.16e'% #phat2 )
-    #phat1 = p1 + prT*(1 - 1/csi1)*n1
-    print('#phat1  = %.16e'% #phat1 )
     pdotxir=(phat1*xi1+phat2*xi2+phat3*xi3)*r
     print('pdotxir = %.16e'% pdotxir)
     pdotn=phat1*n1+phat2*n2+phat3*n3
@@ -216,7 +208,7 @@ def compute_v4P_Hreal(m1=23., m2=10., EMgamma=0.57721566490153286060651209008240
     print('omega = %.16e'% omega)
     omegatildeprime=2*a
     print('omegatildeprime = %.16e'% omegatildeprime)
-    Lambdatprime=4*(a*a+r*r)*r-2*a*a*Deltatprime*sin2theta
+    Lambdatprime=4*(a*a+r*r)*r-a*a*Deltatprime*sin2theta
     print('Lambdatprime = %.16e'% Lambdatprime)
     mucostheta=a*a*costheta/Sigma
     print('mucostheta = %.16e'% mucostheta)

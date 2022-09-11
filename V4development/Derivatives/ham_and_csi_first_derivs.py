@@ -105,7 +105,7 @@ def ham_first_derivs(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, 
     expnu = np.sqrt(exp2nu)
     omega = omegatilde/Lambt
     omegatildeprime = 2*a
-    Lambtprime = 4*(a*a+r*r)*r-2*a*a*Deltatprime*sin2theta
+    Lambtprime = 4*(a*a+r*r)*r-a*a*Deltatprime*sin2theta
     mucostheta = a*a*costheta/Sigma
     nucostheta = a*a*w2*costheta*(w2-Deltat)/(Lambt*Sigma)
     omegacostheta = -2*a*a*costheta*Deltat*omegatilde/(Lambt*Lambt)
@@ -504,12 +504,12 @@ def ham_first_derivs(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, 
     chi_prmp1 = (Lhat1_prmp1*Skerr1 + Lhat2_prmp1*Skerr2 + Lhat3_prmp1*Skerr3)/(1 - 2*eta) + (Skerr1*Sperp1_prmp1/2 + Skerr2*Sperp2_prmp1/2 + Skerr3*Sperp3_prmp1/2)/(Skerrmag*(1.0 - 2.0*eta))
     chi_prmp2 = (Lhat1_prmp2*Skerr1 + Lhat2_prmp2*Skerr2 + Lhat3_prmp2*Skerr3)/(1 - 2*eta) + (Skerr1*Sperp1_prmp2/2 + Skerr2*Sperp2_prmp2/2 + Skerr3*Sperp3_prmp2/2)/(Skerrmag*(1.0 - 2.0*eta))
     chi_prmp3 = (Lhat1_prmp3*Skerr1 + Lhat2_prmp3*Skerr2 + Lhat3_prmp3*Skerr3)/(1 - 2*eta) + (Skerr1*Sperp1_prmp3/2 + Skerr2*Sperp2_prmp3/2 + Skerr3*Sperp3_prmp3/2)/(Skerrmag*(1.0 - 2.0*eta))
-    chi_prmS1x = Lhat1*Skerr1_prmS1x/(1 - 2*eta) + (Skerr1*Sperp1_prmS1x/2 + Skerr1_prmS1x*Sperp1/2 + Skerr2*Sperp2_prmS1x/2 + Skerr3*Sperp3_prmS1x/2)/(Skerrmag*(1.0 - 2.0*eta)) - Skerrmag_prmS1x*(Skerr1*Sperp1/2 + Skerr2*Sperp2/2 + Skerr3*Sperp3/2)/(Skerrmag**2*(1.0 - 2.0*eta))
-    chi_prmS1y = Lhat2*Skerr2_prmS1y/(1 - 2*eta) + (Skerr1*Sperp1_prmS1y/2 + Skerr2*Sperp2_prmS1y/2 + Skerr2_prmS1y*Sperp2/2 + Skerr3*Sperp3_prmS1y/2)/(Skerrmag*(1.0 - 2.0*eta)) - Skerrmag_prmS1y*(Skerr1*Sperp1/2 + Skerr2*Sperp2/2 + Skerr3*Sperp3/2)/(Skerrmag**2*(1.0 - 2.0*eta))
-    chi_prmS1z = Lhat3*Skerr3_prmS1z/(1 - 2*eta) + (Skerr1*Sperp1_prmS1z/2 + Skerr2*Sperp2_prmS1z/2 + Skerr3*Sperp3_prmS1z/2 + Skerr3_prmS1z*Sperp3/2)/(Skerrmag*(1.0 - 2.0*eta)) - Skerrmag_prmS1z*(Skerr1*Sperp1/2 + Skerr2*Sperp2/2 + Skerr3*Sperp3/2)/(Skerrmag**2*(1.0 - 2.0*eta))
-    chi_prmS2x = Lhat1*Skerr1_prmS2x/(1 - 2*eta) + (Skerr1*Sperp1_prmS2x/2 + Skerr1_prmS2x*Sperp1/2 + Skerr2*Sperp2_prmS2x/2 + Skerr3*Sperp3_prmS2x/2)/(Skerrmag*(1.0 - 2.0*eta)) - Skerrmag_prmS2x*(Skerr1*Sperp1/2 + Skerr2*Sperp2/2 + Skerr3*Sperp3/2)/(Skerrmag**2*(1.0 - 2.0*eta))
-    chi_prmS2y = Lhat2*Skerr2_prmS2y/(1 - 2*eta) + (Skerr1*Sperp1_prmS2y/2 + Skerr2*Sperp2_prmS2y/2 + Skerr2_prmS2y*Sperp2/2 + Skerr3*Sperp3_prmS2y/2)/(Skerrmag*(1.0 - 2.0*eta)) - Skerrmag_prmS2y*(Skerr1*Sperp1/2 + Skerr2*Sperp2/2 + Skerr3*Sperp3/2)/(Skerrmag**2*(1.0 - 2.0*eta))
-    chi_prmS2z = Lhat3*Skerr3_prmS2z/(1 - 2*eta) + (Skerr1*Sperp1_prmS2z/2 + Skerr2*Sperp2_prmS2z/2 + Skerr3*Sperp3_prmS2z/2 + Skerr3_prmS2z*Sperp3/2)/(Skerrmag*(1.0 - 2.0*eta)) - Skerrmag_prmS2z*(Skerr1*Sperp1/2 + Skerr2*Sperp2/2 + Skerr3*Sperp3/2)/(Skerrmag**2*(1.0 - 2.0*eta))
+    chi_prmS1x = Lhat1*Skerr1_prmS1x/(1 - 2*eta) + (Skerr1*Sperp1_prmS1x/2 + Skerr1_prmS1x*Sperp1/2 + Skerr2*Sperp2_prmS1x/2 + Skerr3*Sperp3_prmS1x/2)/(Skerrmag*(1.0 - 2.0*eta)) + Skerrmag_prmS1x*(-Skerr1*Sperp1/2 - Skerr2*Sperp2/2 - Skerr3*Sperp3/2)/(Skerrmag**2*(1.0 - 2.0*eta))
+    chi_prmS1y = Lhat2*Skerr2_prmS1y/(1 - 2*eta) + (Skerr1*Sperp1_prmS1y/2 + Skerr2*Sperp2_prmS1y/2 + Skerr2_prmS1y*Sperp2/2 + Skerr3*Sperp3_prmS1y/2)/(Skerrmag*(1.0 - 2.0*eta)) + Skerrmag_prmS1y*(-Skerr1*Sperp1/2 - Skerr2*Sperp2/2 - Skerr3*Sperp3/2)/(Skerrmag**2*(1.0 - 2.0*eta))
+    chi_prmS1z = Lhat3*Skerr3_prmS1z/(1 - 2*eta) + (Skerr1*Sperp1_prmS1z/2 + Skerr2*Sperp2_prmS1z/2 + Skerr3*Sperp3_prmS1z/2 + Skerr3_prmS1z*Sperp3/2)/(Skerrmag*(1.0 - 2.0*eta)) + Skerrmag_prmS1z*(-Skerr1*Sperp1/2 - Skerr2*Sperp2/2 - Skerr3*Sperp3/2)/(Skerrmag**2*(1.0 - 2.0*eta))
+    chi_prmS2x = Lhat1*Skerr1_prmS2x/(1 - 2*eta) + (Skerr1*Sperp1_prmS2x/2 + Skerr1_prmS2x*Sperp1/2 + Skerr2*Sperp2_prmS2x/2 + Skerr3*Sperp3_prmS2x/2)/(Skerrmag*(1.0 - 2.0*eta)) + Skerrmag_prmS2x*(-Skerr1*Sperp1/2 - Skerr2*Sperp2/2 - Skerr3*Sperp3/2)/(Skerrmag**2*(1.0 - 2.0*eta))
+    chi_prmS2y = Lhat2*Skerr2_prmS2y/(1 - 2*eta) + (Skerr1*Sperp1_prmS2y/2 + Skerr2*Sperp2_prmS2y/2 + Skerr2_prmS2y*Sperp2/2 + Skerr3*Sperp3_prmS2y/2)/(Skerrmag*(1.0 - 2.0*eta)) + Skerrmag_prmS2y*(-Skerr1*Sperp1/2 - Skerr2*Sperp2/2 - Skerr3*Sperp3/2)/(Skerrmag**2*(1.0 - 2.0*eta))
+    chi_prmS2z = Lhat3*Skerr3_prmS2z/(1 - 2*eta) + (Skerr1*Sperp1_prmS2z/2 + Skerr2*Sperp2_prmS2z/2 + Skerr3*Sperp3_prmS2z/2 + Skerr3_prmS2z*Sperp3/2)/(Skerrmag*(1.0 - 2.0*eta)) + Skerrmag_prmS2z*(-Skerr1*Sperp1/2 - Skerr2*Sperp2/2 - Skerr3*Sperp3/2)/(Skerrmag**2*(1.0 - 2.0*eta))
     K_prmx = -177.4974*chi**2*chi_prmx*eta**3 - 1.280874*chi**2*chi_prmx*eta + 4.30977*chi**2*chi_prmx + 62.3492*chi*chi_prmx*eta**3 + 12.32932*chi*chi_prmx*eta**2 - 2.76172*chi*chi_prmx - 27.5201*chi_prmx*eta**3 + 17.3736*chi_prmx*eta**2 + 2.26831*chi_prmx*eta - 1.62045*chi_prmx
     K_prmy = -177.4974*chi**2*chi_prmy*eta**3 - 1.280874*chi**2*chi_prmy*eta + 4.30977*chi**2*chi_prmy + 62.3492*chi*chi_prmy*eta**3 + 12.32932*chi*chi_prmy*eta**2 - 2.76172*chi*chi_prmy - 27.5201*chi_prmy*eta**3 + 17.3736*chi_prmy*eta**2 + 2.26831*chi_prmy*eta - 1.62045*chi_prmy
     K_prmz = -177.4974*chi**2*chi_prmz*eta**3 - 1.280874*chi**2*chi_prmz*eta + 4.30977*chi**2*chi_prmz + 62.3492*chi*chi_prmz*eta**3 + 12.32932*chi*chi_prmz*eta**2 - 2.76172*chi*chi_prmz - 27.5201*chi_prmz*eta**3 + 17.3736*chi_prmz*eta**2 + 2.26831*chi_prmz*eta - 1.62045*chi_prmz
@@ -1035,18 +1035,18 @@ def ham_first_derivs(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, 
     omegatildeprime_prmS2x = 2*a_prmS2x
     omegatildeprime_prmS2y = 2*a_prmS2y
     omegatildeprime_prmS2z = 2*a_prmS2z
-    Lambtprime_prmx = -2*Deltatprime*a**2*sin2theta_prmx - 2*Deltatprime_prmx*a**2*sin2theta + 8*r**2*r_prmx + r_prmx*(4*a**2 + 4*r**2)
-    Lambtprime_prmy = -2*Deltatprime*a**2*sin2theta_prmy - 2*Deltatprime_prmy*a**2*sin2theta + 8*r**2*r_prmy + r_prmy*(4*a**2 + 4*r**2)
-    Lambtprime_prmz = -2*Deltatprime*a**2*sin2theta_prmz - 2*Deltatprime_prmz*a**2*sin2theta + 8*r**2*r_prmz + r_prmz*(4*a**2 + 4*r**2)
-    Lambtprime_prmp1 = -2*Deltatprime_prmp1*a**2*sin2theta
-    Lambtprime_prmp2 = -2*Deltatprime_prmp2*a**2*sin2theta
-    Lambtprime_prmp3 = -2*Deltatprime_prmp3*a**2*sin2theta
-    Lambtprime_prmS1x = -2*Deltatprime*a**2*sin2theta_prmS1x - 4*Deltatprime*a*a_prmS1x*sin2theta - 2*Deltatprime_prmS1x*a**2*sin2theta + 8*a*a_prmS1x*r
-    Lambtprime_prmS1y = -2*Deltatprime*a**2*sin2theta_prmS1y - 4*Deltatprime*a*a_prmS1y*sin2theta - 2*Deltatprime_prmS1y*a**2*sin2theta + 8*a*a_prmS1y*r
-    Lambtprime_prmS1z = -2*Deltatprime*a**2*sin2theta_prmS1z - 4*Deltatprime*a*a_prmS1z*sin2theta - 2*Deltatprime_prmS1z*a**2*sin2theta + 8*a*a_prmS1z*r
-    Lambtprime_prmS2x = -2*Deltatprime*a**2*sin2theta_prmS2x - 4*Deltatprime*a*a_prmS2x*sin2theta - 2*Deltatprime_prmS2x*a**2*sin2theta + 8*a*a_prmS2x*r
-    Lambtprime_prmS2y = -2*Deltatprime*a**2*sin2theta_prmS2y - 4*Deltatprime*a*a_prmS2y*sin2theta - 2*Deltatprime_prmS2y*a**2*sin2theta + 8*a*a_prmS2y*r
-    Lambtprime_prmS2z = -2*Deltatprime*a**2*sin2theta_prmS2z - 4*Deltatprime*a*a_prmS2z*sin2theta - 2*Deltatprime_prmS2z*a**2*sin2theta + 8*a*a_prmS2z*r
+    Lambtprime_prmx = -Deltatprime*a**2*sin2theta_prmx - Deltatprime_prmx*a**2*sin2theta + 8*r**2*r_prmx + r_prmx*(4*a**2 + 4*r**2)
+    Lambtprime_prmy = -Deltatprime*a**2*sin2theta_prmy - Deltatprime_prmy*a**2*sin2theta + 8*r**2*r_prmy + r_prmy*(4*a**2 + 4*r**2)
+    Lambtprime_prmz = -Deltatprime*a**2*sin2theta_prmz - Deltatprime_prmz*a**2*sin2theta + 8*r**2*r_prmz + r_prmz*(4*a**2 + 4*r**2)
+    Lambtprime_prmp1 = -Deltatprime_prmp1*a**2*sin2theta
+    Lambtprime_prmp2 = -Deltatprime_prmp2*a**2*sin2theta
+    Lambtprime_prmp3 = -Deltatprime_prmp3*a**2*sin2theta
+    Lambtprime_prmS1x = -Deltatprime*a**2*sin2theta_prmS1x - 2*Deltatprime*a*a_prmS1x*sin2theta - Deltatprime_prmS1x*a**2*sin2theta + 8*a*a_prmS1x*r
+    Lambtprime_prmS1y = -Deltatprime*a**2*sin2theta_prmS1y - 2*Deltatprime*a*a_prmS1y*sin2theta - Deltatprime_prmS1y*a**2*sin2theta + 8*a*a_prmS1y*r
+    Lambtprime_prmS1z = -Deltatprime*a**2*sin2theta_prmS1z - 2*Deltatprime*a*a_prmS1z*sin2theta - Deltatprime_prmS1z*a**2*sin2theta + 8*a*a_prmS1z*r
+    Lambtprime_prmS2x = -Deltatprime*a**2*sin2theta_prmS2x - 2*Deltatprime*a*a_prmS2x*sin2theta - Deltatprime_prmS2x*a**2*sin2theta + 8*a*a_prmS2x*r
+    Lambtprime_prmS2y = -Deltatprime*a**2*sin2theta_prmS2y - 2*Deltatprime*a*a_prmS2y*sin2theta - Deltatprime_prmS2y*a**2*sin2theta + 8*a*a_prmS2y*r
+    Lambtprime_prmS2z = -Deltatprime*a**2*sin2theta_prmS2z - 2*Deltatprime*a*a_prmS2z*sin2theta - Deltatprime_prmS2z*a**2*sin2theta + 8*a*a_prmS2z*r
     mucostheta_prmx = a**2*costheta_prmx/Sigma - Sigma_prmx*a**2*costheta/Sigma**2
     mucostheta_prmy = a**2*costheta_prmy/Sigma - Sigma_prmy*a**2*costheta/Sigma**2
     mucostheta_prmz = a**2*costheta_prmz/Sigma - Sigma_prmz*a**2*costheta/Sigma**2
@@ -1707,4 +1707,4 @@ def ham_first_derivs(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, 
     Hreal_prmS2x = Heff_prmS2x*eta/np.sqrt(2*eta*(Heff - 1) + 1)
     Hreal_prmS2y = Heff_prmS2y*eta/np.sqrt(2*eta*(Heff - 1) + 1)
     Hreal_prmS2z = Heff_prmS2z*eta/np.sqrt(2*eta*(Heff - 1) + 1)
-    return np.array([Hreal_prmx, Hreal_prmy, Hreal_prmz, Hreal_prmp1, Hreal_prmp2, Hreal_prmp3, Hreal_prmS1x, Hreal_prmS1y, Hreal_prmS1z, Hreal_prmS2x, Hreal_prmS2y, Hreal_prmS2z, csi_prmx, csi_prmy, csi_prmz, csi_prmp1, csi_prmp2, csi_prmp3, csi_prmS1x, csi_prmS1y, csi_prmS1z, csi_prmS2x, csi_prmS2y, csi_prmS2z, csi ])
+    return np.array([Hreal_prmx, Hreal_prmy, Hreal_prmz, Hreal_prmp1, Hreal_prmp2, Hreal_prmp3, Hreal_prmS1x, Hreal_prmS1y, Hreal_prmS1z, Hreal_prmS2x, Hreal_prmS2y, Hreal_prmS2z, csi_prmx, csi_prmy, csi_prmz])

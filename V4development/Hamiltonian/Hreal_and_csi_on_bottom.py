@@ -46,7 +46,6 @@ def compute_Hreal_and_csi(m1=23., m2=10., EMgamma=0.5772156649015328606065120900
     e31 = Skerrhat1
     xi3=e31*n2-e32*n1
     xi2 = -e31*n3 + e33*n1
-    #xi2 = e31*n3 + e33*n1
     xi1 = e32*n3 - e33*n2
     v3=n1*xi2-n2*xi1
     v2 = n3*xi1 - n1*xi3
@@ -87,9 +86,6 @@ def compute_Hreal_and_csi(m1=23., m2=10., EMgamma=0.5772156649015328606065120900
     phat3=p3-prT*(1-1/csi1)*n3
     phat2 = p2 - prT*(1 - 1/csi1)*n2
     phat1 = p1 - prT*(1 - 1/csi1)*n1
-    #phat3=p3+prT*(1-1/csi1)*n3
-    #phat2 = p2 + prT*(1 - 1/csi1)*n2
-    #phat1 = p1 + prT*(1 - 1/csi1)*n1
     pdotxir=(phat1*xi1+phat2*xi2+phat3*xi3)*r
     pdotn=phat1*n1+phat2*n2+phat3*n3
     pdotvr=(phat1*v1+phat2*v2+phat3*v3)*r
@@ -108,7 +104,7 @@ def compute_Hreal_and_csi(m1=23., m2=10., EMgamma=0.5772156649015328606065120900
     expnu = np.sqrt(exp2nu)
     omega=omegatilde/Lambdat
     omegatildeprime=2*a
-    Lambdatprime=4*(a*a+r*r)*r-2*a*a*Deltatprime*sin2theta
+    Lambdatprime=4*(a*a+r*r)*r-a*a*Deltatprime*sin2theta
     mucostheta=a*a*costheta/Sigma
     nucostheta=a*a*w2*costheta*(w2-Deltat)/(Lambdat*Sigma)
     omegacostheta=-2*a*a*costheta*Deltat*omegatilde/(Lambdat*Lambdat)
