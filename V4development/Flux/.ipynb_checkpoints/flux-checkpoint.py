@@ -7,7 +7,6 @@ import Flux.factorized_waveform_for_flux as wv
 # approximants build on v2 spin-aligned background
 
 def compute_flux(m1,m2,EMGamma,tortoise,q,p,S1,S2,omega,Hreal,NQC=1.,lMax = 8):
-    print("input params for compute_flux:",m1,m2,EMGamma,tortoise,q,p,S1,S2,omega,Hreal,NQC,lMax)
     r = np.linalg.norm(q)
     eta = m1*m2/(m1+m2)/(m1+m2)
     flux = 0.
@@ -35,11 +34,11 @@ def compute_flux(m1,m2,EMGamma,tortoise,q,p,S1,S2,omega,Hreal,NQC=1.,lMax = 8):
             #print(l,",",m)
             #print(m1,m2,EMGamma,tortoise,q,p,S1,S2,l,m,Hreal,v,chiA,chiS)
             hLM = wv.compute_hFlm_for_flux(m1,m2,EMGamma,tortoise,q,p,S1,S2,l,m,Hreal,v,chiA,chiS)
-            print("l = %d, m = %d, hLM = %.16e"%(l,m,hLM))
             ## NQC terms here
             if l == 2 and m ==2:
                 hLM *= NQC
             flux += m*m*omegasq*hLM*hLM
+            print(l,m,hLM)
             #print("fluxlm = %.16e"%flux)
     if flux > 5 or omegasq > 1:
         flux = 0.

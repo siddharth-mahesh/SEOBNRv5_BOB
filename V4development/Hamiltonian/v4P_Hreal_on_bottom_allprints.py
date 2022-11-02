@@ -140,7 +140,7 @@ def compute_v4P_Hreal(m1=23., m2=10., EMgamma=0.57721566490153286060651209008240
     print('logarg = %.16e'% logarg)
     Deltaucalib = 1 + eta*(Delta0 + np.log1p( logarg))
     print('Deltaucalib  = %.16e'% Deltaucalib )
-    Deltaucalibprime=-eta*u*u*(Delta1+u*(2*Delta2+u*(3*Delta3+u*(4*Delta4+u*(5*(Delta5+Delta5l*np.log(u)))))))/(1+logarg)
+    Deltaucalibprime=-eta*u*u*(Delta1+u*(2*Delta2+u*(3*Delta3+u*(4*Delta4+u*(5*Delta5+Delta5l*(1+5*np.log(u)))))))/(1+logarg)
     print('Deltaucalibprime = %.16e'% Deltaucalibprime)
     Deltaubar=a*a*u*u+(2*u+1/etaKminus1)/etaKminus1
     print('Deltaubar = %.16e'% Deltaubar)

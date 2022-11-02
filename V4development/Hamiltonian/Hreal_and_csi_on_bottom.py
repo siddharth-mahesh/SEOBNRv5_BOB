@@ -70,7 +70,7 @@ def compute_Hreal_and_csi(m1=23., m2=10., EMgamma=0.5772156649015328606065120900
     Delta5l=etaKminus1*etaKminus1*np.divide(64,5)
     logarg=u*(Delta1+u*(Delta2+u*(Delta3+u*(Delta4+u*(Delta5+Delta5l*np.log(u))))))
     Deltaucalib = 1 + eta*(Delta0 + np.log(1 + logarg))
-    Deltaucalibprime=-eta*u*u*(Delta1+u*(2*Delta2+u*(3*Delta3+u*(4*Delta4+u*(5*(Delta5+Delta5l*np.log(u)))))))/(1+logarg)
+    Deltaucalibprime=-eta*u*u*(Delta1+u*(2*Delta2+u*(3*Delta3+u*(4*Delta4+u*(5*Delta5+Delta5l*(1+5*np.log(u)))))))/(1+logarg)
     Deltaubar=a*a*u*u+(2*u+1/etaKminus1)/etaKminus1
     Deltaubarprime = -2*a*a*u*u*u - 2*u*u/(etaKminus1)
     Deltau=np.abs(Deltaubar*Deltaucalib)

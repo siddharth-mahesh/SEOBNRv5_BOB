@@ -38,6 +38,7 @@ def compute_flux(m1,m2,EMGamma,tortoise,q,p,S1,S2,omega,Hreal,NQC=1.,lMax = 8):
             if l == 2 and m ==2:
                 hLM *= NQC
             flux += m*m*omegasq*hLM*hLM
+            print(l,m,hLM)
             #print("fluxlm = %.16e"%flux)
     if flux > 5 or omegasq > 1:
         flux = 0.

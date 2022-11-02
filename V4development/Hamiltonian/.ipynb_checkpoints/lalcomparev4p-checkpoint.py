@@ -134,7 +134,7 @@ def compute_Hreal_and_csi(m1=23., m2=10., EMgamma=0.5772156649015328606065120900
     #D = 1. + log1p(6.*eta*u2 + 2.*(26. - 3.*eta)*eta*u3);
     
     omegatilde=2*a*r
-    #lal version: 365
+    #lal version: 365 (coeffs map to zero)
     #ww=2.*a*r + coeffs->b3*eta*a2*a*u + coeffs->bb3*eta*a*u;
     
     chi=(Skerr1*Lhat1+Skerr2*Lhat2+Skerr3*Lhat3)/(1-2*eta)+np.divide(1,2)*(Sperp1*Skerr1+Sperp2*Skerr2+Sperp3*Skerr3)/(Skerrmag*(1.-2.*eta))
@@ -152,14 +152,48 @@ def compute_Hreal_and_csi(m1=23., m2=10., EMgamma=0.5772156649015328606065120900
     Kchi0=267.788*eta*eta*eta-126.687*eta*eta+10.2573*eta+1.7336
     K=-59.1658*chi*chi*chi*eta*eta*eta-0.426958*chi*chi*chi*eta+1.43659*chi*chi*chi+31.1746*chi*chi*eta*eta*eta+6.16466*chi*chi*eta*eta-1.38086*chi*chi-27.5201*chi*eta*eta*eta+17.3736*chi*eta*eta+2.26831*chi*eta-1.62045*chi+Kchi0
     etaKminus1 = eta*K - 1
-    Delta0=K*(eta*K-2)
-    Delta1=-2*etaKminus1*(K+Delta0)
-    Delta2=np.divide(1,2)*Delta1*(Delta1-4*etaKminus1)-a*a*etaKminus1*etaKminus1*Delta0
-    Delta3=-np.divide(1,3)*Delta1*Delta1*Delta1+etaKminus1*Delta1*Delta1+Delta2*Delta1-2*etaKminus1*(Delta2-etaKminus1)-a*a*etaKminus1*etaKminus1*Delta1
-    Delta4=np.divide(1,12)*(6*a*a*(Delta1*Delta1-2*Delta2)*etaKminus1*etaKminus1+3*Delta1*Delta1*Delta1*Delta1-8*etaKminus1*Delta1*Delta1*Delta1-12*Delta2*Delta1*Delta1+12*(2*etaKminus1*Delta2+Delta3)*Delta1+12*(np.divide(94,3)-np.divide(41,32)*np.pi*np.pi)*etaKminus1*etaKminus1+6*(Delta2*Delta2-4*Delta3*etaKminus1))
-    Delta5=etaKminus1*etaKminus1*(np.divide(-4237,60)+np.divide(128,5)*EMgamma+np.divide(2275,512)*np.pi*np.pi-np.divide(1,3)*a*a*(Delta1*Delta1*Delta1-3*Delta1*Delta2+3*Delta3)-(Delta1*Delta1*Delta1*Delta1*Delta1-5*Delta1*Delta1*Delta1*Delta2+5*Delta1*Delta2*Delta2+5*Delta1*Delta1*Delta3-5*Delta2*Delta3-5*Delta1*Delta4)/(5*etaKminus1*etaKminus1)+(Delta1*Delta1*Delta1*Delta1-4*Delta1*Delta1*Delta2+2*Delta2*Delta2+4*Delta1*Delta3-4*Delta4)/(2*etaKminus1)+np.divide(256,5)*np.log(2)+(np.divide(41,32)*np.pi*np.pi-np.divide(221,6))*eta)
-    Delta5l=etaKminus1*etaKminus1*np.divide(64,5)
+    #lal version: [SpinPrecEOBHCoeffs.c] 226-233, [SpinEOBHamiltonian.h]14-29. coeffnmK -> coeff of eta^nchi^m
+    #static const REAL8 coeff00K = 1.7336;
+    #static const REAL8 coeff01K = -1.62045;
+    #static const REAL8 coeff02K = -1.38086;
+    #static const REAL8 coeff03K = 1.43659;
+    #static const REAL8 coeff10K = 10.2573;
+    #static const REAL8 coeff11K = 2.26831;
+    #static const REAL8 coeff12K = 0;
+    #static const REAL8 coeff13K = -0.426958;
+    #static const REAL8 coeff20K = -126.687;
+    #static const REAL8 coeff21K = 17.3736;
+    #static const REAL8 coeff22K = 6.16466;
+    #static const REAL8 coeff23K = 0;
+    #static const REAL8 coeff30K = 267.788;
+    #static const REAL8 coeff31K = -27.5201;
+    #static const REAL8 coeff32K = 31.1746;
+    #static const REAL8 coeff33K = -59.1658;
     
+    #lal version:[SpinPrecEOBHCoeffs.c] 236-250, kn in lal == Deltan in nrpy, KK in lal == K in nrpy, m1PlusEtaKK in lal 
+    Delta0=K*(eta*K-2)
+    #coeffs->k0 = k0 = KK * (m1PlusEtaKK - 1.);
+    
+    Delta1=-2*etaKminus1*(K+Delta0)
+    #coeffs->k1 = k1 = -2. * (k0 + KK) * m1PlusEtaKK;
+    #k1p2 = k1 * k1;
+    #k1p3 = k1 * k1p2;
+    
+    Delta2=np.divide(1,2)*Delta1*(Delta1-4*etaKminus1)-a*a*etaKminus1*etaKminus1*Delta0
+    #coeffs->k2 = k2 = (k1 * (k1 - 4. * m1PlusEtaKK)) * 0.5 - a * a * k0 * m1PlusEtaKK * m1PlusEtaKK;
+    
+    Delta3=-np.divide(1,3)*Delta1*Delta1*Delta1+etaKminus1*Delta1*Delta1+Delta2*Delta1-2*etaKminus1*(Delta2-etaKminus1)-a*a*etaKminus1*etaKminus1*Delta1
+    #coeffs->k3 = k3 = -(k1 * k1) * k1 * third + k1 * k2 + (k1 * k1) * m1PlusEtaKK - 2. * (k2 - m1PlusEtaKK) * m1PlusEtaKK - a * a * k1 * (m1PlusEtaKK * m1PlusEtaKK);
+    
+    Delta4=np.divide(1,12)*(6*a*a*(Delta1*Delta1-2*Delta2)*etaKminus1*etaKminus1+3*Delta1*Delta1*Delta1*Delta1-8*etaKminus1*Delta1*Delta1*Delta1-12*Delta2*Delta1*Delta1+12*(2*etaKminus1*Delta2+Delta3)*Delta1+12*(np.divide(94,3)-np.divide(41,32)*np.pi*np.pi)*etaKminus1*etaKminus1+6*(Delta2*Delta2-4*Delta3*etaKminus1))
+    #coeffs->k4 = k4 = ((24. / 96.) * (k1 * k1) * (k1 * k1) - (96. / 96.) * (k1 * k1) * k2 + (48. / 96.) * k2 * k2 - (64. / 96.) * (k1 * k1) * k1 * m1PlusEtaKK + (48. / 96.) * (a * a) * (k1 * k1 - 2. * k2) * (m1PlusEtaKK * m1PlusEtaKK) +
+    #                  (96. / 96.) * k1 * (k3 + 2. * k2 * m1PlusEtaKK) - m1PlusEtaKK * ((192. / 96.) * k3 + m1PlusEtaKK * (-(3008. / 96.) + (123. / 96.) * LAL_PI * LAL_PI)));
+    
+    Delta5=etaKminus1*etaKminus1*(np.divide(-4237,60)+np.divide(128,5)*EMgamma+np.divide(2275,512)*np.pi*np.pi-np.divide(1,3)*a*a*(Delta1*Delta1*Delta1-3*Delta1*Delta2+3*Delta3)-(Delta1*Delta1*Delta1*Delta1*Delta1-5*Delta1*Delta1*Delta1*Delta2+5*Delta1*Delta2*Delta2+5*Delta1*Delta1*Delta3-5*Delta2*Delta3-5*Delta1*Delta4)/(5*etaKminus1*etaKminus1)+(Delta1*Delta1*Delta1*Delta1-4*Delta1*Delta1*Delta2+2*Delta2*Delta2+4*Delta1*Delta3-4*Delta4)/(2*etaKminus1)+np.divide(256,5)*np.log(2)+(np.divide(41,32)*np.pi*np.pi-np.divide(221,6))*eta)
+    #coeffs->k5 = k5 = m1PlusEtaKK * m1PlusEtaKK * (-4237. / 60. + 128. / 5. * LAL_GAMMA + 2275. * LAL_PI * LAL_PI / 512. - third * (a * a) * (k1p3 - 3. * (k1 * k2) + 3. * k3) - ((k1p3 * k1p2) - 5. * (k1p3 * k2) + 5. * k1 * k2 * k2 + 5. * k1p2 * k3 - 5. * k2 * k3 - 5. * k1 * k4) * fifth * invm1PlusEtaKK * invm1PlusEtaKK + ((k1p2 * k1p2) - 4. * (k1p2 * k2) + 2. * k2 * k2 + 4. * k1 * k3 - 4. * k4) * 0.5 * invm1PlusEtaKK + (256. / 5.) * ln2 + (41. * LAL_PI * LAL_PI / 32. - 221. / 6.) * eta);
+    
+    Delta5l=etaKminus1*etaKminus1*np.divide(64,5)
+    #coeffs->k5l = k5l = (m1PlusEtaKK * m1PlusEtaKK) * (64. / 5.);        
     
     logarg=u*(Delta1+u*(Delta2+u*(Delta3+u*(Delta4+u*(Delta5+Delta5l*np.log(u))))))
     Deltaucalib = 1 + eta*(Delta0 + np.log(1 + logarg))
@@ -186,6 +220,7 @@ def compute_Hreal_and_csi(m1=23., m2=10., EMgamma=0.5772156649015328606065120900
     #deltaU_u = 2.*(invm1PlusetaKK + a2*u)*logTerms +
     #       bulk * (eta*(coeffs->k1 + u*(2.*coeffs->k2 + u*(3.*coeffs->k3 + u*(4.*coeffs->k4 + 5.*(coeffs->k5+coeffs->k5l*logu)*u)))))
     #       / (1. + logarg);
+    #BUG!!!!! logu not differentiated in k5l*u5*logu
     
     
     Deltatprime=2*r*Deltau+r*r*Deltauprime
@@ -339,7 +374,7 @@ def compute_Hreal_and_csi(m1=23., m2=10., EMgamma=0.5772156649015328606065120900
     
     sigmastarcoeffTerm1=eta/12*(14/r+4*Qminus1-30*DrSipn2)
     #lal version: 458
-    #deltaSigmaStar_x=eta*((-8. - 3.*r*(12.*pn2 - pp))*sKerr_x + (14. + (- 30.*pn2 + 4.*pp)*r)*sStar_x)*(1./12.)*u;    
+    #deltaSigmaStar_x = eta*((-8. - 3.*r*(12.*pn2 - pp))*sKerr_x + (14. + (- 30.*pn2 + 4.*pp)*r)*sStar_x)*(1./12.)*u;    
     
     sigmastarcoeff=sigmastarcoeffTerm1+sigmastarcoeffTerm2
     Deltasigmastar3=sigmastar3*sigmastarcoeff+sigma3*sigmacoeff
@@ -389,7 +424,8 @@ def compute_Hreal_and_csi(m1=23., m2=10., EMgamma=0.5772156649015328606065120900
     
     HssTerm3=expmu*expnu*pdotxir*(Jtilde*pdotn*Sdotxi*Btilde-expmu*expnu*pdotxir*Sdotn)+(pdotvr*(Sdotn*pdotvr-Jtilde*pdotn*Sdotv)-exp2mu*(np.sqrt(Q)+Q)*Sdotn*xisq)*Btilde*Btilde
     HssTerm3coeff=omegacostheta/(2*exp2mu*expmu*expnu*Btilde*(Q+np.sqrt(Q)))
-    #lal version: 530(term)
+    #lal version: 530(term->)
+    
     
     HssTerm2=expmu*pdotxir*(expmu*exp2nu*pdotxir*Sdotv-expnu*pdotvr*Sdotxi*Btilde)+xisq*Btilde*Btilde*(exp2mu*(np.sqrt(Q)+Q)*Sdotv+Jtilde*pdotn*(pdotvr*Sdotn-Jtilde*pdotn*Sdotv))
     HssTerm2coeff=Jtilde*omegar/(2*exp2mu*expmu*expnu*Btilde*(Q+np.sqrt(Q))*xisq)
