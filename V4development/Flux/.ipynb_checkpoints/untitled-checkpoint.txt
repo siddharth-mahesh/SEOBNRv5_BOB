@@ -1,0 +1,98 @@
+import numpy as np
+import Flux.factorized_waveform_for_flux as wv
+
+## Function to compute factorized flux
+# Where does omega come from more generally? 
+# Spin aligned EOB version is a parameter we may not need as all precessing 
+# approximants build on v2 spin-aligned background
+
+## Compute the Associate Legendre Polynomial for input value 0 (P_l^m(0))
+## List constructed as: 
+# AssociatedLegendra[n] = (list of P_n+1^m(0) for m in order [1,n+1] ), n+1 since list elements go from 0 onwards while polynomials are ordered from 1 onwards
+
+AssociatedLegendre = [[-1.0], [0.0, 3.0], [1.5, 0.0, -15.0], [0.0, -7.5, 0.0, 105.0], [-1.875, 0.0, 52.5, 0.0, -945.0], [0.0, 13.125, 0.0, -472.5, 0.0, 10395.0], [2.1875, 0.0, -118.125, 0.0, 5197.5, 0.0, -135135.0], [0.0, -19.6875, 0.0, 1299.375, 0.0, -67567.5, 0.0, 2027025.0]]
+
+def compute_hFlm_for_flux(m1, m2, EMgamma, tortoise, q, p, S1, S2, l, m, Hreal, v,chiA,chiS):
+    eta = m1*m2/(m1+m2)/(m1+m2)
+    
+    epsilon = (l+m)%2
+    
+    r = np.linalg.norm(q)
+    
+    rholmpowl = aux.rholmpowl(m1,m2,l,m,chiA,chiS,v,EMgamma)
+    
+    Se_eff = aux.Se_eff(l,m,Hreal,v,q,p,eta)
+    
+    lfactorialinv = 1/np.math.factorial(l)
+    
+    Omega = np.power(v,3)
+    
+    hathatk = m*Hreal*Omega
+    
+    pihathatk4 = 4*np.pi*hathatk
+    
+    Tlmprefac = np.sqrt( pihathatk4 / ( 1 - np.exp( -pihathatk4 ) ) )
+    
+    Tlmprodfac = aux.Tlmprodfac(l,hathatk)
+    
+    T_lm = lfactorialinv*Tlmprefac*np.sqrt(Tlmprodfac)
+    
+    vPhi = r*Omega*np.cbrt(aux.vPhiNonKeplerian(m1,m2,EMgamma,tortoise,q,p,S1,S2))
+    
+    Vl_Phi = np.power(vPhi,l+epsilon)
+    
+    Ylminuse_minusm = aux.AbsSphericalHarmonicAtPiOver2(l-epsilon,-m)
+    
+    c_lpluse = aux.Newtonian_c(m1,m2,l,m)
+    
+    ne_lm = aux.Newtonian_n(m1,m2,l,m)
+    
+    hNe_lm = eta*ne_lm*c_lpluse*Vl_Phi*Ylminuse_minusm
+    
+    hF_lm = hNe_lm*Se_eff*T_lm*rholmpowl
+    
+    return hF_lm
+
+
+def compute_flux(m1,m2,EMGamma,tortoise,q,p,S1,S2,omega,Hreal,NQC=1.,lMax = 8):
+    r = np.linalg.norm(q)
+    eta = m1*m2/(m1+m2)/(m1+m2)
+    flux = 0.
+    omegasq = omega*omega
+    v = np.cbrt(omega)
+    rcrossp = np.cross(q,p)
+    rcrosspmag = np.linalg.norm(rcrossp)
+    
+    m1hat = m1/(m1+m2)
+    m2hat = m2/(m1+m2)
+    S1_over_m12 = S1/m1hat/m1hat
+    S2_over_m22 = S2/m2hat/m2hat
+    Lhat = rcrossp/rcrosspmag
+    s1dotL = np.dot(S1_over_m12,Lhat)
+    s2dotL = np.dot(S2_over_m22,Lhat)
+    
+    #print("s1dotL = ",s1dotL)
+    #print("s2dotL = ",s2dotL)
+    
+    chiS = 0.5*(s1dotL + s2dotL)
+    chiA = 0.5*(s1dotL - s2dotL)
+    #print("inputs:m1,m2,EMGamma,tortoise,q,p,S1,S2,Hreal,v,chiA,chiS")
+    #print(m1,m2,EMGamma,tortoise,q,p,S1,S2,Hreal,v,chiA,chiS)
+    for l in range(2,lMax+1):
+        for m in range(1,l+1):
+            #print(l,",",m)
+            #print(m1,m2,EMGamma,tortoise,q,p,S1,S2,l,m,Hreal,v,chiA,chiS)
+            hLM = wv.compute_hFlm_for_flux(m1,m2,EMGamma,tortoise,q,p,S1,S2,l,m,Hreal,v,chiA,chiS)
+            ## NQC terms here
+            if l == 2 and m ==2:
+                hLM *= NQC
+            flux += m*m*omegasq*hLM*hLM
+            print(l,m,hLM)
+            #print("fluxlm = %.16e"%flux)
+    if flux > 5 or omegasq > 1:
+        flux = 0.
+        
+    return flux/np.pi/8.
+
+
+    

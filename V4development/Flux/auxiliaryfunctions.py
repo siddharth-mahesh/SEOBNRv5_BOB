@@ -6,7 +6,7 @@ import Flux.modes as fm
 
 def dRvec(m1,m2,tortoise,x,y,z,p1,p2,p3,S1x,S1y,S1z,S2x,S2y,S2z):
     eta = m1*m2/((m1+m2)*(m1+m2))
-    dH = ham_first_derivs(m1,m2,tortoise,x,y,z,p1,p2,p3,S1x,S2y,S2z,S2x,S2y,S2z)
+    dH = ham_first_derivs(m1,m2,tortoise,x,y,z,p1,p2,p3,S1x,S1y,S1z,S2x,S2y,S2z)
     dHdP = np.array([dH[3],dH[4],dH[5]])/eta
     q = [x,y,z]
     R = np.linalg.norm(q)
@@ -206,7 +206,8 @@ def Tlmprodfac(l,hathatk):
 
 ## Compute the exact Circular Frequency at the given phase space points
 # Question: why is this necessary if we are already passing omega through the flux function?
-# if we are not computing waveform then what is being passed as v?
+# Answer: The omega passed into the flux is the instantaneous angular frequency. The omega computed here is the frequency of a circular orbit at that instantaneous positions on a v4P background with the instantaneous spins.
+# Addendum: This rather bulky calculation is done to compute the waveform for every multipole moment and thus repeats  ~ 30 times at each RHS evaluation when only one is needed. While it makes sense to have it within the hLM computation for complex waveforms since we only calculate individual modes, it does not makes sense when computing the overall flux as all 27 modes are needed anyways and will have the same value of omega and vphikepler.
 
 def CalcOmega(m1,m2,EMGamma,tortoise,q,p,S1,S2):
     #print("q = ", q)

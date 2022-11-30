@@ -20,16 +20,16 @@ int compute_modes(WaveformCoefficients * const coeffs, REAL8 m1,REAL8  m2,REAL8 
     memset(coeffs,0, sizeof(WaveformCoefficients));
     
     coeffs->delta22vh3 = 7./3.;
-    coeffs->delta22vh6 = -4.*(deltam*chiA + chiS*(1. - 2.*eta))/3. + (428.*np.pi)/105.;
+    coeffs->delta22vh6 = -4.*(deltam*chiA + chiS*(1. - 2.*eta))/3. + (428.*M_PI)/105.;
     coeffs->delta22v8 = 0.;
-    coeffs->delta22vh9 = -2203./81. + 1712.*np.pi*np.pi/ 315.;
+    coeffs->delta22vh9 = -2203./81. + 1712.*M_PI*M_PI/ 315.;
     coeffs->delta22v5 = -24.*eta;
     coeffs->delta22v6 = 0.;
     coeffs->rho22v2 = -43./42. + (55.*eta)/84.;
     coeffs->rho22v3 = (-2.*(chiS + chiA*deltam - chiS*eta))/3.;
     coeffs->rho22v4 = -20555./10584. + 0.5*(chiS + chiA*deltam)*(chiS + chiA*deltam) - (33025.*eta)/21168. + (19583.*eta2)/42336.;
     coeffs->rho22v5 = (-34./21. + 49.*eta/18. + 209.*eta2/126.)*chiS + (-34./21. - 19.*eta/42.)*deltam*chiA;
-    coeffs->rho22v6 = 1556919113./122245200.+(89.*a2)/252.-(48993925.*eta)/9779616.-(6292061.*eta2)/3259872.+(10620745.*eta3)/39118464.+(41.*eta*np.pi*np.pi)/192.;
+    coeffs->rho22v6 = 1556919113./122245200.+(89.*a2)/252.-(48993925.*eta)/9779616.-(6292061.*eta2)/3259872.+(10620745.*eta3)/39118464.+(41.*eta*M_PI*M_PI)/192.;
     coeffs->rho22v6l = -428./105.;
     coeffs->rho22v7 = a3/3. + chiA*deltam*(18733./15876. + (50140.*eta)/3969. + (97865.*eta2)/63504.) + chiS*(18733./15876. + (74749.*eta)/5292. - (245717.*eta2)/63504. + (50803.*eta3)/63504.);
     coeffs->rho22v8 = -387216563023./160190110080. + (18353.*a2)/21168. - a2*a2/8.;
@@ -38,9 +38,9 @@ int compute_modes(WaveformCoefficients * const coeffs, REAL8 m1,REAL8  m2,REAL8 
     coeffs->rho22v10l = 439877./55566.;
     
     coeffs->delta21vh3 = 2./3.;
-    coeffs->delta21vh6 = 107.*np.pi/105.;
+    coeffs->delta21vh6 = 107.*M_PI/105.;
     coeffs->delta21ch7 = 0.;
-    coeffs->delta21vh9 = -272./81. + (214.*np.pi*np.pi)/315.;
+    coeffs->delta21vh9 = -272./81. + (214.*M_PI*M_PI)/315.;
     coeffs->delta21v5 = -493.*eta/42.;
     coeffs->delta21v7 = 0.;
     coeffs->rho21v1 = 0.;    
@@ -64,8 +64,8 @@ int compute_modes(WaveformCoefficients * const coeffs, REAL8 m1,REAL8  m2,REAL8 
     }
     
     coeffs->delta33vh3 = 13./10.;
-    coeffs->delta33vh6 = (39.*np.pi)/7.;
-    coeffs->delta33vh9 = -227827./3000. + (78.*np.pi*np.pi)/7.;
+    coeffs->delta33vh6 = (39.*M_PI)/7.;
+    coeffs->delta33vh9 = -227827./3000. + (78.*M_PI*M_PI)/7.;
     coeffs->delta33v5 = -80897.*eta/2430.; 
     if(deltam2){
         coeffs->rho33v2 = -7./6. + (2.*eta)/3.;
@@ -84,8 +84,8 @@ int compute_modes(WaveformCoefficients * const coeffs, REAL8 m1,REAL8  m2,REAL8 
     
     coeffs->delta32vh3 = (10. + 33.*eta)/(-15.*m1p3eta);
     coeffs->delta32vh4 = 0.;
-    coeffs->delta32vh6 = (52.*np.pi)/21.;
-    coeffs->delta32vh9 = -9112./405. + (208.*np.pi*np.pi)/63.;
+    coeffs->delta32vh6 = (52.*M_PI)/21.;
+    coeffs->delta32vh9 = -9112./405. + (208.*M_PI*M_PI)/63.;
     coeffs->rho32v1 = (4.*chiS*eta)/(-3.*m1p3eta);
     coeffs->rho32v2 =  (328. - 1115.*eta + 320.*eta2)/(270.*m1p3eta);
     coeffs->rho32v3 =  2./9.*a;
@@ -98,9 +98,9 @@ int compute_modes(WaveformCoefficients * const coeffs, REAL8 m1,REAL8  m2,REAL8 
     
     if(deltam2){
         coeffs->delta31vh3 = 13./30.;
-        coeffs->delta31vh6 = (13.*np.pi)/21.;
+        coeffs->delta31vh6 = (13.*M_PI)/21.;
         coeffs->delta31vh7 = 0.;
-        coeffs->delta31vh9 = -227827./81000. + (26.*np.pi*np.pi)/63.;
+        coeffs->delta31vh9 = -227827./81000. + (26.*M_PI*M_PI)/63.;
         coeffs->delta31v5 = -17.*eta/10.;
         coeffs->rho31v2 =  -13./18. - (2.*eta)/9.;
         coeffs->rho31v3 =  0.;
@@ -117,7 +117,7 @@ int compute_modes(WaveformCoefficients * const coeffs, REAL8 m1,REAL8  m2,REAL8 
     }
     
     coeffs->delta44vh3 = (112. + 219.*eta)/(-120.*m1p3eta);
-    coeffs->delta44vh6 = (25136.*np.pi)/3465.;
+    coeffs->delta44vh6 = (25136.*M_PI)/3465.;
     coeffs->delta44vh9 = 0.;    
     coeffs->rho44v2 =  (1614. - 5870.*eta + 2625.*eta2)/(1320.*m1p3eta);
     coeffs->rho44v3 =  (chiA * (10. - 39.*eta)*deltam + chiS * (10. - 41.*eta + 42.*eta2)) / (15.*m1p3eta);
@@ -129,7 +129,7 @@ int compute_modes(WaveformCoefficients * const coeffs, REAL8 m1,REAL8  m2,REAL8 
     if(deltam2){
         coeffs->delta43vh3 = (486. + 4961.*eta)/(810.*(1. - 2.*eta));
         coeffs->delta43vh4 = 0.;
-        coeffs->delta43vh6 = 1571.*np.pi/385.;
+        coeffs->delta43vh6 = 1571.*M_PI/385.;
         coeffs->rho43v1 =  0.;
         coeffs->rho43v2 =  (222. - 547.*eta + 160.*eta2)/(176.*(-1. + 2.*eta));
         coeffs->rho43v4 =  -6894273./7047040. + (3.*a2)/8.;
@@ -142,7 +142,7 @@ int compute_modes(WaveformCoefficients * const coeffs, REAL8 m1,REAL8  m2,REAL8 
     }
     
     coeffs->delta42vh3 = (7.*(1. + 6.*eta))/(-15.*m1p3eta);
-    coeffs->delta42vh6 = (6284.*np.pi)/3465.;
+    coeffs->delta42vh6 = (6284.*M_PI)/3465.;
     coeffs->rho42v2 =  (1146. - 3530.*eta + 285.*eta2)/(1320.*m1p3eta);
     coeffs->rho42v3 =  (chiA * (10. - 21.*eta)*deltam + chiS*(10. - 59.*eta + 78.*eta2))/(15.*m1p3eta);
     coeffs->rho42v4 = a2/2.+(-114859044.+295834536.*eta+1204388696.*eta2-3047981160.*eta3-379526805.*eta4)/(317116800.*m1p3eta*m1p3eta);
@@ -153,7 +153,7 @@ int compute_modes(WaveformCoefficients * const coeffs, REAL8 m1,REAL8  m2,REAL8 
     if(deltam2){
         coeffs->delta41vh3 = (2. + 507.*eta)/(10.*(1. - 2.*eta));
         coeffs->delta41vh4 = 0.;
-        coeffs->delta41vh6 = 1571.*np.pi/3465.;        
+        coeffs->delta41vh6 = 1571.*M_PI/3465.;        
         coeffs->rho41v1 =  0.0;
         coeffs->rho41v2 =  (602. - 1385.*eta + 288.*eta2)/(528.*(-1. + 2.*eta));
         coeffs->rho41v4 =  -7775491./21141120. + (3.* a2)/8.;
