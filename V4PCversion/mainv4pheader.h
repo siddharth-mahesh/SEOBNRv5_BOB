@@ -1,4 +1,37 @@
+# include<complex.h>
 # include<math.h>
+
+// Function defining the Kronecker delta
+
+int kron_delta(int i, int j){
+    if(i == j){
+        return 1;
+    }
+    return 0;
+}
+
+// Function to compute factorial
+
+int factorial(int n){
+    if (n<=0){
+        return 1;
+    }
+    else{
+        return n*factorial(n-1);
+    }
+}
+
+// Function to compute a double factorial; see https://en.wikipedia.org/wiki/Double_factorial
+
+int doublefactorial(int n){
+    if (n <= 0){
+        return 1;
+    }
+    else{
+        return n * doublefactorial(n-2);
+    }
+}
+
 
 typedef struct WaveformCoefficients
 {

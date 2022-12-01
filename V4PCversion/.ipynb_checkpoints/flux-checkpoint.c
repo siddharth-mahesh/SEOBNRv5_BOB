@@ -4,37 +4,6 @@
 #include "v4P_hamiltonian_first_derivatives.c"
 #include "waveformcoefficients.c"
 
-// Function defining the Kronecker delta
-
-int kron_delta(int i, int j){
-    if(i == j){
-        return 1;
-    }
-    return 0;
-}
-
-// Function to compute factorial
-
-int factorial(int n){
-    if (n<=0){
-        return 1;
-    }
-    else{
-        return n*factorial(n-1);
-    }
-}
-
-// Function to compute a double factorial; see https://en.wikipedia.org/wiki/Double_factorial
-
-int doublefactorial(int n){
-    if (n <= 0){
-        return 1;
-    }
-    else{
-        return n * doublefactorial(n-2);
-    }
-}
-
 // Function to get dRdt from the hamiltonian derivatives
 
 int dRvec(REAL8 dR[], REAL8 m1,REAL8 m2,int tortoise,REAL8 q[], REAL8 p[], REAL8 S1[], REAL8 S2[]){
@@ -60,9 +29,9 @@ int dRvec(REAL8 dR[], REAL8 m1,REAL8 m2,int tortoise,REAL8 q[], REAL8 p[], REAL8
 }
 
 
-// Compute the Newtonian prefix m
+// Compute the Newtonian prefix m for the flux (i.e returning a real result)
 
-REAL8 Newtonian_n(REAL8 m1,REAL8 m2,int l,int m){
+REAL8 Newtonian_flux_n(REAL8 m1,REAL8 m2,int l,int m){
     int epsilon = (l+m)%2 ;
     int doubfact = doublefactorial(2*l+1);
     REAL8 n = pow(m, l)*8*(M_PI/doubfact);
@@ -89,7 +58,7 @@ REAL8 Newtonian_n(REAL8 m1,REAL8 m2,int l,int m){
 
 REAL8 Newtonian_c(REAL8 m1,REAL8 m2,int l,int m){
     REAL8 Mtot = m1 + m2;
-    REAL8 m1hat = np.divide(m1,Mtot)
+    REAL8 m1hat = np.divide(m1,Mtot);
     REAL8 m2hat = np.divide(m2,Mtot);
     int epsilon = (l+m)%2;
     int sign;
@@ -537,10 +506,9 @@ REAL8 compute_hFlm_for_flux(REAL8 m1,REAL8 m2,REAL8 EMgamma,int tortoise,REAL8 q
     REAL8 Vl_Phi = pow(vPhi,l+epsilon);
     REAL8 Ylminuse_minusm = AbsSphericalHarmonicAtPiOver2(l-epsilon,-m);
     REAL8 c_lpluse = Newtonian_c(m1,m2,l,m);
-    REAL8 ne_lm = Newtonian_n(m1,m2,l,m);
+    REAL8 ne_lm = Newtonian_flux_n(m1,m2,l,m);
     REAL8 hNe_lm = eta*ne_lm*c_lpluse*Vl_Phi*Ylminuse_minusm;
-    REAL8 hF_lm = hNe_lm*Se_eff*T_lm*rholmpowl;
-    
+    REAL8 hF_lm = hNe_lm*Se_eff*T_lm*rholmpowl;    
     return hF_lm;
 }
 
@@ -577,14 +545,14 @@ REAL8 compute_flux(REAL8 m1,REAL8 m2,REAL8 EMGamma,REAL8 tortoise,REAL8 q,REAL8 
     REAL8 chiS = 0.5*(s1dotL + s2dotL);
     REAL8 chiA = 0.5*(s1dotL - s2dotL);
     if (omegasq > 1){
-        flux = 0.
+        flux = 0.;
     }
     else{
         for (l = 2, l <= lMax, l++){
             for (m = 1 m <= l, m++){
                 hLM = compute_hFlm_for_flux(m1,m2,EMGamma,tortoise,q,p,S1,S2,l,m,Hreal,v,chiA,chiS);
                 if (l == 2 && m == 2){
-                    hLM *= NQC
+                    hLM *= NQC;
                 }
                 flux += m*m*omegasq*hLM*hLM;
             }
