@@ -6,7 +6,7 @@ import Flux.factorized_waveform_for_flux as wv
 # Spin aligned EOB version is a parameter we may not need as all precessing 
 # approximants build on v2 spin-aligned background
 
-def compute_flux(m1,m2,EMGamma,tortoise,q,p,S1,S2,omega,Hreal,NQC=1.,lMax = 8):
+def compute_flux(m1,m2,tortoise,q,p,S1,S2,omega,Hreal,NQC=1.,lMax = 8):
     r = np.linalg.norm(q)
     eta = m1*m2/(m1+m2)/(m1+m2)
     flux = 0.
@@ -33,7 +33,7 @@ def compute_flux(m1,m2,EMGamma,tortoise,q,p,S1,S2,omega,Hreal,NQC=1.,lMax = 8):
         for m in range(1,l+1):
             #print(l,",",m)
             #print(m1,m2,EMGamma,tortoise,q,p,S1,S2,l,m,Hreal,v,chiA,chiS)
-            hLM = wv.compute_hFlm_for_flux(m1,m2,EMGamma,tortoise,q,p,S1,S2,l,m,Hreal,v,chiA,chiS)
+            hLM = wv.compute_hFlm_for_flux(m1,m2,tortoise,q,p,S1,S2,l,m,Hreal,v,chiA,chiS)
             ## NQC terms here
             if l == 2 and m ==2:
                 hLM *= NQC

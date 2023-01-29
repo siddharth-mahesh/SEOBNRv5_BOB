@@ -1,6 +1,7 @@
 import numpy as np
 from Derivatives.ham_and_csi_first_derivs import ham_first_derivs
 import Flux.modes as fm
+EMGamma = 0.577215664901532860606512090082402431
 
 ## Function to get d\vec{R}dt from the hamiltonian derivatives
 
@@ -209,7 +210,7 @@ def Tlmprodfac(l,hathatk):
 # Answer: The omega passed into the flux is the instantaneous angular frequency. The omega computed here is the frequency of a circular orbit at that instantaneous positions on a v4P background with the instantaneous spins.
 # Addendum: This rather bulky calculation is done to compute the waveform for every multipole moment and thus repeats  ~ 30 times at each RHS evaluation when only one is needed. While it makes sense to have it within the hLM computation for complex waveforms since we only calculate individual modes, it does not makes sense when computing the overall flux as all 27 modes are needed anyways and will have the same value of omega and vphikepler.
 
-def CalcOmega(m1,m2,EMGamma,tortoise,q,p,S1,S2):
+def CalcOmega(m1,m2,tortoise,q,p,S1,S2):
     #print("q = ", q)
     #print("p = ", p)
     #print("S1 = ", S1)
@@ -278,8 +279,8 @@ def CalcOmega(m1,m2,EMGamma,tortoise,q,p,S1,S2):
     return omega
     
 ## Compute the non-Keplerian coefficient for vPhi
-def vPhiNonKeplerian(m1,m2,EMGamma,tortoise,q,p,S1,S2):
-    omega_circular = CalcOmega(m1,m2,EMGamma,tortoise,q,p,S1,S2)
+def vPhiNonKeplerian(m1,m2,tortoise,q,p,S1,S2):
+    omega_circular = CalcOmega(m1,m2,tortoise,q,p,S1,S2)
     r = np.linalg.norm(q)
     r3 = r*r*r
     #print("vPhiKepler = %.16e" % (1/(omega_circular*omega_circular*r3)) )
@@ -287,14 +288,14 @@ def vPhiNonKeplerian(m1,m2,EMGamma,tortoise,q,p,S1,S2):
     
 ## Function to compute the Post-Newtonian Waveform modes
 
-def rholmpowl(m1,m2,l,m,chiA,chiS,v,EMgamma):
+def rholmpowl(m1,m2,l,m,chiA,chiS,v):
     eta = m1*m2/(m1+m2)/(m1+m2)
     tplspin = (1. - 2.*eta)*chiS + chiA*(m1-m2)/(m1+m2)
     #print("validate_a = %.16e"%tplspin)
     #print(m1,m2,tplspin,eta,chiA,chiS)
     test = fm.compute_modes(m1,m2,tplspin,chiA,chiS)
     vsq = v*v
-    eulerlog = EMgamma + np.log(2.*m*v)
+    eulerlog = EMGamma + np.log(2.*m*v)
     auxflm = 0
     if l==2:
         if m==2:

@@ -70,7 +70,7 @@ REAL8 compute_v4P_Hreal(REAL8 m1,REAL8 m2,INT tortoise,REAL8 x,REAL8 y,REAL8 z,R
     REAL8 Delta5l=etaKminus1*etaKminus1*np.divide(64,5) ;
     REAL8 logarg=u*(Delta1+u*(Delta2+u*(Delta3+u*(Delta4+u*(Delta5+Delta5l*log(u)))))) ;
     REAL8 Deltaucalib = 1 + eta*(Delta0 + log1p( logarg)) ;
-    REAL8 Deltaucalibprime=-eta*u*u*(Delta1+u*(2*Delta2+u*(3*Delta3+u*(4*Delta4+u*(5*Delta5+Delta5l*(1+5*log(u)))))))/(1+logarg) ;
+    REAL8 Deltaucalibprime = -eta*u*u*(Delta1+u*(2*Delta2+u*(3*Delta3+u*(4*Delta4+u*(5*(Delta5+Delta5l*log(u)))))))/(1+logarg) ;
     REAL8 Deltaubar=a*a*u*u+(2*u+1/etaKminus1)/etaKminus1 ;
     REAL8 Deltaubarprime = -2*a*a*u*u*u - 2*u*u/(etaKminus1) ;
     REAL8 Deltau=fabs(Deltaubar*Deltaucalib) ;

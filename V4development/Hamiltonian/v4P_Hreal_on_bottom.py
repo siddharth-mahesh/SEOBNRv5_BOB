@@ -69,8 +69,8 @@ def compute_v4P_Hreal(m1=23., m2=10., EMgamma=0.57721566490153286060651209008240
     Delta5=etaKminus1*etaKminus1*(np.divide(-4237,60)+np.divide(128,5)*EMgamma+np.divide(2275,512)*np.pi*np.pi-np.divide(1,3)*a*a*(Delta1*Delta1*Delta1-3*Delta1*Delta2+3*Delta3)-(Delta1*Delta1*Delta1*Delta1*Delta1-5*Delta1*Delta1*Delta1*Delta2+5*Delta1*Delta2*Delta2+5*Delta1*Delta1*Delta3-5*Delta2*Delta3-5*Delta1*Delta4)/(5*etaKminus1*etaKminus1)+(Delta1*Delta1*Delta1*Delta1-4*Delta1*Delta1*Delta2+2*Delta2*Delta2+4*Delta1*Delta3-4*Delta4)/(2*etaKminus1)+np.divide(256,5)*np.log(2)+(np.divide(41,32)*np.pi*np.pi-np.divide(221,6))*eta)
     Delta5l=etaKminus1*etaKminus1*np.divide(64,5)
     logarg=u*(Delta1+u*(Delta2+u*(Delta3+u*(Delta4+u*(Delta5+Delta5l*np.log(u))))))
-    Deltaucalib = 1 + eta*(Delta0 + np.np.log1p( logarg))
-    Deltaucalibprime=-eta*u*u*(Delta1+u*(2*Delta2+u*(3*Delta3+u*(4*Delta4+u*(5*Delta5+Delta5l*(1+5*np.log(u)))))))/(1+logarg)
+    Deltaucalib = 1 + eta*(Delta0 + np.log1p( logarg))
+    Deltaucalibprime = -eta*u*u*(Delta1+u*(2*Delta2+u*(3*Delta3+u*(4*Delta4+u*(5*(Delta5+Delta5l*np.log(u)))))))/(1+logarg)
     Deltaubar=a*a*u*u+(2*u+1/etaKminus1)/etaKminus1
     Deltaubarprime = -2*a*a*u*u*u - 2*u*u/(etaKminus1)
     Deltau=np.abs(Deltaubar*Deltaucalib)

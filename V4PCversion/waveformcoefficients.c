@@ -1,22 +1,22 @@
 #include "mainv4pheader.h"
 #include <string.h>
 
-int compute_modes(WaveformCoefficients * const coeffs, REAL8 m1,REAL8  m2,REAL8 eta, REAL8  a,REAL8  chiA,REAL8 chiS){
+int compute_modes(WaveformCoefficients * const coeffs, double m1,double  m2,double eta, double  a,double  chiA,double chiS){
     
-    REAL8 deltam = (m1 - m2)/(m1 + m2);
-    REAL8 deltam2=deltam*deltam;
-    REAL8 a2 = a*a;
-    REAL8 a3 = a2*a;
-    REAL8 a4 = a3*a;
-    REAL8 a5 = a4*a;
-    REAL8 a6 = a5*a;
-    REAL8 a7=a6*a;
-    REAL8 eta2 = eta*eta;
-    REAL8 eta3 = eta2*eta;
-    REAL8 eta4=eta3*eta;
-    REAL8 m1p3eta=-1+3*eta;
-    REAL8 m1p3eta2 = m1p3eta*m1p3eta;
-    REAL8 m1p3eta3 = m1p3eta2*m1p3eta;
+    double deltam = (m1 - m2)/(m1 + m2);
+    double deltam2=deltam*deltam;
+    double a2 = a*a;
+    double a3 = a2*a;
+    double a4 = a3*a;
+    double a5 = a4*a;
+    double a6 = a5*a;
+    double a7=a6*a;
+    double eta2 = eta*eta;
+    double eta3 = eta2*eta;
+    double eta4=eta3*eta;
+    double m1p3eta=-1+3*eta;
+    double m1p3eta2 = m1p3eta*m1p3eta;
+    double m1p3eta3 = m1p3eta2*m1p3eta;
     memset(coeffs,0, sizeof(WaveformCoefficients));
     
     coeffs->delta22vh3 = 7./3.;
