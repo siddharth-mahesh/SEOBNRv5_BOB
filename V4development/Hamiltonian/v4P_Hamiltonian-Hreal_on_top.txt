@@ -1,4 +1,4 @@
-Hreal = sp.sqrt(1 + 2*eta*(Heff - 1))
+Hreal = sp.sqrt(1 + 2*eta*(sp.Abs(Heff) - 1))
 
 Heff = Hs + Hns - Hd + dSS*eta*u*u*u*u*(S1x*S1x + S1y*S1y + S1z*S1z + S2x*S2x + S2y*S2y + S2z*S2z)
 dSS = 528.511*chi*chi*chi*eta*eta - 41.0003*chi*chi*chi*eta + 1161.78*chi*chi*eta*eta*eta - 326.325*chi*chi*eta*eta
@@ -157,7 +157,7 @@ csi2 = 1 + (sp.Rational(1,2) - sp.Rational(1,2)*sp.sign(sp.Rational(3,2) - torto
 
 csi1 = 1 + (1 - sp.Abs(1-tortoise))*(csi - 1)
 
-csi = sp.sqrt(Deltar*Deltat)/w2
+csi = sp.sqrt(sp.Abs(Deltar*Deltat))/w2
 
 Lambdat = sp.Abs(w2*w2 - a*a*Deltat*sin2theta)
 
@@ -174,7 +174,7 @@ Deltaubarprime = -2*a*a*u*u*u - 2*u*u/(etaKminus1)
 Deltaubar = a*a*u*u + (2*u + 1/etaKminus1)/etaKminus1
 
 Deltaucalibprime = -eta*u*u*(Delta1+u*(2*Delta2+u*(3*Delta3+u*(4*Delta4+u*(5*(Delta5+Delta5l*sp.log(u)))))))/(1+logarg)
-Deltaucalib = 1 + eta*(Delta0 + sp.log(1 + logarg))
+Deltaucalib = 1 + eta*(Delta0 + sp.log(sp.Abs(1 + logarg)))
 logarg = u*(Delta1 + u*(Delta2 + u*(Delta3 + u*(Delta4 + u*(Delta5 + Delta5l*sp.log(u))))))
 
 Delta5l = etaKminus1*etaKminus1*sp.Rational(64,5)

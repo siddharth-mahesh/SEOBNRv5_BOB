@@ -70,7 +70,7 @@ def ham_x_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, 
     Delta5 = etaKminus1*etaKminus1*(np.true_divide(-4237,60)+np.true_divide(128,5)*EMgamma+np.true_divide(2275,512)*np.pi*np.pi-np.true_divide(1,3)*a*a*(Delta1*Delta1*Delta1-3*Delta1*Delta2+3*Delta3)-(Delta1*Delta1*Delta1*Delta1*Delta1-5*Delta1*Delta1*Delta1*Delta2+5*Delta1*Delta2*Delta2+5*Delta1*Delta1*Delta3-5*Delta2*Delta3-5*Delta1*Delta4)/(5*etaKminus1*etaKminus1)+(Delta1*Delta1*Delta1*Delta1-4*Delta1*Delta1*Delta2+2*Delta2*Delta2+4*Delta1*Delta3-4*Delta4)/(2*etaKminus1)+np.true_divide(256,5)*np.log(2)+(np.true_divide(41,32)*np.pi*np.pi-np.true_divide(221,6))*eta)
     Delta5l = etaKminus1*etaKminus1*np.true_divide(64,5)
     logarg = u*(Delta1+u*(Delta2+u*(Delta3+u*(Delta4+u*(Delta5+Delta5l*np.log(u))))))
-    Deltaucalib = 1+eta*(Delta0+np.log1p(logarg))
+    Deltaucalib = 1+eta*(Delta0+np.log(np.abs(1+logarg)))
     Deltaucalibprime = -eta*u*u*(Delta1+u*(2*Delta2+u*(3*Delta3+u*(4*Delta4+u*(5*(Delta5+Delta5l*np.log(u)))))))/(1+logarg)
     Deltaubar = a*a*u*u+(2*u+1/etaKminus1)/etaKminus1
     Deltaubarprime = -2*a*a*u*u*u-2*u*u/(etaKminus1)
@@ -80,7 +80,7 @@ def ham_x_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, 
     Deltat = r*r*Deltau
     Deltar = Deltat*Dinv
     Lambt = np.abs(w2*w2-a*a*Deltat*sin2theta)
-    csi = np.sqrt(Deltar*Deltat)/w2
+    csi = np.sqrt(np.abs(Deltar*Deltat))/w2
     csi1 = 1+(1-np.abs(1-tortoise))*(csi-1)
     csi2 = 1+(np.true_divide(1,2)-np.true_divide(1,2)*np.sign(np.true_divide(3,2)-tortoise))*(csi-1)
     prT = csi2*(p1*n1+p2*n2+p3*n3)
@@ -161,7 +161,7 @@ def ham_x_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, 
     Hs = Hso+Hss
     dSS = 528.511*chi*chi*chi*eta*eta-41.0003*chi*chi*chi*eta+1161.78*chi*chi*eta*eta*eta-326.325*chi*chi*eta*eta+37.1964*chi*eta+706.958*eta*eta*eta-36.0272*eta+6.06807
     Heff = Hs+Hns-Hd+dSS*eta*u*u*u*u*(S1x*S1x+S1y*S1y+S1z*S1z+S2x*S2x+S2y*S2y+S2z*S2z)
-    Hreal = np.sqrt(1+2*eta*(Heff-1))
+    Hreal = np.sqrt(1+2*eta*(np.abs(Heff)-1))
 
     r_prmx = x/np.sqrt(x**2 + y**2 + z**2)
     u_prmx = -r_prmx/r**2
@@ -209,7 +209,7 @@ def ham_x_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, 
     Delta5_prmx = etaKminus1**2*(-a**2*(3*Delta1**2*Delta1_prmx - 3*Delta1*Delta2_prmx - 3*Delta1_prmx*Delta2 + 3*Delta3_prmx)/3 + (4*Delta1**3*Delta1_prmx - 4*Delta1**2*Delta2_prmx - 8*Delta1*Delta1_prmx*Delta2 + 4*Delta1*Delta3_prmx + 4*Delta1_prmx*Delta3 + 4*Delta2*Delta2_prmx - 4*Delta4_prmx)/(2*etaKminus1) - etaKminus1_prmx*(Delta1**4 - 4*Delta1**2*Delta2 + 4*Delta1*Delta3 + 2*Delta2**2 - 4*Delta4)/(2*etaKminus1**2) - (5*Delta1**4*Delta1_prmx - 5*Delta1**3*Delta2_prmx - 15*Delta1**2*Delta1_prmx*Delta2 + 5*Delta1**2*Delta3_prmx + 10*Delta1*Delta1_prmx*Delta3 + 10*Delta1*Delta2*Delta2_prmx - 5*Delta1*Delta4_prmx + 5*Delta1_prmx*Delta2**2 - 5*Delta1_prmx*Delta4 - 5*Delta2*Delta3_prmx - 5*Delta2_prmx*Delta3)/(5*etaKminus1**2) + etaKminus1_prmx*(2*Delta1**5 - 10*Delta1**3*Delta2 + 10*Delta1**2*Delta3 + 10*Delta1*Delta2**2 - 10*Delta1*Delta4 - 10*Delta2*Delta3)/(5*etaKminus1**3)) + etaKminus1*etaKminus1_prmx*(256*EMgamma/5 + 2*a**2*(-Delta1**3 + 3*Delta1*Delta2 - 3*Delta3)/3 + 2*eta*(-221/6 + 41*np.pi**2/32) - 4237/30 + 512*np.log(2)/5 + 2275*np.pi**2/256 + (Delta1**4 - 4*Delta1**2*Delta2 + 4*Delta1*Delta3 + 2*Delta2**2 - 4*Delta4)/etaKminus1 - 2*(Delta1**5 - 5*Delta1**3*Delta2 + 5*Delta1**2*Delta3 + 5*Delta1*Delta2**2 - 5*Delta1*Delta4 - 5*Delta2*Delta3)/(5*etaKminus1**2))
     Delta5l_prmx = 128*etaKminus1*etaKminus1_prmx/5
     logarg_prmx = u*(Delta1_prmx + u*(Delta2_prmx + u*(Delta3_prmx + u*(Delta4_prmx + u*(Delta5l*u_prmx/u + Delta5l_prmx*np.log(u) + Delta5_prmx) + u_prmx*(Delta5 + Delta5l*np.log(u))) + u_prmx*(Delta4 + u*(Delta5 + Delta5l*np.log(u)))) + u_prmx*(Delta3 + u*(Delta4 + u*(Delta5 + Delta5l*np.log(u))))) + u_prmx*(Delta2 + u*(Delta3 + u*(Delta4 + u*(Delta5 + Delta5l*np.log(u)))))) + u_prmx*(Delta1 + u*(Delta2 + u*(Delta3 + u*(Delta4 + u*(Delta5 + Delta5l*np.log(u))))))
-    Deltaucalib_prmx = eta*(Delta0_prmx + logarg_prmx/(logarg + 1))
+    Deltaucalib_prmx = eta*(Delta0_prmx + logarg_prmx*np.sign(logarg + 1)/np.abs(logarg + 1))
     Deltaucalibprime_prmx = eta*logarg_prmx*u**2*(Delta1 + u*(2*Delta2 + u*(3*Delta3 + u*(4*Delta4 + u*(5*Delta5 + 5*Delta5l*np.log(u))))))/(logarg + 1)**2 - eta*u**2*(Delta1_prmx + u*(2*Delta2_prmx + u*(3*Delta3_prmx + u*(4*Delta4_prmx + u*(5*Delta5l*u_prmx/u + 5*Delta5l_prmx*np.log(u) + 5*Delta5_prmx) + u_prmx*(5*Delta5 + 5*Delta5l*np.log(u))) + u_prmx*(4*Delta4 + u*(5*Delta5 + 5*Delta5l*np.log(u)))) + u_prmx*(3*Delta3 + u*(4*Delta4 + u*(5*Delta5 + 5*Delta5l*np.log(u))))) + u_prmx*(2*Delta2 + u*(3*Delta3 + u*(4*Delta4 + u*(5*Delta5 + 5*Delta5l*np.log(u))))))/(logarg + 1) + eta*u*u_prmx*(-2*Delta1 - 2*u*(2*Delta2 + u*(3*Delta3 + u*(4*Delta4 + u*(5*Delta5 + 5*Delta5l*np.log(u))))))/(logarg + 1)
     Deltaubar_prmx = 2*a**2*u*u_prmx + (2*u_prmx - etaKminus1_prmx/etaKminus1**2)/etaKminus1 + etaKminus1_prmx*(-2*u - 1/etaKminus1)/etaKminus1**2
     Deltaubarprime_prmx = -6*a**2*u**2*u_prmx - 4*u*u_prmx/etaKminus1 + 2*etaKminus1_prmx*u**2/etaKminus1**2
@@ -219,7 +219,7 @@ def ham_x_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, 
     Deltat_prmx = 2*Deltau*r*r_prmx + Deltau_prmx*r**2
     Deltar_prmx = Deltat*Dinv_prmx + Deltat_prmx*Dinv
     Lambt_prmx = (Deltat*a**2*sin2theta_prmx + Deltat_prmx*a**2*sin2theta - 2*w2*w2_prmx)*np.sign(Deltat*a**2*sin2theta - w2**2)
-    csi_prmx = -w2_prmx*np.sqrt(Deltar*Deltat)/w2**2 + np.sqrt(Deltar*Deltat)*(Deltar*Deltat_prmx/2 + Deltar_prmx*Deltat/2)/(Deltar*Deltat*w2)
+    csi_prmx = (Deltar*Deltat_prmx + Deltar_prmx*Deltat)*np.sign(Deltar*Deltat)/(2*w2*np.sqrt(np.abs(Deltar*Deltat))) - w2_prmx*np.sqrt(np.abs(Deltar*Deltat))/w2**2
     csi1_prmx = csi_prmx*(1 - np.abs(tortoise - 1))
     csi2_prmx = csi_prmx*(1/2 - np.sign(3/2 - tortoise)/2)
     prT_prmx = csi2*(n1_prmx*p1 + n2_prmx*p2 + n3_prmx*p3) + csi2_prmx*(n1*p1 + n2*p2 + n3*p3)
@@ -299,8 +299,8 @@ def ham_x_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, 
     Hs_prmx = Hso_prmx + Hss_prmx
     dSS_prmx = 1585.533*chi**2*chi_prmx*eta**2 - 123.0009*chi**2*chi_prmx*eta + 2323.56*chi*chi_prmx*eta**3 - 652.65*chi*chi_prmx*eta**2 + 37.1964*chi_prmx*eta
     Heff_prmx = -Hd_prmx + Hns_prmx + Hs_prmx + dSS*eta*u**3*u_prmx*(4*S1x**2 + 4*S1y**2 + 4*S1z**2 + 4*S2x**2 + 4*S2y**2 + 4*S2z**2) + dSS_prmx*eta*u**4*(S1x**2 + S1y**2 + S1z**2 + S2x**2 + S2y**2 + S2z**2)
-    Hreal_prmx = Heff_prmx*eta/np.sqrt(eta*(2*Heff - 2) + 1)
-    return np.array([Hreal_prmx,csi_prmx])
+    Hreal_prmx = Heff_prmx*eta*np.sign(Heff)/np.sqrt(eta*(2*np.abs(Heff) - 2) + 1)
+    return np.array([Hreal_prmx,csi_prmx,csi])
 
 def ham_y_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z):
     EMgamma = 0.577215664901532860606512090082402431
@@ -372,7 +372,7 @@ def ham_y_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, 
     Delta5 = etaKminus1*etaKminus1*(np.true_divide(-4237,60)+np.true_divide(128,5)*EMgamma+np.true_divide(2275,512)*np.pi*np.pi-np.true_divide(1,3)*a*a*(Delta1*Delta1*Delta1-3*Delta1*Delta2+3*Delta3)-(Delta1*Delta1*Delta1*Delta1*Delta1-5*Delta1*Delta1*Delta1*Delta2+5*Delta1*Delta2*Delta2+5*Delta1*Delta1*Delta3-5*Delta2*Delta3-5*Delta1*Delta4)/(5*etaKminus1*etaKminus1)+(Delta1*Delta1*Delta1*Delta1-4*Delta1*Delta1*Delta2+2*Delta2*Delta2+4*Delta1*Delta3-4*Delta4)/(2*etaKminus1)+np.true_divide(256,5)*np.log(2)+(np.true_divide(41,32)*np.pi*np.pi-np.true_divide(221,6))*eta)
     Delta5l = etaKminus1*etaKminus1*np.true_divide(64,5)
     logarg = u*(Delta1+u*(Delta2+u*(Delta3+u*(Delta4+u*(Delta5+Delta5l*np.log(u))))))
-    Deltaucalib = 1+eta*(Delta0+np.log1p(logarg))
+    Deltaucalib = 1+eta*(Delta0+np.log(np.abs(1+logarg)))
     Deltaucalibprime = -eta*u*u*(Delta1+u*(2*Delta2+u*(3*Delta3+u*(4*Delta4+u*(5*(Delta5+Delta5l*np.log(u)))))))/(1+logarg)
     Deltaubar = a*a*u*u+(2*u+1/etaKminus1)/etaKminus1
     Deltaubarprime = -2*a*a*u*u*u-2*u*u/(etaKminus1)
@@ -382,7 +382,7 @@ def ham_y_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, 
     Deltat = r*r*Deltau
     Deltar = Deltat*Dinv
     Lambt = np.abs(w2*w2-a*a*Deltat*sin2theta)
-    csi = np.sqrt(Deltar*Deltat)/w2
+    csi = np.sqrt(np.abs(Deltar*Deltat))/w2
     csi1 = 1+(1-np.abs(1-tortoise))*(csi-1)
     csi2 = 1+(np.true_divide(1,2)-np.true_divide(1,2)*np.sign(np.true_divide(3,2)-tortoise))*(csi-1)
     prT = csi2*(p1*n1+p2*n2+p3*n3)
@@ -463,7 +463,7 @@ def ham_y_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, 
     Hs = Hso+Hss
     dSS = 528.511*chi*chi*chi*eta*eta-41.0003*chi*chi*chi*eta+1161.78*chi*chi*eta*eta*eta-326.325*chi*chi*eta*eta+37.1964*chi*eta+706.958*eta*eta*eta-36.0272*eta+6.06807
     Heff = Hs+Hns-Hd+dSS*eta*u*u*u*u*(S1x*S1x+S1y*S1y+S1z*S1z+S2x*S2x+S2y*S2y+S2z*S2z)
-    Hreal = np.sqrt(1+2*eta*(Heff-1))
+    Hreal = np.sqrt(1+2*eta*(np.abs(Heff)-1))
 
     r_prmy = y/np.sqrt(x**2 + y**2 + z**2)
     u_prmy = -r_prmy/r**2
@@ -511,7 +511,7 @@ def ham_y_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, 
     Delta5_prmy = etaKminus1**2*(-a**2*(3*Delta1**2*Delta1_prmy - 3*Delta1*Delta2_prmy - 3*Delta1_prmy*Delta2 + 3*Delta3_prmy)/3 + (4*Delta1**3*Delta1_prmy - 4*Delta1**2*Delta2_prmy - 8*Delta1*Delta1_prmy*Delta2 + 4*Delta1*Delta3_prmy + 4*Delta1_prmy*Delta3 + 4*Delta2*Delta2_prmy - 4*Delta4_prmy)/(2*etaKminus1) - etaKminus1_prmy*(Delta1**4 - 4*Delta1**2*Delta2 + 4*Delta1*Delta3 + 2*Delta2**2 - 4*Delta4)/(2*etaKminus1**2) - (5*Delta1**4*Delta1_prmy - 5*Delta1**3*Delta2_prmy - 15*Delta1**2*Delta1_prmy*Delta2 + 5*Delta1**2*Delta3_prmy + 10*Delta1*Delta1_prmy*Delta3 + 10*Delta1*Delta2*Delta2_prmy - 5*Delta1*Delta4_prmy + 5*Delta1_prmy*Delta2**2 - 5*Delta1_prmy*Delta4 - 5*Delta2*Delta3_prmy - 5*Delta2_prmy*Delta3)/(5*etaKminus1**2) + etaKminus1_prmy*(2*Delta1**5 - 10*Delta1**3*Delta2 + 10*Delta1**2*Delta3 + 10*Delta1*Delta2**2 - 10*Delta1*Delta4 - 10*Delta2*Delta3)/(5*etaKminus1**3)) + etaKminus1*etaKminus1_prmy*(256*EMgamma/5 + 2*a**2*(-Delta1**3 + 3*Delta1*Delta2 - 3*Delta3)/3 + 2*eta*(-221/6 + 41*np.pi**2/32) - 4237/30 + 512*np.log(2)/5 + 2275*np.pi**2/256 + (Delta1**4 - 4*Delta1**2*Delta2 + 4*Delta1*Delta3 + 2*Delta2**2 - 4*Delta4)/etaKminus1 - 2*(Delta1**5 - 5*Delta1**3*Delta2 + 5*Delta1**2*Delta3 + 5*Delta1*Delta2**2 - 5*Delta1*Delta4 - 5*Delta2*Delta3)/(5*etaKminus1**2))
     Delta5l_prmy = 128*etaKminus1*etaKminus1_prmy/5
     logarg_prmy = u*(Delta1_prmy + u*(Delta2_prmy + u*(Delta3_prmy + u*(Delta4_prmy + u*(Delta5l*u_prmy/u + Delta5l_prmy*np.log(u) + Delta5_prmy) + u_prmy*(Delta5 + Delta5l*np.log(u))) + u_prmy*(Delta4 + u*(Delta5 + Delta5l*np.log(u)))) + u_prmy*(Delta3 + u*(Delta4 + u*(Delta5 + Delta5l*np.log(u))))) + u_prmy*(Delta2 + u*(Delta3 + u*(Delta4 + u*(Delta5 + Delta5l*np.log(u)))))) + u_prmy*(Delta1 + u*(Delta2 + u*(Delta3 + u*(Delta4 + u*(Delta5 + Delta5l*np.log(u))))))
-    Deltaucalib_prmy = eta*(Delta0_prmy + logarg_prmy/(logarg + 1))
+    Deltaucalib_prmy = eta*(Delta0_prmy + logarg_prmy*np.sign(logarg + 1)/np.abs(logarg + 1))
     Deltaucalibprime_prmy = eta*logarg_prmy*u**2*(Delta1 + u*(2*Delta2 + u*(3*Delta3 + u*(4*Delta4 + u*(5*Delta5 + 5*Delta5l*np.log(u))))))/(logarg + 1)**2 - eta*u**2*(Delta1_prmy + u*(2*Delta2_prmy + u*(3*Delta3_prmy + u*(4*Delta4_prmy + u*(5*Delta5l*u_prmy/u + 5*Delta5l_prmy*np.log(u) + 5*Delta5_prmy) + u_prmy*(5*Delta5 + 5*Delta5l*np.log(u))) + u_prmy*(4*Delta4 + u*(5*Delta5 + 5*Delta5l*np.log(u)))) + u_prmy*(3*Delta3 + u*(4*Delta4 + u*(5*Delta5 + 5*Delta5l*np.log(u))))) + u_prmy*(2*Delta2 + u*(3*Delta3 + u*(4*Delta4 + u*(5*Delta5 + 5*Delta5l*np.log(u))))))/(logarg + 1) + eta*u*u_prmy*(-2*Delta1 - 2*u*(2*Delta2 + u*(3*Delta3 + u*(4*Delta4 + u*(5*Delta5 + 5*Delta5l*np.log(u))))))/(logarg + 1)
     Deltaubar_prmy = 2*a**2*u*u_prmy + (2*u_prmy - etaKminus1_prmy/etaKminus1**2)/etaKminus1 + etaKminus1_prmy*(-2*u - 1/etaKminus1)/etaKminus1**2
     Deltaubarprime_prmy = -6*a**2*u**2*u_prmy - 4*u*u_prmy/etaKminus1 + 2*etaKminus1_prmy*u**2/etaKminus1**2
@@ -521,7 +521,7 @@ def ham_y_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, 
     Deltat_prmy = 2*Deltau*r*r_prmy + Deltau_prmy*r**2
     Deltar_prmy = Deltat*Dinv_prmy + Deltat_prmy*Dinv
     Lambt_prmy = (Deltat*a**2*sin2theta_prmy + Deltat_prmy*a**2*sin2theta - 2*w2*w2_prmy)*np.sign(Deltat*a**2*sin2theta - w2**2)
-    csi_prmy = -w2_prmy*np.sqrt(Deltar*Deltat)/w2**2 + np.sqrt(Deltar*Deltat)*(Deltar*Deltat_prmy/2 + Deltar_prmy*Deltat/2)/(Deltar*Deltat*w2)
+    csi_prmy = (Deltar*Deltat_prmy + Deltar_prmy*Deltat)*np.sign(Deltar*Deltat)/(2*w2*np.sqrt(np.abs(Deltar*Deltat))) - w2_prmy*np.sqrt(np.abs(Deltar*Deltat))/w2**2
     csi1_prmy = csi_prmy*(1 - np.abs(tortoise - 1))
     csi2_prmy = csi_prmy*(1/2 - np.sign(3/2 - tortoise)/2)
     prT_prmy = csi2*(n1_prmy*p1 + n2_prmy*p2 + n3_prmy*p3) + csi2_prmy*(n1*p1 + n2*p2 + n3*p3)
@@ -601,7 +601,7 @@ def ham_y_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, 
     Hs_prmy = Hso_prmy + Hss_prmy
     dSS_prmy = 1585.533*chi**2*chi_prmy*eta**2 - 123.0009*chi**2*chi_prmy*eta + 2323.56*chi*chi_prmy*eta**3 - 652.65*chi*chi_prmy*eta**2 + 37.1964*chi_prmy*eta
     Heff_prmy = -Hd_prmy + Hns_prmy + Hs_prmy + dSS*eta*u**3*u_prmy*(4*S1x**2 + 4*S1y**2 + 4*S1z**2 + 4*S2x**2 + 4*S2y**2 + 4*S2z**2) + dSS_prmy*eta*u**4*(S1x**2 + S1y**2 + S1z**2 + S2x**2 + S2y**2 + S2z**2)
-    Hreal_prmy = Heff_prmy*eta/np.sqrt(eta*(2*Heff - 2) + 1)
+    Hreal_prmy = Heff_prmy*eta*np.sign(Heff)/np.sqrt(eta*(2*np.abs(Heff) - 2) + 1)
     return np.array([Hreal_prmy,csi_prmy])
 
 def ham_z_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z):
@@ -674,7 +674,7 @@ def ham_z_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, 
     Delta5 = etaKminus1*etaKminus1*(np.true_divide(-4237,60)+np.true_divide(128,5)*EMgamma+np.true_divide(2275,512)*np.pi*np.pi-np.true_divide(1,3)*a*a*(Delta1*Delta1*Delta1-3*Delta1*Delta2+3*Delta3)-(Delta1*Delta1*Delta1*Delta1*Delta1-5*Delta1*Delta1*Delta1*Delta2+5*Delta1*Delta2*Delta2+5*Delta1*Delta1*Delta3-5*Delta2*Delta3-5*Delta1*Delta4)/(5*etaKminus1*etaKminus1)+(Delta1*Delta1*Delta1*Delta1-4*Delta1*Delta1*Delta2+2*Delta2*Delta2+4*Delta1*Delta3-4*Delta4)/(2*etaKminus1)+np.true_divide(256,5)*np.log(2)+(np.true_divide(41,32)*np.pi*np.pi-np.true_divide(221,6))*eta)
     Delta5l = etaKminus1*etaKminus1*np.true_divide(64,5)
     logarg = u*(Delta1+u*(Delta2+u*(Delta3+u*(Delta4+u*(Delta5+Delta5l*np.log(u))))))
-    Deltaucalib = 1+eta*(Delta0+np.log1p(logarg))
+    Deltaucalib = 1+eta*(Delta0+np.log(np.abs(1+logarg)))
     Deltaucalibprime = -eta*u*u*(Delta1+u*(2*Delta2+u*(3*Delta3+u*(4*Delta4+u*(5*(Delta5+Delta5l*np.log(u)))))))/(1+logarg)
     Deltaubar = a*a*u*u+(2*u+1/etaKminus1)/etaKminus1
     Deltaubarprime = -2*a*a*u*u*u-2*u*u/(etaKminus1)
@@ -684,7 +684,7 @@ def ham_z_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, 
     Deltat = r*r*Deltau
     Deltar = Deltat*Dinv
     Lambt = np.abs(w2*w2-a*a*Deltat*sin2theta)
-    csi = np.sqrt(Deltar*Deltat)/w2
+    csi = np.sqrt(np.abs(Deltar*Deltat))/w2
     csi1 = 1+(1-np.abs(1-tortoise))*(csi-1)
     csi2 = 1+(np.true_divide(1,2)-np.true_divide(1,2)*np.sign(np.true_divide(3,2)-tortoise))*(csi-1)
     prT = csi2*(p1*n1+p2*n2+p3*n3)
@@ -765,7 +765,7 @@ def ham_z_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, 
     Hs = Hso+Hss
     dSS = 528.511*chi*chi*chi*eta*eta-41.0003*chi*chi*chi*eta+1161.78*chi*chi*eta*eta*eta-326.325*chi*chi*eta*eta+37.1964*chi*eta+706.958*eta*eta*eta-36.0272*eta+6.06807
     Heff = Hs+Hns-Hd+dSS*eta*u*u*u*u*(S1x*S1x+S1y*S1y+S1z*S1z+S2x*S2x+S2y*S2y+S2z*S2z)
-    Hreal = np.sqrt(1+2*eta*(Heff-1))
+    Hreal = np.sqrt(1+2*eta*(np.abs(Heff)-1))
 
     r_prmz = z/np.sqrt(x**2 + y**2 + z**2)
     u_prmz = -r_prmz/r**2
@@ -813,7 +813,7 @@ def ham_z_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, 
     Delta5_prmz = etaKminus1**2*(-a**2*(3*Delta1**2*Delta1_prmz - 3*Delta1*Delta2_prmz - 3*Delta1_prmz*Delta2 + 3*Delta3_prmz)/3 + (4*Delta1**3*Delta1_prmz - 4*Delta1**2*Delta2_prmz - 8*Delta1*Delta1_prmz*Delta2 + 4*Delta1*Delta3_prmz + 4*Delta1_prmz*Delta3 + 4*Delta2*Delta2_prmz - 4*Delta4_prmz)/(2*etaKminus1) - etaKminus1_prmz*(Delta1**4 - 4*Delta1**2*Delta2 + 4*Delta1*Delta3 + 2*Delta2**2 - 4*Delta4)/(2*etaKminus1**2) - (5*Delta1**4*Delta1_prmz - 5*Delta1**3*Delta2_prmz - 15*Delta1**2*Delta1_prmz*Delta2 + 5*Delta1**2*Delta3_prmz + 10*Delta1*Delta1_prmz*Delta3 + 10*Delta1*Delta2*Delta2_prmz - 5*Delta1*Delta4_prmz + 5*Delta1_prmz*Delta2**2 - 5*Delta1_prmz*Delta4 - 5*Delta2*Delta3_prmz - 5*Delta2_prmz*Delta3)/(5*etaKminus1**2) + etaKminus1_prmz*(2*Delta1**5 - 10*Delta1**3*Delta2 + 10*Delta1**2*Delta3 + 10*Delta1*Delta2**2 - 10*Delta1*Delta4 - 10*Delta2*Delta3)/(5*etaKminus1**3)) + etaKminus1*etaKminus1_prmz*(256*EMgamma/5 + 2*a**2*(-Delta1**3 + 3*Delta1*Delta2 - 3*Delta3)/3 + 2*eta*(-221/6 + 41*np.pi**2/32) - 4237/30 + 512*np.log(2)/5 + 2275*np.pi**2/256 + (Delta1**4 - 4*Delta1**2*Delta2 + 4*Delta1*Delta3 + 2*Delta2**2 - 4*Delta4)/etaKminus1 - 2*(Delta1**5 - 5*Delta1**3*Delta2 + 5*Delta1**2*Delta3 + 5*Delta1*Delta2**2 - 5*Delta1*Delta4 - 5*Delta2*Delta3)/(5*etaKminus1**2))
     Delta5l_prmz = 128*etaKminus1*etaKminus1_prmz/5
     logarg_prmz = u*(Delta1_prmz + u*(Delta2_prmz + u*(Delta3_prmz + u*(Delta4_prmz + u*(Delta5l*u_prmz/u + Delta5l_prmz*np.log(u) + Delta5_prmz) + u_prmz*(Delta5 + Delta5l*np.log(u))) + u_prmz*(Delta4 + u*(Delta5 + Delta5l*np.log(u)))) + u_prmz*(Delta3 + u*(Delta4 + u*(Delta5 + Delta5l*np.log(u))))) + u_prmz*(Delta2 + u*(Delta3 + u*(Delta4 + u*(Delta5 + Delta5l*np.log(u)))))) + u_prmz*(Delta1 + u*(Delta2 + u*(Delta3 + u*(Delta4 + u*(Delta5 + Delta5l*np.log(u))))))
-    Deltaucalib_prmz = eta*(Delta0_prmz + logarg_prmz/(logarg + 1))
+    Deltaucalib_prmz = eta*(Delta0_prmz + logarg_prmz*np.sign(logarg + 1)/np.abs(logarg + 1))
     Deltaucalibprime_prmz = eta*logarg_prmz*u**2*(Delta1 + u*(2*Delta2 + u*(3*Delta3 + u*(4*Delta4 + u*(5*Delta5 + 5*Delta5l*np.log(u))))))/(logarg + 1)**2 - eta*u**2*(Delta1_prmz + u*(2*Delta2_prmz + u*(3*Delta3_prmz + u*(4*Delta4_prmz + u*(5*Delta5l*u_prmz/u + 5*Delta5l_prmz*np.log(u) + 5*Delta5_prmz) + u_prmz*(5*Delta5 + 5*Delta5l*np.log(u))) + u_prmz*(4*Delta4 + u*(5*Delta5 + 5*Delta5l*np.log(u)))) + u_prmz*(3*Delta3 + u*(4*Delta4 + u*(5*Delta5 + 5*Delta5l*np.log(u))))) + u_prmz*(2*Delta2 + u*(3*Delta3 + u*(4*Delta4 + u*(5*Delta5 + 5*Delta5l*np.log(u))))))/(logarg + 1) + eta*u*u_prmz*(-2*Delta1 - 2*u*(2*Delta2 + u*(3*Delta3 + u*(4*Delta4 + u*(5*Delta5 + 5*Delta5l*np.log(u))))))/(logarg + 1)
     Deltaubar_prmz = 2*a**2*u*u_prmz + (2*u_prmz - etaKminus1_prmz/etaKminus1**2)/etaKminus1 + etaKminus1_prmz*(-2*u - 1/etaKminus1)/etaKminus1**2
     Deltaubarprime_prmz = -6*a**2*u**2*u_prmz - 4*u*u_prmz/etaKminus1 + 2*etaKminus1_prmz*u**2/etaKminus1**2
@@ -823,7 +823,7 @@ def ham_z_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, 
     Deltat_prmz = 2*Deltau*r*r_prmz + Deltau_prmz*r**2
     Deltar_prmz = Deltat*Dinv_prmz + Deltat_prmz*Dinv
     Lambt_prmz = (Deltat*a**2*sin2theta_prmz + Deltat_prmz*a**2*sin2theta - 2*w2*w2_prmz)*np.sign(Deltat*a**2*sin2theta - w2**2)
-    csi_prmz = -w2_prmz*np.sqrt(Deltar*Deltat)/w2**2 + np.sqrt(Deltar*Deltat)*(Deltar*Deltat_prmz/2 + Deltar_prmz*Deltat/2)/(Deltar*Deltat*w2)
+    csi_prmz = (Deltar*Deltat_prmz + Deltar_prmz*Deltat)*np.sign(Deltar*Deltat)/(2*w2*np.sqrt(np.abs(Deltar*Deltat))) - w2_prmz*np.sqrt(np.abs(Deltar*Deltat))/w2**2
     csi1_prmz = csi_prmz*(1 - np.abs(tortoise - 1))
     csi2_prmz = csi_prmz*(1/2 - np.sign(3/2 - tortoise)/2)
     prT_prmz = csi2*(n1_prmz*p1 + n2_prmz*p2 + n3_prmz*p3) + csi2_prmz*(n1*p1 + n2*p2 + n3*p3)
@@ -903,7 +903,7 @@ def ham_z_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, 
     Hs_prmz = Hso_prmz + Hss_prmz
     dSS_prmz = 1585.533*chi**2*chi_prmz*eta**2 - 123.0009*chi**2*chi_prmz*eta + 2323.56*chi*chi_prmz*eta**3 - 652.65*chi*chi_prmz*eta**2 + 37.1964*chi_prmz*eta
     Heff_prmz = -Hd_prmz + Hns_prmz + Hs_prmz + dSS*eta*u**3*u_prmz*(4*S1x**2 + 4*S1y**2 + 4*S1z**2 + 4*S2x**2 + 4*S2y**2 + 4*S2z**2) + dSS_prmz*eta*u**4*(S1x**2 + S1y**2 + S1z**2 + S2x**2 + S2y**2 + S2z**2)
-    Hreal_prmz = Heff_prmz*eta/np.sqrt(eta*(2*Heff - 2) + 1)
+    Hreal_prmz = Heff_prmz*eta*np.sign(Heff)/np.sqrt(eta*(2*np.abs(Heff) - 2) + 1)
     return np.array([Hreal_prmz,csi_prmz])
 
 def ham_p1_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z):
@@ -976,7 +976,7 @@ def ham_p1_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y,
     Delta5 = etaKminus1*etaKminus1*(np.true_divide(-4237,60)+np.true_divide(128,5)*EMgamma+np.true_divide(2275,512)*np.pi*np.pi-np.true_divide(1,3)*a*a*(Delta1*Delta1*Delta1-3*Delta1*Delta2+3*Delta3)-(Delta1*Delta1*Delta1*Delta1*Delta1-5*Delta1*Delta1*Delta1*Delta2+5*Delta1*Delta2*Delta2+5*Delta1*Delta1*Delta3-5*Delta2*Delta3-5*Delta1*Delta4)/(5*etaKminus1*etaKminus1)+(Delta1*Delta1*Delta1*Delta1-4*Delta1*Delta1*Delta2+2*Delta2*Delta2+4*Delta1*Delta3-4*Delta4)/(2*etaKminus1)+np.true_divide(256,5)*np.log(2)+(np.true_divide(41,32)*np.pi*np.pi-np.true_divide(221,6))*eta)
     Delta5l = etaKminus1*etaKminus1*np.true_divide(64,5)
     logarg = u*(Delta1+u*(Delta2+u*(Delta3+u*(Delta4+u*(Delta5+Delta5l*np.log(u))))))
-    Deltaucalib = 1+eta*(Delta0+np.log1p(logarg))
+    Deltaucalib = 1+eta*(Delta0+np.log(np.abs(1+logarg)))
     Deltaucalibprime = -eta*u*u*(Delta1+u*(2*Delta2+u*(3*Delta3+u*(4*Delta4+u*(5*(Delta5+Delta5l*np.log(u)))))))/(1+logarg)
     Deltaubar = a*a*u*u+(2*u+1/etaKminus1)/etaKminus1
     Deltaubarprime = -2*a*a*u*u*u-2*u*u/(etaKminus1)
@@ -986,7 +986,7 @@ def ham_p1_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y,
     Deltat = r*r*Deltau
     Deltar = Deltat*Dinv
     Lambt = np.abs(w2*w2-a*a*Deltat*sin2theta)
-    csi = np.sqrt(Deltar*Deltat)/w2
+    csi = np.sqrt(np.abs(Deltar*Deltat))/w2
     csi1 = 1+(1-np.abs(1-tortoise))*(csi-1)
     csi2 = 1+(np.true_divide(1,2)-np.true_divide(1,2)*np.sign(np.true_divide(3,2)-tortoise))*(csi-1)
     prT = csi2*(p1*n1+p2*n2+p3*n3)
@@ -1067,7 +1067,7 @@ def ham_p1_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y,
     Hs = Hso+Hss
     dSS = 528.511*chi*chi*chi*eta*eta-41.0003*chi*chi*chi*eta+1161.78*chi*chi*eta*eta*eta-326.325*chi*chi*eta*eta+37.1964*chi*eta+706.958*eta*eta*eta-36.0272*eta+6.06807
     Heff = Hs+Hns-Hd+dSS*eta*u*u*u*u*(S1x*S1x+S1y*S1y+S1z*S1z+S2x*S2x+S2y*S2y+S2z*S2z)
-    Hreal = np.sqrt(1+2*eta*(Heff-1))
+    Hreal = np.sqrt(1+2*eta*(np.abs(Heff)-1))
 
     L3_prmp1 = -y
     L2_prmp1 = z
@@ -1097,7 +1097,7 @@ def ham_p1_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y,
     Delta5_prmp1 = etaKminus1**2*(-a**2*(3*Delta1**2*Delta1_prmp1 - 3*Delta1*Delta2_prmp1 - 3*Delta1_prmp1*Delta2 + 3*Delta3_prmp1)/3 + (4*Delta1**3*Delta1_prmp1 - 4*Delta1**2*Delta2_prmp1 - 8*Delta1*Delta1_prmp1*Delta2 + 4*Delta1*Delta3_prmp1 + 4*Delta1_prmp1*Delta3 + 4*Delta2*Delta2_prmp1 - 4*Delta4_prmp1)/(2*etaKminus1) - etaKminus1_prmp1*(Delta1**4 - 4*Delta1**2*Delta2 + 4*Delta1*Delta3 + 2*Delta2**2 - 4*Delta4)/(2*etaKminus1**2) - (5*Delta1**4*Delta1_prmp1 - 5*Delta1**3*Delta2_prmp1 - 15*Delta1**2*Delta1_prmp1*Delta2 + 5*Delta1**2*Delta3_prmp1 + 10*Delta1*Delta1_prmp1*Delta3 + 10*Delta1*Delta2*Delta2_prmp1 - 5*Delta1*Delta4_prmp1 + 5*Delta1_prmp1*Delta2**2 - 5*Delta1_prmp1*Delta4 - 5*Delta2*Delta3_prmp1 - 5*Delta2_prmp1*Delta3)/(5*etaKminus1**2) + etaKminus1_prmp1*(2*Delta1**5 - 10*Delta1**3*Delta2 + 10*Delta1**2*Delta3 + 10*Delta1*Delta2**2 - 10*Delta1*Delta4 - 10*Delta2*Delta3)/(5*etaKminus1**3)) + etaKminus1*etaKminus1_prmp1*(256*EMgamma/5 + 2*a**2*(-Delta1**3 + 3*Delta1*Delta2 - 3*Delta3)/3 + 2*eta*(-221/6 + 41*np.pi**2/32) - 4237/30 + 512*np.log(2)/5 + 2275*np.pi**2/256 + (Delta1**4 - 4*Delta1**2*Delta2 + 4*Delta1*Delta3 + 2*Delta2**2 - 4*Delta4)/etaKminus1 - 2*(Delta1**5 - 5*Delta1**3*Delta2 + 5*Delta1**2*Delta3 + 5*Delta1*Delta2**2 - 5*Delta1*Delta4 - 5*Delta2*Delta3)/(5*etaKminus1**2))
     Delta5l_prmp1 = 128*etaKminus1*etaKminus1_prmp1/5
     logarg_prmp1 = u*(Delta1_prmp1 + u*(Delta2_prmp1 + u*(Delta3_prmp1 + u*(Delta4_prmp1 + u*(Delta5l_prmp1*np.log(u) + Delta5_prmp1)))))
-    Deltaucalib_prmp1 = eta*(Delta0_prmp1 + logarg_prmp1/(logarg + 1))
+    Deltaucalib_prmp1 = eta*(Delta0_prmp1 + logarg_prmp1*np.sign(logarg + 1)/np.abs(logarg + 1))
     Deltaucalibprime_prmp1 = eta*logarg_prmp1*u**2*(Delta1 + u*(2*Delta2 + u*(3*Delta3 + u*(4*Delta4 + u*(5*Delta5 + 5*Delta5l*np.log(u))))))/(logarg + 1)**2 - eta*u**2*(Delta1_prmp1 + u*(2*Delta2_prmp1 + u*(3*Delta3_prmp1 + u*(4*Delta4_prmp1 + u*(5*Delta5l_prmp1*np.log(u) + 5*Delta5_prmp1)))))/(logarg + 1)
     Deltaubar_prmp1 = etaKminus1_prmp1*(-2*u - 1/etaKminus1)/etaKminus1**2 - etaKminus1_prmp1/etaKminus1**3
     Deltaubarprime_prmp1 = 2*etaKminus1_prmp1*u**2/etaKminus1**2
@@ -1107,7 +1107,7 @@ def ham_p1_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y,
     Deltat_prmp1 = Deltau_prmp1*r**2
     Deltar_prmp1 = Deltat_prmp1*Dinv
     Lambt_prmp1 = Deltat_prmp1*a**2*sin2theta*np.sign(Deltat*a**2*sin2theta - w2**2)
-    csi_prmp1 = np.sqrt(Deltar*Deltat)*(Deltar*Deltat_prmp1/2 + Deltar_prmp1*Deltat/2)/(Deltar*Deltat*w2)
+    csi_prmp1 = (Deltar*Deltat_prmp1 + Deltar_prmp1*Deltat)*np.sign(Deltar*Deltat)/(2*w2*np.sqrt(np.abs(Deltar*Deltat)))
     csi1_prmp1 = csi_prmp1*(1 - np.abs(tortoise - 1))
     csi2_prmp1 = csi_prmp1*(1/2 - np.sign(3/2 - tortoise)/2)
     prT_prmp1 = csi2*n1 + csi2_prmp1*(n1*p1 + n2*p2 + n3*p3)
@@ -1182,7 +1182,7 @@ def ham_p1_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y,
     Hs_prmp1 = Hso_prmp1 + Hss_prmp1
     dSS_prmp1 = 1585.533*chi**2*chi_prmp1*eta**2 - 123.0009*chi**2*chi_prmp1*eta + 2323.56*chi*chi_prmp1*eta**3 - 652.65*chi*chi_prmp1*eta**2 + 37.1964*chi_prmp1*eta
     Heff_prmp1 = -Hd_prmp1 + Hns_prmp1 + Hs_prmp1 + dSS_prmp1*eta*u**4*(S1x**2 + S1y**2 + S1z**2 + S2x**2 + S2y**2 + S2z**2)
-    Hreal_prmp1 = Heff_prmp1*eta/np.sqrt(eta*(2*Heff - 2) + 1)
+    Hreal_prmp1 = Heff_prmp1*eta*np.sign(Heff)/np.sqrt(eta*(2*np.abs(Heff) - 2) + 1)
     return Hreal_prmp1
 
 def ham_p2_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z):
@@ -1255,7 +1255,7 @@ def ham_p2_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y,
     Delta5 = etaKminus1*etaKminus1*(np.true_divide(-4237,60)+np.true_divide(128,5)*EMgamma+np.true_divide(2275,512)*np.pi*np.pi-np.true_divide(1,3)*a*a*(Delta1*Delta1*Delta1-3*Delta1*Delta2+3*Delta3)-(Delta1*Delta1*Delta1*Delta1*Delta1-5*Delta1*Delta1*Delta1*Delta2+5*Delta1*Delta2*Delta2+5*Delta1*Delta1*Delta3-5*Delta2*Delta3-5*Delta1*Delta4)/(5*etaKminus1*etaKminus1)+(Delta1*Delta1*Delta1*Delta1-4*Delta1*Delta1*Delta2+2*Delta2*Delta2+4*Delta1*Delta3-4*Delta4)/(2*etaKminus1)+np.true_divide(256,5)*np.log(2)+(np.true_divide(41,32)*np.pi*np.pi-np.true_divide(221,6))*eta)
     Delta5l = etaKminus1*etaKminus1*np.true_divide(64,5)
     logarg = u*(Delta1+u*(Delta2+u*(Delta3+u*(Delta4+u*(Delta5+Delta5l*np.log(u))))))
-    Deltaucalib = 1+eta*(Delta0+np.log1p(logarg))
+    Deltaucalib = 1+eta*(Delta0+np.log(np.abs(1+logarg)))
     Deltaucalibprime = -eta*u*u*(Delta1+u*(2*Delta2+u*(3*Delta3+u*(4*Delta4+u*(5*(Delta5+Delta5l*np.log(u)))))))/(1+logarg)
     Deltaubar = a*a*u*u+(2*u+1/etaKminus1)/etaKminus1
     Deltaubarprime = -2*a*a*u*u*u-2*u*u/(etaKminus1)
@@ -1265,7 +1265,7 @@ def ham_p2_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y,
     Deltat = r*r*Deltau
     Deltar = Deltat*Dinv
     Lambt = np.abs(w2*w2-a*a*Deltat*sin2theta)
-    csi = np.sqrt(Deltar*Deltat)/w2
+    csi = np.sqrt(np.abs(Deltar*Deltat))/w2
     csi1 = 1+(1-np.abs(1-tortoise))*(csi-1)
     csi2 = 1+(np.true_divide(1,2)-np.true_divide(1,2)*np.sign(np.true_divide(3,2)-tortoise))*(csi-1)
     prT = csi2*(p1*n1+p2*n2+p3*n3)
@@ -1346,7 +1346,7 @@ def ham_p2_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y,
     Hs = Hso+Hss
     dSS = 528.511*chi*chi*chi*eta*eta-41.0003*chi*chi*chi*eta+1161.78*chi*chi*eta*eta*eta-326.325*chi*chi*eta*eta+37.1964*chi*eta+706.958*eta*eta*eta-36.0272*eta+6.06807
     Heff = Hs+Hns-Hd+dSS*eta*u*u*u*u*(S1x*S1x+S1y*S1y+S1z*S1z+S2x*S2x+S2y*S2y+S2z*S2z)
-    Hreal = np.sqrt(1+2*eta*(Heff-1))
+    Hreal = np.sqrt(1+2*eta*(np.abs(Heff)-1))
 
     L3_prmp2 = x
     L1_prmp2 = -z
@@ -1376,7 +1376,7 @@ def ham_p2_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y,
     Delta5_prmp2 = etaKminus1**2*(-a**2*(3*Delta1**2*Delta1_prmp2 - 3*Delta1*Delta2_prmp2 - 3*Delta1_prmp2*Delta2 + 3*Delta3_prmp2)/3 + (4*Delta1**3*Delta1_prmp2 - 4*Delta1**2*Delta2_prmp2 - 8*Delta1*Delta1_prmp2*Delta2 + 4*Delta1*Delta3_prmp2 + 4*Delta1_prmp2*Delta3 + 4*Delta2*Delta2_prmp2 - 4*Delta4_prmp2)/(2*etaKminus1) - etaKminus1_prmp2*(Delta1**4 - 4*Delta1**2*Delta2 + 4*Delta1*Delta3 + 2*Delta2**2 - 4*Delta4)/(2*etaKminus1**2) - (5*Delta1**4*Delta1_prmp2 - 5*Delta1**3*Delta2_prmp2 - 15*Delta1**2*Delta1_prmp2*Delta2 + 5*Delta1**2*Delta3_prmp2 + 10*Delta1*Delta1_prmp2*Delta3 + 10*Delta1*Delta2*Delta2_prmp2 - 5*Delta1*Delta4_prmp2 + 5*Delta1_prmp2*Delta2**2 - 5*Delta1_prmp2*Delta4 - 5*Delta2*Delta3_prmp2 - 5*Delta2_prmp2*Delta3)/(5*etaKminus1**2) + etaKminus1_prmp2*(2*Delta1**5 - 10*Delta1**3*Delta2 + 10*Delta1**2*Delta3 + 10*Delta1*Delta2**2 - 10*Delta1*Delta4 - 10*Delta2*Delta3)/(5*etaKminus1**3)) + etaKminus1*etaKminus1_prmp2*(256*EMgamma/5 + 2*a**2*(-Delta1**3 + 3*Delta1*Delta2 - 3*Delta3)/3 + 2*eta*(-221/6 + 41*np.pi**2/32) - 4237/30 + 512*np.log(2)/5 + 2275*np.pi**2/256 + (Delta1**4 - 4*Delta1**2*Delta2 + 4*Delta1*Delta3 + 2*Delta2**2 - 4*Delta4)/etaKminus1 - 2*(Delta1**5 - 5*Delta1**3*Delta2 + 5*Delta1**2*Delta3 + 5*Delta1*Delta2**2 - 5*Delta1*Delta4 - 5*Delta2*Delta3)/(5*etaKminus1**2))
     Delta5l_prmp2 = 128*etaKminus1*etaKminus1_prmp2/5
     logarg_prmp2 = u*(Delta1_prmp2 + u*(Delta2_prmp2 + u*(Delta3_prmp2 + u*(Delta4_prmp2 + u*(Delta5l_prmp2*np.log(u) + Delta5_prmp2)))))
-    Deltaucalib_prmp2 = eta*(Delta0_prmp2 + logarg_prmp2/(logarg + 1))
+    Deltaucalib_prmp2 = eta*(Delta0_prmp2 + logarg_prmp2*np.sign(logarg + 1)/np.abs(logarg + 1))
     Deltaucalibprime_prmp2 = eta*logarg_prmp2*u**2*(Delta1 + u*(2*Delta2 + u*(3*Delta3 + u*(4*Delta4 + u*(5*Delta5 + 5*Delta5l*np.log(u))))))/(logarg + 1)**2 - eta*u**2*(Delta1_prmp2 + u*(2*Delta2_prmp2 + u*(3*Delta3_prmp2 + u*(4*Delta4_prmp2 + u*(5*Delta5l_prmp2*np.log(u) + 5*Delta5_prmp2)))))/(logarg + 1)
     Deltaubar_prmp2 = etaKminus1_prmp2*(-2*u - 1/etaKminus1)/etaKminus1**2 - etaKminus1_prmp2/etaKminus1**3
     Deltaubarprime_prmp2 = 2*etaKminus1_prmp2*u**2/etaKminus1**2
@@ -1386,7 +1386,7 @@ def ham_p2_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y,
     Deltat_prmp2 = Deltau_prmp2*r**2
     Deltar_prmp2 = Deltat_prmp2*Dinv
     Lambt_prmp2 = Deltat_prmp2*a**2*sin2theta*np.sign(Deltat*a**2*sin2theta - w2**2)
-    csi_prmp2 = np.sqrt(Deltar*Deltat)*(Deltar*Deltat_prmp2/2 + Deltar_prmp2*Deltat/2)/(Deltar*Deltat*w2)
+    csi_prmp2 = (Deltar*Deltat_prmp2 + Deltar_prmp2*Deltat)*np.sign(Deltar*Deltat)/(2*w2*np.sqrt(np.abs(Deltar*Deltat)))
     csi1_prmp2 = csi_prmp2*(1 - np.abs(tortoise - 1))
     csi2_prmp2 = csi_prmp2*(1/2 - np.sign(3/2 - tortoise)/2)
     prT_prmp2 = csi2*n2 + csi2_prmp2*(n1*p1 + n2*p2 + n3*p3)
@@ -1461,7 +1461,7 @@ def ham_p2_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y,
     Hs_prmp2 = Hso_prmp2 + Hss_prmp2
     dSS_prmp2 = 1585.533*chi**2*chi_prmp2*eta**2 - 123.0009*chi**2*chi_prmp2*eta + 2323.56*chi*chi_prmp2*eta**3 - 652.65*chi*chi_prmp2*eta**2 + 37.1964*chi_prmp2*eta
     Heff_prmp2 = -Hd_prmp2 + Hns_prmp2 + Hs_prmp2 + dSS_prmp2*eta*u**4*(S1x**2 + S1y**2 + S1z**2 + S2x**2 + S2y**2 + S2z**2)
-    Hreal_prmp2 = Heff_prmp2*eta/np.sqrt(eta*(2*Heff - 2) + 1)
+    Hreal_prmp2 = Heff_prmp2*eta*np.sign(Heff)/np.sqrt(eta*(2*np.abs(Heff) - 2) + 1)
     return Hreal_prmp2
 
 def ham_p3_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z):
@@ -1534,7 +1534,7 @@ def ham_p3_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y,
     Delta5 = etaKminus1*etaKminus1*(np.true_divide(-4237,60)+np.true_divide(128,5)*EMgamma+np.true_divide(2275,512)*np.pi*np.pi-np.true_divide(1,3)*a*a*(Delta1*Delta1*Delta1-3*Delta1*Delta2+3*Delta3)-(Delta1*Delta1*Delta1*Delta1*Delta1-5*Delta1*Delta1*Delta1*Delta2+5*Delta1*Delta2*Delta2+5*Delta1*Delta1*Delta3-5*Delta2*Delta3-5*Delta1*Delta4)/(5*etaKminus1*etaKminus1)+(Delta1*Delta1*Delta1*Delta1-4*Delta1*Delta1*Delta2+2*Delta2*Delta2+4*Delta1*Delta3-4*Delta4)/(2*etaKminus1)+np.true_divide(256,5)*np.log(2)+(np.true_divide(41,32)*np.pi*np.pi-np.true_divide(221,6))*eta)
     Delta5l = etaKminus1*etaKminus1*np.true_divide(64,5)
     logarg = u*(Delta1+u*(Delta2+u*(Delta3+u*(Delta4+u*(Delta5+Delta5l*np.log(u))))))
-    Deltaucalib = 1+eta*(Delta0+np.log1p(logarg))
+    Deltaucalib = 1+eta*(Delta0+np.log(np.abs(1+logarg)))
     Deltaucalibprime = -eta*u*u*(Delta1+u*(2*Delta2+u*(3*Delta3+u*(4*Delta4+u*(5*(Delta5+Delta5l*np.log(u)))))))/(1+logarg)
     Deltaubar = a*a*u*u+(2*u+1/etaKminus1)/etaKminus1
     Deltaubarprime = -2*a*a*u*u*u-2*u*u/(etaKminus1)
@@ -1544,7 +1544,7 @@ def ham_p3_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y,
     Deltat = r*r*Deltau
     Deltar = Deltat*Dinv
     Lambt = np.abs(w2*w2-a*a*Deltat*sin2theta)
-    csi = np.sqrt(Deltar*Deltat)/w2
+    csi = np.sqrt(np.abs(Deltar*Deltat))/w2
     csi1 = 1+(1-np.abs(1-tortoise))*(csi-1)
     csi2 = 1+(np.true_divide(1,2)-np.true_divide(1,2)*np.sign(np.true_divide(3,2)-tortoise))*(csi-1)
     prT = csi2*(p1*n1+p2*n2+p3*n3)
@@ -1625,7 +1625,7 @@ def ham_p3_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y,
     Hs = Hso+Hss
     dSS = 528.511*chi*chi*chi*eta*eta-41.0003*chi*chi*chi*eta+1161.78*chi*chi*eta*eta*eta-326.325*chi*chi*eta*eta+37.1964*chi*eta+706.958*eta*eta*eta-36.0272*eta+6.06807
     Heff = Hs+Hns-Hd+dSS*eta*u*u*u*u*(S1x*S1x+S1y*S1y+S1z*S1z+S2x*S2x+S2y*S2y+S2z*S2z)
-    Hreal = np.sqrt(1+2*eta*(Heff-1))
+    Hreal = np.sqrt(1+2*eta*(np.abs(Heff)-1))
 
     L2_prmp3 = -x
     L1_prmp3 = y
@@ -1655,7 +1655,7 @@ def ham_p3_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y,
     Delta5_prmp3 = etaKminus1**2*(-a**2*(3*Delta1**2*Delta1_prmp3 - 3*Delta1*Delta2_prmp3 - 3*Delta1_prmp3*Delta2 + 3*Delta3_prmp3)/3 + (4*Delta1**3*Delta1_prmp3 - 4*Delta1**2*Delta2_prmp3 - 8*Delta1*Delta1_prmp3*Delta2 + 4*Delta1*Delta3_prmp3 + 4*Delta1_prmp3*Delta3 + 4*Delta2*Delta2_prmp3 - 4*Delta4_prmp3)/(2*etaKminus1) - etaKminus1_prmp3*(Delta1**4 - 4*Delta1**2*Delta2 + 4*Delta1*Delta3 + 2*Delta2**2 - 4*Delta4)/(2*etaKminus1**2) - (5*Delta1**4*Delta1_prmp3 - 5*Delta1**3*Delta2_prmp3 - 15*Delta1**2*Delta1_prmp3*Delta2 + 5*Delta1**2*Delta3_prmp3 + 10*Delta1*Delta1_prmp3*Delta3 + 10*Delta1*Delta2*Delta2_prmp3 - 5*Delta1*Delta4_prmp3 + 5*Delta1_prmp3*Delta2**2 - 5*Delta1_prmp3*Delta4 - 5*Delta2*Delta3_prmp3 - 5*Delta2_prmp3*Delta3)/(5*etaKminus1**2) + etaKminus1_prmp3*(2*Delta1**5 - 10*Delta1**3*Delta2 + 10*Delta1**2*Delta3 + 10*Delta1*Delta2**2 - 10*Delta1*Delta4 - 10*Delta2*Delta3)/(5*etaKminus1**3)) + etaKminus1*etaKminus1_prmp3*(256*EMgamma/5 + 2*a**2*(-Delta1**3 + 3*Delta1*Delta2 - 3*Delta3)/3 + 2*eta*(-221/6 + 41*np.pi**2/32) - 4237/30 + 512*np.log(2)/5 + 2275*np.pi**2/256 + (Delta1**4 - 4*Delta1**2*Delta2 + 4*Delta1*Delta3 + 2*Delta2**2 - 4*Delta4)/etaKminus1 - 2*(Delta1**5 - 5*Delta1**3*Delta2 + 5*Delta1**2*Delta3 + 5*Delta1*Delta2**2 - 5*Delta1*Delta4 - 5*Delta2*Delta3)/(5*etaKminus1**2))
     Delta5l_prmp3 = 128*etaKminus1*etaKminus1_prmp3/5
     logarg_prmp3 = u*(Delta1_prmp3 + u*(Delta2_prmp3 + u*(Delta3_prmp3 + u*(Delta4_prmp3 + u*(Delta5l_prmp3*np.log(u) + Delta5_prmp3)))))
-    Deltaucalib_prmp3 = eta*(Delta0_prmp3 + logarg_prmp3/(logarg + 1))
+    Deltaucalib_prmp3 = eta*(Delta0_prmp3 + logarg_prmp3*np.sign(logarg + 1)/np.abs(logarg + 1))
     Deltaucalibprime_prmp3 = eta*logarg_prmp3*u**2*(Delta1 + u*(2*Delta2 + u*(3*Delta3 + u*(4*Delta4 + u*(5*Delta5 + 5*Delta5l*np.log(u))))))/(logarg + 1)**2 - eta*u**2*(Delta1_prmp3 + u*(2*Delta2_prmp3 + u*(3*Delta3_prmp3 + u*(4*Delta4_prmp3 + u*(5*Delta5l_prmp3*np.log(u) + 5*Delta5_prmp3)))))/(logarg + 1)
     Deltaubar_prmp3 = etaKminus1_prmp3*(-2*u - 1/etaKminus1)/etaKminus1**2 - etaKminus1_prmp3/etaKminus1**3
     Deltaubarprime_prmp3 = 2*etaKminus1_prmp3*u**2/etaKminus1**2
@@ -1665,7 +1665,7 @@ def ham_p3_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y,
     Deltat_prmp3 = Deltau_prmp3*r**2
     Deltar_prmp3 = Deltat_prmp3*Dinv
     Lambt_prmp3 = Deltat_prmp3*a**2*sin2theta*np.sign(Deltat*a**2*sin2theta - w2**2)
-    csi_prmp3 = np.sqrt(Deltar*Deltat)*(Deltar*Deltat_prmp3/2 + Deltar_prmp3*Deltat/2)/(Deltar*Deltat*w2)
+    csi_prmp3 = (Deltar*Deltat_prmp3 + Deltar_prmp3*Deltat)*np.sign(Deltar*Deltat)/(2*w2*np.sqrt(np.abs(Deltar*Deltat)))
     csi1_prmp3 = csi_prmp3*(1 - np.abs(tortoise - 1))
     csi2_prmp3 = csi_prmp3*(1/2 - np.sign(3/2 - tortoise)/2)
     prT_prmp3 = csi2*n3 + csi2_prmp3*(n1*p1 + n2*p2 + n3*p3)
@@ -1740,7 +1740,7 @@ def ham_p3_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y,
     Hs_prmp3 = Hso_prmp3 + Hss_prmp3
     dSS_prmp3 = 1585.533*chi**2*chi_prmp3*eta**2 - 123.0009*chi**2*chi_prmp3*eta + 2323.56*chi*chi_prmp3*eta**3 - 652.65*chi*chi_prmp3*eta**2 + 37.1964*chi_prmp3*eta
     Heff_prmp3 = -Hd_prmp3 + Hns_prmp3 + Hs_prmp3 + dSS_prmp3*eta*u**4*(S1x**2 + S1y**2 + S1z**2 + S2x**2 + S2y**2 + S2z**2)
-    Hreal_prmp3 = Heff_prmp3*eta/np.sqrt(eta*(2*Heff - 2) + 1)
+    Hreal_prmp3 = Heff_prmp3*eta*np.sign(Heff)/np.sqrt(eta*(2*np.abs(Heff) - 2) + 1)
     return Hreal_prmp3
 
 def ham_S1x_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z):
@@ -1813,7 +1813,7 @@ def ham_S1x_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Delta5 = etaKminus1*etaKminus1*(np.true_divide(-4237,60)+np.true_divide(128,5)*EMgamma+np.true_divide(2275,512)*np.pi*np.pi-np.true_divide(1,3)*a*a*(Delta1*Delta1*Delta1-3*Delta1*Delta2+3*Delta3)-(Delta1*Delta1*Delta1*Delta1*Delta1-5*Delta1*Delta1*Delta1*Delta2+5*Delta1*Delta2*Delta2+5*Delta1*Delta1*Delta3-5*Delta2*Delta3-5*Delta1*Delta4)/(5*etaKminus1*etaKminus1)+(Delta1*Delta1*Delta1*Delta1-4*Delta1*Delta1*Delta2+2*Delta2*Delta2+4*Delta1*Delta3-4*Delta4)/(2*etaKminus1)+np.true_divide(256,5)*np.log(2)+(np.true_divide(41,32)*np.pi*np.pi-np.true_divide(221,6))*eta)
     Delta5l = etaKminus1*etaKminus1*np.true_divide(64,5)
     logarg = u*(Delta1+u*(Delta2+u*(Delta3+u*(Delta4+u*(Delta5+Delta5l*np.log(u))))))
-    Deltaucalib = 1+eta*(Delta0+np.log1p(logarg))
+    Deltaucalib = 1+eta*(Delta0+np.log(np.abs(1+logarg)))
     Deltaucalibprime = -eta*u*u*(Delta1+u*(2*Delta2+u*(3*Delta3+u*(4*Delta4+u*(5*(Delta5+Delta5l*np.log(u)))))))/(1+logarg)
     Deltaubar = a*a*u*u+(2*u+1/etaKminus1)/etaKminus1
     Deltaubarprime = -2*a*a*u*u*u-2*u*u/(etaKminus1)
@@ -1823,7 +1823,7 @@ def ham_S1x_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Deltat = r*r*Deltau
     Deltar = Deltat*Dinv
     Lambt = np.abs(w2*w2-a*a*Deltat*sin2theta)
-    csi = np.sqrt(Deltar*Deltat)/w2
+    csi = np.sqrt(np.abs(Deltar*Deltat))/w2
     csi1 = 1+(1-np.abs(1-tortoise))*(csi-1)
     csi2 = 1+(np.true_divide(1,2)-np.true_divide(1,2)*np.sign(np.true_divide(3,2)-tortoise))*(csi-1)
     prT = csi2*(p1*n1+p2*n2+p3*n3)
@@ -1904,7 +1904,7 @@ def ham_S1x_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Hs = Hso+Hss
     dSS = 528.511*chi*chi*chi*eta*eta-41.0003*chi*chi*chi*eta+1161.78*chi*chi*eta*eta*eta-326.325*chi*chi*eta*eta+37.1964*chi*eta+706.958*eta*eta*eta-36.0272*eta+6.06807
     Heff = Hs+Hns-Hd+dSS*eta*u*u*u*u*(S1x*S1x+S1y*S1y+S1z*S1z+S2x*S2x+S2y*S2y+S2z*S2z)
-    Hreal = np.sqrt(1+2*eta*(Heff-1))
+    Hreal = np.sqrt(1+2*eta*(np.abs(Heff)-1))
 
     sigmastar1_prmS1x = m2/m1
     sigma1_prmS1x = 1
@@ -1947,7 +1947,7 @@ def ham_S1x_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Delta5_prmS1x = etaKminus1**2*(-a**2*(3*Delta1**2*Delta1_prmS1x - 3*Delta1*Delta2_prmS1x - 3*Delta1_prmS1x*Delta2 + 3*Delta3_prmS1x)/3 + a*a_prmS1x*(-2*Delta1**3 + 6*Delta1*Delta2 - 6*Delta3)/3 + (4*Delta1**3*Delta1_prmS1x - 4*Delta1**2*Delta2_prmS1x - 8*Delta1*Delta1_prmS1x*Delta2 + 4*Delta1*Delta3_prmS1x + 4*Delta1_prmS1x*Delta3 + 4*Delta2*Delta2_prmS1x - 4*Delta4_prmS1x)/(2*etaKminus1) - etaKminus1_prmS1x*(Delta1**4 - 4*Delta1**2*Delta2 + 4*Delta1*Delta3 + 2*Delta2**2 - 4*Delta4)/(2*etaKminus1**2) - (5*Delta1**4*Delta1_prmS1x - 5*Delta1**3*Delta2_prmS1x - 15*Delta1**2*Delta1_prmS1x*Delta2 + 5*Delta1**2*Delta3_prmS1x + 10*Delta1*Delta1_prmS1x*Delta3 + 10*Delta1*Delta2*Delta2_prmS1x - 5*Delta1*Delta4_prmS1x + 5*Delta1_prmS1x*Delta2**2 - 5*Delta1_prmS1x*Delta4 - 5*Delta2*Delta3_prmS1x - 5*Delta2_prmS1x*Delta3)/(5*etaKminus1**2) + etaKminus1_prmS1x*(2*Delta1**5 - 10*Delta1**3*Delta2 + 10*Delta1**2*Delta3 + 10*Delta1*Delta2**2 - 10*Delta1*Delta4 - 10*Delta2*Delta3)/(5*etaKminus1**3)) + etaKminus1*etaKminus1_prmS1x*(256*EMgamma/5 + 2*a**2*(-Delta1**3 + 3*Delta1*Delta2 - 3*Delta3)/3 + 2*eta*(-221/6 + 41*np.pi**2/32) - 4237/30 + 512*np.log(2)/5 + 2275*np.pi**2/256 + (Delta1**4 - 4*Delta1**2*Delta2 + 4*Delta1*Delta3 + 2*Delta2**2 - 4*Delta4)/etaKminus1 - 2*(Delta1**5 - 5*Delta1**3*Delta2 + 5*Delta1**2*Delta3 + 5*Delta1*Delta2**2 - 5*Delta1*Delta4 - 5*Delta2*Delta3)/(5*etaKminus1**2))
     Delta5l_prmS1x = 128*etaKminus1*etaKminus1_prmS1x/5
     logarg_prmS1x = u*(Delta1_prmS1x + u*(Delta2_prmS1x + u*(Delta3_prmS1x + u*(Delta4_prmS1x + u*(Delta5l_prmS1x*np.log(u) + Delta5_prmS1x)))))
-    Deltaucalib_prmS1x = eta*(Delta0_prmS1x + logarg_prmS1x/(logarg + 1))
+    Deltaucalib_prmS1x = eta*(Delta0_prmS1x + logarg_prmS1x*np.sign(logarg + 1)/np.abs(logarg + 1))
     Deltaucalibprime_prmS1x = eta*logarg_prmS1x*u**2*(Delta1 + u*(2*Delta2 + u*(3*Delta3 + u*(4*Delta4 + u*(5*Delta5 + 5*Delta5l*np.log(u))))))/(logarg + 1)**2 - eta*u**2*(Delta1_prmS1x + u*(2*Delta2_prmS1x + u*(3*Delta3_prmS1x + u*(4*Delta4_prmS1x + u*(5*Delta5l_prmS1x*np.log(u) + 5*Delta5_prmS1x)))))/(logarg + 1)
     Deltaubar_prmS1x = 2*a*a_prmS1x*u**2 + etaKminus1_prmS1x*(-2*u - 1/etaKminus1)/etaKminus1**2 - etaKminus1_prmS1x/etaKminus1**3
     Deltaubarprime_prmS1x = -4*a*a_prmS1x*u**3 + 2*etaKminus1_prmS1x*u**2/etaKminus1**2
@@ -1957,7 +1957,7 @@ def ham_S1x_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Deltat_prmS1x = Deltau_prmS1x*r**2
     Deltar_prmS1x = Deltat_prmS1x*Dinv
     Lambt_prmS1x = (Deltat*a**2*sin2theta_prmS1x + 2*Deltat*a*a_prmS1x*sin2theta + Deltat_prmS1x*a**2*sin2theta - 2*w2*w2_prmS1x)*np.sign(Deltat*a**2*sin2theta - w2**2)
-    csi_prmS1x = -w2_prmS1x*np.sqrt(Deltar*Deltat)/w2**2 + np.sqrt(Deltar*Deltat)*(Deltar*Deltat_prmS1x/2 + Deltar_prmS1x*Deltat/2)/(Deltar*Deltat*w2)
+    csi_prmS1x = (Deltar*Deltat_prmS1x + Deltar_prmS1x*Deltat)*np.sign(Deltar*Deltat)/(2*w2*np.sqrt(np.abs(Deltar*Deltat))) - w2_prmS1x*np.sqrt(np.abs(Deltar*Deltat))/w2**2
     csi1_prmS1x = csi_prmS1x*(1 - np.abs(tortoise - 1))
     csi2_prmS1x = csi_prmS1x*(1/2 - np.sign(3/2 - tortoise)/2)
     prT_prmS1x = csi2_prmS1x*(n1*p1 + n2*p2 + n3*p3)
@@ -2037,7 +2037,7 @@ def ham_S1x_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Hs_prmS1x = Hso_prmS1x + Hss_prmS1x
     dSS_prmS1x = 1585.533*chi**2*chi_prmS1x*eta**2 - 123.0009*chi**2*chi_prmS1x*eta + 2323.56*chi*chi_prmS1x*eta**3 - 652.65*chi*chi_prmS1x*eta**2 + 37.1964*chi_prmS1x*eta
     Heff_prmS1x = -Hd_prmS1x + Hns_prmS1x + Hs_prmS1x + 2*S1x*dSS*eta*u**4 + dSS_prmS1x*eta*u**4*(S1x**2 + S1y**2 + S1z**2 + S2x**2 + S2y**2 + S2z**2)
-    Hreal_prmS1x = Heff_prmS1x*eta/np.sqrt(eta*(2*Heff - 2) + 1)
+    Hreal_prmS1x = Heff_prmS1x*eta*np.sign(Heff)/np.sqrt(eta*(2*np.abs(Heff) - 2) + 1)
     return Hreal_prmS1x
 
 def ham_S1y_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z):
@@ -2110,7 +2110,7 @@ def ham_S1y_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Delta5 = etaKminus1*etaKminus1*(np.true_divide(-4237,60)+np.true_divide(128,5)*EMgamma+np.true_divide(2275,512)*np.pi*np.pi-np.true_divide(1,3)*a*a*(Delta1*Delta1*Delta1-3*Delta1*Delta2+3*Delta3)-(Delta1*Delta1*Delta1*Delta1*Delta1-5*Delta1*Delta1*Delta1*Delta2+5*Delta1*Delta2*Delta2+5*Delta1*Delta1*Delta3-5*Delta2*Delta3-5*Delta1*Delta4)/(5*etaKminus1*etaKminus1)+(Delta1*Delta1*Delta1*Delta1-4*Delta1*Delta1*Delta2+2*Delta2*Delta2+4*Delta1*Delta3-4*Delta4)/(2*etaKminus1)+np.true_divide(256,5)*np.log(2)+(np.true_divide(41,32)*np.pi*np.pi-np.true_divide(221,6))*eta)
     Delta5l = etaKminus1*etaKminus1*np.true_divide(64,5)
     logarg = u*(Delta1+u*(Delta2+u*(Delta3+u*(Delta4+u*(Delta5+Delta5l*np.log(u))))))
-    Deltaucalib = 1+eta*(Delta0+np.log1p(logarg))
+    Deltaucalib = 1+eta*(Delta0+np.log(np.abs(1+logarg)))
     Deltaucalibprime = -eta*u*u*(Delta1+u*(2*Delta2+u*(3*Delta3+u*(4*Delta4+u*(5*(Delta5+Delta5l*np.log(u)))))))/(1+logarg)
     Deltaubar = a*a*u*u+(2*u+1/etaKminus1)/etaKminus1
     Deltaubarprime = -2*a*a*u*u*u-2*u*u/(etaKminus1)
@@ -2120,7 +2120,7 @@ def ham_S1y_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Deltat = r*r*Deltau
     Deltar = Deltat*Dinv
     Lambt = np.abs(w2*w2-a*a*Deltat*sin2theta)
-    csi = np.sqrt(Deltar*Deltat)/w2
+    csi = np.sqrt(np.abs(Deltar*Deltat))/w2
     csi1 = 1+(1-np.abs(1-tortoise))*(csi-1)
     csi2 = 1+(np.true_divide(1,2)-np.true_divide(1,2)*np.sign(np.true_divide(3,2)-tortoise))*(csi-1)
     prT = csi2*(p1*n1+p2*n2+p3*n3)
@@ -2201,7 +2201,7 @@ def ham_S1y_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Hs = Hso+Hss
     dSS = 528.511*chi*chi*chi*eta*eta-41.0003*chi*chi*chi*eta+1161.78*chi*chi*eta*eta*eta-326.325*chi*chi*eta*eta+37.1964*chi*eta+706.958*eta*eta*eta-36.0272*eta+6.06807
     Heff = Hs+Hns-Hd+dSS*eta*u*u*u*u*(S1x*S1x+S1y*S1y+S1z*S1z+S2x*S2x+S2y*S2y+S2z*S2z)
-    Hreal = np.sqrt(1+2*eta*(Heff-1))
+    Hreal = np.sqrt(1+2*eta*(np.abs(Heff)-1))
 
     sigmastar2_prmS1y = m2/m1
     sigma2_prmS1y = 1
@@ -2244,7 +2244,7 @@ def ham_S1y_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Delta5_prmS1y = etaKminus1**2*(-a**2*(3*Delta1**2*Delta1_prmS1y - 3*Delta1*Delta2_prmS1y - 3*Delta1_prmS1y*Delta2 + 3*Delta3_prmS1y)/3 + a*a_prmS1y*(-2*Delta1**3 + 6*Delta1*Delta2 - 6*Delta3)/3 + (4*Delta1**3*Delta1_prmS1y - 4*Delta1**2*Delta2_prmS1y - 8*Delta1*Delta1_prmS1y*Delta2 + 4*Delta1*Delta3_prmS1y + 4*Delta1_prmS1y*Delta3 + 4*Delta2*Delta2_prmS1y - 4*Delta4_prmS1y)/(2*etaKminus1) - etaKminus1_prmS1y*(Delta1**4 - 4*Delta1**2*Delta2 + 4*Delta1*Delta3 + 2*Delta2**2 - 4*Delta4)/(2*etaKminus1**2) - (5*Delta1**4*Delta1_prmS1y - 5*Delta1**3*Delta2_prmS1y - 15*Delta1**2*Delta1_prmS1y*Delta2 + 5*Delta1**2*Delta3_prmS1y + 10*Delta1*Delta1_prmS1y*Delta3 + 10*Delta1*Delta2*Delta2_prmS1y - 5*Delta1*Delta4_prmS1y + 5*Delta1_prmS1y*Delta2**2 - 5*Delta1_prmS1y*Delta4 - 5*Delta2*Delta3_prmS1y - 5*Delta2_prmS1y*Delta3)/(5*etaKminus1**2) + etaKminus1_prmS1y*(2*Delta1**5 - 10*Delta1**3*Delta2 + 10*Delta1**2*Delta3 + 10*Delta1*Delta2**2 - 10*Delta1*Delta4 - 10*Delta2*Delta3)/(5*etaKminus1**3)) + etaKminus1*etaKminus1_prmS1y*(256*EMgamma/5 + 2*a**2*(-Delta1**3 + 3*Delta1*Delta2 - 3*Delta3)/3 + 2*eta*(-221/6 + 41*np.pi**2/32) - 4237/30 + 512*np.log(2)/5 + 2275*np.pi**2/256 + (Delta1**4 - 4*Delta1**2*Delta2 + 4*Delta1*Delta3 + 2*Delta2**2 - 4*Delta4)/etaKminus1 - 2*(Delta1**5 - 5*Delta1**3*Delta2 + 5*Delta1**2*Delta3 + 5*Delta1*Delta2**2 - 5*Delta1*Delta4 - 5*Delta2*Delta3)/(5*etaKminus1**2))
     Delta5l_prmS1y = 128*etaKminus1*etaKminus1_prmS1y/5
     logarg_prmS1y = u*(Delta1_prmS1y + u*(Delta2_prmS1y + u*(Delta3_prmS1y + u*(Delta4_prmS1y + u*(Delta5l_prmS1y*np.log(u) + Delta5_prmS1y)))))
-    Deltaucalib_prmS1y = eta*(Delta0_prmS1y + logarg_prmS1y/(logarg + 1))
+    Deltaucalib_prmS1y = eta*(Delta0_prmS1y + logarg_prmS1y*np.sign(logarg + 1)/np.abs(logarg + 1))
     Deltaucalibprime_prmS1y = eta*logarg_prmS1y*u**2*(Delta1 + u*(2*Delta2 + u*(3*Delta3 + u*(4*Delta4 + u*(5*Delta5 + 5*Delta5l*np.log(u))))))/(logarg + 1)**2 - eta*u**2*(Delta1_prmS1y + u*(2*Delta2_prmS1y + u*(3*Delta3_prmS1y + u*(4*Delta4_prmS1y + u*(5*Delta5l_prmS1y*np.log(u) + 5*Delta5_prmS1y)))))/(logarg + 1)
     Deltaubar_prmS1y = 2*a*a_prmS1y*u**2 + etaKminus1_prmS1y*(-2*u - 1/etaKminus1)/etaKminus1**2 - etaKminus1_prmS1y/etaKminus1**3
     Deltaubarprime_prmS1y = -4*a*a_prmS1y*u**3 + 2*etaKminus1_prmS1y*u**2/etaKminus1**2
@@ -2254,7 +2254,7 @@ def ham_S1y_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Deltat_prmS1y = Deltau_prmS1y*r**2
     Deltar_prmS1y = Deltat_prmS1y*Dinv
     Lambt_prmS1y = (Deltat*a**2*sin2theta_prmS1y + 2*Deltat*a*a_prmS1y*sin2theta + Deltat_prmS1y*a**2*sin2theta - 2*w2*w2_prmS1y)*np.sign(Deltat*a**2*sin2theta - w2**2)
-    csi_prmS1y = -w2_prmS1y*np.sqrt(Deltar*Deltat)/w2**2 + np.sqrt(Deltar*Deltat)*(Deltar*Deltat_prmS1y/2 + Deltar_prmS1y*Deltat/2)/(Deltar*Deltat*w2)
+    csi_prmS1y = (Deltar*Deltat_prmS1y + Deltar_prmS1y*Deltat)*np.sign(Deltar*Deltat)/(2*w2*np.sqrt(np.abs(Deltar*Deltat))) - w2_prmS1y*np.sqrt(np.abs(Deltar*Deltat))/w2**2
     csi1_prmS1y = csi_prmS1y*(1 - np.abs(tortoise - 1))
     csi2_prmS1y = csi_prmS1y*(1/2 - np.sign(3/2 - tortoise)/2)
     prT_prmS1y = csi2_prmS1y*(n1*p1 + n2*p2 + n3*p3)
@@ -2334,7 +2334,7 @@ def ham_S1y_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Hs_prmS1y = Hso_prmS1y + Hss_prmS1y
     dSS_prmS1y = 1585.533*chi**2*chi_prmS1y*eta**2 - 123.0009*chi**2*chi_prmS1y*eta + 2323.56*chi*chi_prmS1y*eta**3 - 652.65*chi*chi_prmS1y*eta**2 + 37.1964*chi_prmS1y*eta
     Heff_prmS1y = -Hd_prmS1y + Hns_prmS1y + Hs_prmS1y + 2*S1y*dSS*eta*u**4 + dSS_prmS1y*eta*u**4*(S1x**2 + S1y**2 + S1z**2 + S2x**2 + S2y**2 + S2z**2)
-    Hreal_prmS1y = Heff_prmS1y*eta/np.sqrt(eta*(2*Heff - 2) + 1)
+    Hreal_prmS1y = Heff_prmS1y*eta*np.sign(Heff)/np.sqrt(eta*(2*np.abs(Heff) - 2) + 1)
     return Hreal_prmS1y
 
 def ham_S1z_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z):
@@ -2407,7 +2407,7 @@ def ham_S1z_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Delta5 = etaKminus1*etaKminus1*(np.true_divide(-4237,60)+np.true_divide(128,5)*EMgamma+np.true_divide(2275,512)*np.pi*np.pi-np.true_divide(1,3)*a*a*(Delta1*Delta1*Delta1-3*Delta1*Delta2+3*Delta3)-(Delta1*Delta1*Delta1*Delta1*Delta1-5*Delta1*Delta1*Delta1*Delta2+5*Delta1*Delta2*Delta2+5*Delta1*Delta1*Delta3-5*Delta2*Delta3-5*Delta1*Delta4)/(5*etaKminus1*etaKminus1)+(Delta1*Delta1*Delta1*Delta1-4*Delta1*Delta1*Delta2+2*Delta2*Delta2+4*Delta1*Delta3-4*Delta4)/(2*etaKminus1)+np.true_divide(256,5)*np.log(2)+(np.true_divide(41,32)*np.pi*np.pi-np.true_divide(221,6))*eta)
     Delta5l = etaKminus1*etaKminus1*np.true_divide(64,5)
     logarg = u*(Delta1+u*(Delta2+u*(Delta3+u*(Delta4+u*(Delta5+Delta5l*np.log(u))))))
-    Deltaucalib = 1+eta*(Delta0+np.log1p(logarg))
+    Deltaucalib = 1+eta*(Delta0+np.log(np.abs(1+logarg)))
     Deltaucalibprime = -eta*u*u*(Delta1+u*(2*Delta2+u*(3*Delta3+u*(4*Delta4+u*(5*(Delta5+Delta5l*np.log(u)))))))/(1+logarg)
     Deltaubar = a*a*u*u+(2*u+1/etaKminus1)/etaKminus1
     Deltaubarprime = -2*a*a*u*u*u-2*u*u/(etaKminus1)
@@ -2417,7 +2417,7 @@ def ham_S1z_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Deltat = r*r*Deltau
     Deltar = Deltat*Dinv
     Lambt = np.abs(w2*w2-a*a*Deltat*sin2theta)
-    csi = np.sqrt(Deltar*Deltat)/w2
+    csi = np.sqrt(np.abs(Deltar*Deltat))/w2
     csi1 = 1+(1-np.abs(1-tortoise))*(csi-1)
     csi2 = 1+(np.true_divide(1,2)-np.true_divide(1,2)*np.sign(np.true_divide(3,2)-tortoise))*(csi-1)
     prT = csi2*(p1*n1+p2*n2+p3*n3)
@@ -2498,7 +2498,7 @@ def ham_S1z_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Hs = Hso+Hss
     dSS = 528.511*chi*chi*chi*eta*eta-41.0003*chi*chi*chi*eta+1161.78*chi*chi*eta*eta*eta-326.325*chi*chi*eta*eta+37.1964*chi*eta+706.958*eta*eta*eta-36.0272*eta+6.06807
     Heff = Hs+Hns-Hd+dSS*eta*u*u*u*u*(S1x*S1x+S1y*S1y+S1z*S1z+S2x*S2x+S2y*S2y+S2z*S2z)
-    Hreal = np.sqrt(1+2*eta*(Heff-1))
+    Hreal = np.sqrt(1+2*eta*(np.abs(Heff)-1))
 
     sigmastar3_prmS1z = m2/m1
     sigma3_prmS1z = 1
@@ -2541,7 +2541,7 @@ def ham_S1z_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Delta5_prmS1z = etaKminus1**2*(-a**2*(3*Delta1**2*Delta1_prmS1z - 3*Delta1*Delta2_prmS1z - 3*Delta1_prmS1z*Delta2 + 3*Delta3_prmS1z)/3 + a*a_prmS1z*(-2*Delta1**3 + 6*Delta1*Delta2 - 6*Delta3)/3 + (4*Delta1**3*Delta1_prmS1z - 4*Delta1**2*Delta2_prmS1z - 8*Delta1*Delta1_prmS1z*Delta2 + 4*Delta1*Delta3_prmS1z + 4*Delta1_prmS1z*Delta3 + 4*Delta2*Delta2_prmS1z - 4*Delta4_prmS1z)/(2*etaKminus1) - etaKminus1_prmS1z*(Delta1**4 - 4*Delta1**2*Delta2 + 4*Delta1*Delta3 + 2*Delta2**2 - 4*Delta4)/(2*etaKminus1**2) - (5*Delta1**4*Delta1_prmS1z - 5*Delta1**3*Delta2_prmS1z - 15*Delta1**2*Delta1_prmS1z*Delta2 + 5*Delta1**2*Delta3_prmS1z + 10*Delta1*Delta1_prmS1z*Delta3 + 10*Delta1*Delta2*Delta2_prmS1z - 5*Delta1*Delta4_prmS1z + 5*Delta1_prmS1z*Delta2**2 - 5*Delta1_prmS1z*Delta4 - 5*Delta2*Delta3_prmS1z - 5*Delta2_prmS1z*Delta3)/(5*etaKminus1**2) + etaKminus1_prmS1z*(2*Delta1**5 - 10*Delta1**3*Delta2 + 10*Delta1**2*Delta3 + 10*Delta1*Delta2**2 - 10*Delta1*Delta4 - 10*Delta2*Delta3)/(5*etaKminus1**3)) + etaKminus1*etaKminus1_prmS1z*(256*EMgamma/5 + 2*a**2*(-Delta1**3 + 3*Delta1*Delta2 - 3*Delta3)/3 + 2*eta*(-221/6 + 41*np.pi**2/32) - 4237/30 + 512*np.log(2)/5 + 2275*np.pi**2/256 + (Delta1**4 - 4*Delta1**2*Delta2 + 4*Delta1*Delta3 + 2*Delta2**2 - 4*Delta4)/etaKminus1 - 2*(Delta1**5 - 5*Delta1**3*Delta2 + 5*Delta1**2*Delta3 + 5*Delta1*Delta2**2 - 5*Delta1*Delta4 - 5*Delta2*Delta3)/(5*etaKminus1**2))
     Delta5l_prmS1z = 128*etaKminus1*etaKminus1_prmS1z/5
     logarg_prmS1z = u*(Delta1_prmS1z + u*(Delta2_prmS1z + u*(Delta3_prmS1z + u*(Delta4_prmS1z + u*(Delta5l_prmS1z*np.log(u) + Delta5_prmS1z)))))
-    Deltaucalib_prmS1z = eta*(Delta0_prmS1z + logarg_prmS1z/(logarg + 1))
+    Deltaucalib_prmS1z = eta*(Delta0_prmS1z + logarg_prmS1z*np.sign(logarg + 1)/np.abs(logarg + 1))
     Deltaucalibprime_prmS1z = eta*logarg_prmS1z*u**2*(Delta1 + u*(2*Delta2 + u*(3*Delta3 + u*(4*Delta4 + u*(5*Delta5 + 5*Delta5l*np.log(u))))))/(logarg + 1)**2 - eta*u**2*(Delta1_prmS1z + u*(2*Delta2_prmS1z + u*(3*Delta3_prmS1z + u*(4*Delta4_prmS1z + u*(5*Delta5l_prmS1z*np.log(u) + 5*Delta5_prmS1z)))))/(logarg + 1)
     Deltaubar_prmS1z = 2*a*a_prmS1z*u**2 + etaKminus1_prmS1z*(-2*u - 1/etaKminus1)/etaKminus1**2 - etaKminus1_prmS1z/etaKminus1**3
     Deltaubarprime_prmS1z = -4*a*a_prmS1z*u**3 + 2*etaKminus1_prmS1z*u**2/etaKminus1**2
@@ -2551,7 +2551,7 @@ def ham_S1z_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Deltat_prmS1z = Deltau_prmS1z*r**2
     Deltar_prmS1z = Deltat_prmS1z*Dinv
     Lambt_prmS1z = (Deltat*a**2*sin2theta_prmS1z + 2*Deltat*a*a_prmS1z*sin2theta + Deltat_prmS1z*a**2*sin2theta - 2*w2*w2_prmS1z)*np.sign(Deltat*a**2*sin2theta - w2**2)
-    csi_prmS1z = -w2_prmS1z*np.sqrt(Deltar*Deltat)/w2**2 + np.sqrt(Deltar*Deltat)*(Deltar*Deltat_prmS1z/2 + Deltar_prmS1z*Deltat/2)/(Deltar*Deltat*w2)
+    csi_prmS1z = (Deltar*Deltat_prmS1z + Deltar_prmS1z*Deltat)*np.sign(Deltar*Deltat)/(2*w2*np.sqrt(np.abs(Deltar*Deltat))) - w2_prmS1z*np.sqrt(np.abs(Deltar*Deltat))/w2**2
     csi1_prmS1z = csi_prmS1z*(1 - np.abs(tortoise - 1))
     csi2_prmS1z = csi_prmS1z*(1/2 - np.sign(3/2 - tortoise)/2)
     prT_prmS1z = csi2_prmS1z*(n1*p1 + n2*p2 + n3*p3)
@@ -2631,7 +2631,7 @@ def ham_S1z_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Hs_prmS1z = Hso_prmS1z + Hss_prmS1z
     dSS_prmS1z = 1585.533*chi**2*chi_prmS1z*eta**2 - 123.0009*chi**2*chi_prmS1z*eta + 2323.56*chi*chi_prmS1z*eta**3 - 652.65*chi*chi_prmS1z*eta**2 + 37.1964*chi_prmS1z*eta
     Heff_prmS1z = -Hd_prmS1z + Hns_prmS1z + Hs_prmS1z + 2*S1z*dSS*eta*u**4 + dSS_prmS1z*eta*u**4*(S1x**2 + S1y**2 + S1z**2 + S2x**2 + S2y**2 + S2z**2)
-    Hreal_prmS1z = Heff_prmS1z*eta/np.sqrt(eta*(2*Heff - 2) + 1)
+    Hreal_prmS1z = Heff_prmS1z*eta*np.sign(Heff)/np.sqrt(eta*(2*np.abs(Heff) - 2) + 1)
     return Hreal_prmS1z
 
 def ham_S2x_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z):
@@ -2704,7 +2704,7 @@ def ham_S2x_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Delta5 = etaKminus1*etaKminus1*(np.true_divide(-4237,60)+np.true_divide(128,5)*EMgamma+np.true_divide(2275,512)*np.pi*np.pi-np.true_divide(1,3)*a*a*(Delta1*Delta1*Delta1-3*Delta1*Delta2+3*Delta3)-(Delta1*Delta1*Delta1*Delta1*Delta1-5*Delta1*Delta1*Delta1*Delta2+5*Delta1*Delta2*Delta2+5*Delta1*Delta1*Delta3-5*Delta2*Delta3-5*Delta1*Delta4)/(5*etaKminus1*etaKminus1)+(Delta1*Delta1*Delta1*Delta1-4*Delta1*Delta1*Delta2+2*Delta2*Delta2+4*Delta1*Delta3-4*Delta4)/(2*etaKminus1)+np.true_divide(256,5)*np.log(2)+(np.true_divide(41,32)*np.pi*np.pi-np.true_divide(221,6))*eta)
     Delta5l = etaKminus1*etaKminus1*np.true_divide(64,5)
     logarg = u*(Delta1+u*(Delta2+u*(Delta3+u*(Delta4+u*(Delta5+Delta5l*np.log(u))))))
-    Deltaucalib = 1+eta*(Delta0+np.log1p(logarg))
+    Deltaucalib = 1+eta*(Delta0+np.log(np.abs(1+logarg)))
     Deltaucalibprime = -eta*u*u*(Delta1+u*(2*Delta2+u*(3*Delta3+u*(4*Delta4+u*(5*(Delta5+Delta5l*np.log(u)))))))/(1+logarg)
     Deltaubar = a*a*u*u+(2*u+1/etaKminus1)/etaKminus1
     Deltaubarprime = -2*a*a*u*u*u-2*u*u/(etaKminus1)
@@ -2714,7 +2714,7 @@ def ham_S2x_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Deltat = r*r*Deltau
     Deltar = Deltat*Dinv
     Lambt = np.abs(w2*w2-a*a*Deltat*sin2theta)
-    csi = np.sqrt(Deltar*Deltat)/w2
+    csi = np.sqrt(np.abs(Deltar*Deltat))/w2
     csi1 = 1+(1-np.abs(1-tortoise))*(csi-1)
     csi2 = 1+(np.true_divide(1,2)-np.true_divide(1,2)*np.sign(np.true_divide(3,2)-tortoise))*(csi-1)
     prT = csi2*(p1*n1+p2*n2+p3*n3)
@@ -2795,7 +2795,7 @@ def ham_S2x_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Hs = Hso+Hss
     dSS = 528.511*chi*chi*chi*eta*eta-41.0003*chi*chi*chi*eta+1161.78*chi*chi*eta*eta*eta-326.325*chi*chi*eta*eta+37.1964*chi*eta+706.958*eta*eta*eta-36.0272*eta+6.06807
     Heff = Hs+Hns-Hd+dSS*eta*u*u*u*u*(S1x*S1x+S1y*S1y+S1z*S1z+S2x*S2x+S2y*S2y+S2z*S2z)
-    Hreal = np.sqrt(1+2*eta*(Heff-1))
+    Hreal = np.sqrt(1+2*eta*(np.abs(Heff)-1))
 
     sigmastar1_prmS2x = m1/m2
     sigma1_prmS2x = 1
@@ -2838,7 +2838,7 @@ def ham_S2x_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Delta5_prmS2x = etaKminus1**2*(-a**2*(3*Delta1**2*Delta1_prmS2x - 3*Delta1*Delta2_prmS2x - 3*Delta1_prmS2x*Delta2 + 3*Delta3_prmS2x)/3 + a*a_prmS2x*(-2*Delta1**3 + 6*Delta1*Delta2 - 6*Delta3)/3 + (4*Delta1**3*Delta1_prmS2x - 4*Delta1**2*Delta2_prmS2x - 8*Delta1*Delta1_prmS2x*Delta2 + 4*Delta1*Delta3_prmS2x + 4*Delta1_prmS2x*Delta3 + 4*Delta2*Delta2_prmS2x - 4*Delta4_prmS2x)/(2*etaKminus1) - etaKminus1_prmS2x*(Delta1**4 - 4*Delta1**2*Delta2 + 4*Delta1*Delta3 + 2*Delta2**2 - 4*Delta4)/(2*etaKminus1**2) - (5*Delta1**4*Delta1_prmS2x - 5*Delta1**3*Delta2_prmS2x - 15*Delta1**2*Delta1_prmS2x*Delta2 + 5*Delta1**2*Delta3_prmS2x + 10*Delta1*Delta1_prmS2x*Delta3 + 10*Delta1*Delta2*Delta2_prmS2x - 5*Delta1*Delta4_prmS2x + 5*Delta1_prmS2x*Delta2**2 - 5*Delta1_prmS2x*Delta4 - 5*Delta2*Delta3_prmS2x - 5*Delta2_prmS2x*Delta3)/(5*etaKminus1**2) + etaKminus1_prmS2x*(2*Delta1**5 - 10*Delta1**3*Delta2 + 10*Delta1**2*Delta3 + 10*Delta1*Delta2**2 - 10*Delta1*Delta4 - 10*Delta2*Delta3)/(5*etaKminus1**3)) + etaKminus1*etaKminus1_prmS2x*(256*EMgamma/5 + 2*a**2*(-Delta1**3 + 3*Delta1*Delta2 - 3*Delta3)/3 + 2*eta*(-221/6 + 41*np.pi**2/32) - 4237/30 + 512*np.log(2)/5 + 2275*np.pi**2/256 + (Delta1**4 - 4*Delta1**2*Delta2 + 4*Delta1*Delta3 + 2*Delta2**2 - 4*Delta4)/etaKminus1 - 2*(Delta1**5 - 5*Delta1**3*Delta2 + 5*Delta1**2*Delta3 + 5*Delta1*Delta2**2 - 5*Delta1*Delta4 - 5*Delta2*Delta3)/(5*etaKminus1**2))
     Delta5l_prmS2x = 128*etaKminus1*etaKminus1_prmS2x/5
     logarg_prmS2x = u*(Delta1_prmS2x + u*(Delta2_prmS2x + u*(Delta3_prmS2x + u*(Delta4_prmS2x + u*(Delta5l_prmS2x*np.log(u) + Delta5_prmS2x)))))
-    Deltaucalib_prmS2x = eta*(Delta0_prmS2x + logarg_prmS2x/(logarg + 1))
+    Deltaucalib_prmS2x = eta*(Delta0_prmS2x + logarg_prmS2x*np.sign(logarg + 1)/np.abs(logarg + 1))
     Deltaucalibprime_prmS2x = eta*logarg_prmS2x*u**2*(Delta1 + u*(2*Delta2 + u*(3*Delta3 + u*(4*Delta4 + u*(5*Delta5 + 5*Delta5l*np.log(u))))))/(logarg + 1)**2 - eta*u**2*(Delta1_prmS2x + u*(2*Delta2_prmS2x + u*(3*Delta3_prmS2x + u*(4*Delta4_prmS2x + u*(5*Delta5l_prmS2x*np.log(u) + 5*Delta5_prmS2x)))))/(logarg + 1)
     Deltaubar_prmS2x = 2*a*a_prmS2x*u**2 + etaKminus1_prmS2x*(-2*u - 1/etaKminus1)/etaKminus1**2 - etaKminus1_prmS2x/etaKminus1**3
     Deltaubarprime_prmS2x = -4*a*a_prmS2x*u**3 + 2*etaKminus1_prmS2x*u**2/etaKminus1**2
@@ -2848,7 +2848,7 @@ def ham_S2x_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Deltat_prmS2x = Deltau_prmS2x*r**2
     Deltar_prmS2x = Deltat_prmS2x*Dinv
     Lambt_prmS2x = (Deltat*a**2*sin2theta_prmS2x + 2*Deltat*a*a_prmS2x*sin2theta + Deltat_prmS2x*a**2*sin2theta - 2*w2*w2_prmS2x)*np.sign(Deltat*a**2*sin2theta - w2**2)
-    csi_prmS2x = -w2_prmS2x*np.sqrt(Deltar*Deltat)/w2**2 + np.sqrt(Deltar*Deltat)*(Deltar*Deltat_prmS2x/2 + Deltar_prmS2x*Deltat/2)/(Deltar*Deltat*w2)
+    csi_prmS2x = (Deltar*Deltat_prmS2x + Deltar_prmS2x*Deltat)*np.sign(Deltar*Deltat)/(2*w2*np.sqrt(np.abs(Deltar*Deltat))) - w2_prmS2x*np.sqrt(np.abs(Deltar*Deltat))/w2**2
     csi1_prmS2x = csi_prmS2x*(1 - np.abs(tortoise - 1))
     csi2_prmS2x = csi_prmS2x*(1/2 - np.sign(3/2 - tortoise)/2)
     prT_prmS2x = csi2_prmS2x*(n1*p1 + n2*p2 + n3*p3)
@@ -2928,7 +2928,7 @@ def ham_S2x_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Hs_prmS2x = Hso_prmS2x + Hss_prmS2x
     dSS_prmS2x = 1585.533*chi**2*chi_prmS2x*eta**2 - 123.0009*chi**2*chi_prmS2x*eta + 2323.56*chi*chi_prmS2x*eta**3 - 652.65*chi*chi_prmS2x*eta**2 + 37.1964*chi_prmS2x*eta
     Heff_prmS2x = -Hd_prmS2x + Hns_prmS2x + Hs_prmS2x + 2*S2x*dSS*eta*u**4 + dSS_prmS2x*eta*u**4*(S1x**2 + S1y**2 + S1z**2 + S2x**2 + S2y**2 + S2z**2)
-    Hreal_prmS2x = Heff_prmS2x*eta/np.sqrt(eta*(2*Heff - 2) + 1)
+    Hreal_prmS2x = Heff_prmS2x*eta*np.sign(Heff)/np.sqrt(eta*(2*np.abs(Heff) - 2) + 1)
     return Hreal_prmS2x
 
 def ham_S2y_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z):
@@ -3001,7 +3001,7 @@ def ham_S2y_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Delta5 = etaKminus1*etaKminus1*(np.true_divide(-4237,60)+np.true_divide(128,5)*EMgamma+np.true_divide(2275,512)*np.pi*np.pi-np.true_divide(1,3)*a*a*(Delta1*Delta1*Delta1-3*Delta1*Delta2+3*Delta3)-(Delta1*Delta1*Delta1*Delta1*Delta1-5*Delta1*Delta1*Delta1*Delta2+5*Delta1*Delta2*Delta2+5*Delta1*Delta1*Delta3-5*Delta2*Delta3-5*Delta1*Delta4)/(5*etaKminus1*etaKminus1)+(Delta1*Delta1*Delta1*Delta1-4*Delta1*Delta1*Delta2+2*Delta2*Delta2+4*Delta1*Delta3-4*Delta4)/(2*etaKminus1)+np.true_divide(256,5)*np.log(2)+(np.true_divide(41,32)*np.pi*np.pi-np.true_divide(221,6))*eta)
     Delta5l = etaKminus1*etaKminus1*np.true_divide(64,5)
     logarg = u*(Delta1+u*(Delta2+u*(Delta3+u*(Delta4+u*(Delta5+Delta5l*np.log(u))))))
-    Deltaucalib = 1+eta*(Delta0+np.log1p(logarg))
+    Deltaucalib = 1+eta*(Delta0+np.log(np.abs(1+logarg)))
     Deltaucalibprime = -eta*u*u*(Delta1+u*(2*Delta2+u*(3*Delta3+u*(4*Delta4+u*(5*(Delta5+Delta5l*np.log(u)))))))/(1+logarg)
     Deltaubar = a*a*u*u+(2*u+1/etaKminus1)/etaKminus1
     Deltaubarprime = -2*a*a*u*u*u-2*u*u/(etaKminus1)
@@ -3011,7 +3011,7 @@ def ham_S2y_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Deltat = r*r*Deltau
     Deltar = Deltat*Dinv
     Lambt = np.abs(w2*w2-a*a*Deltat*sin2theta)
-    csi = np.sqrt(Deltar*Deltat)/w2
+    csi = np.sqrt(np.abs(Deltar*Deltat))/w2
     csi1 = 1+(1-np.abs(1-tortoise))*(csi-1)
     csi2 = 1+(np.true_divide(1,2)-np.true_divide(1,2)*np.sign(np.true_divide(3,2)-tortoise))*(csi-1)
     prT = csi2*(p1*n1+p2*n2+p3*n3)
@@ -3092,7 +3092,7 @@ def ham_S2y_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Hs = Hso+Hss
     dSS = 528.511*chi*chi*chi*eta*eta-41.0003*chi*chi*chi*eta+1161.78*chi*chi*eta*eta*eta-326.325*chi*chi*eta*eta+37.1964*chi*eta+706.958*eta*eta*eta-36.0272*eta+6.06807
     Heff = Hs+Hns-Hd+dSS*eta*u*u*u*u*(S1x*S1x+S1y*S1y+S1z*S1z+S2x*S2x+S2y*S2y+S2z*S2z)
-    Hreal = np.sqrt(1+2*eta*(Heff-1))
+    Hreal = np.sqrt(1+2*eta*(np.abs(Heff)-1))
 
     sigmastar2_prmS2y = m1/m2
     sigma2_prmS2y = 1
@@ -3135,7 +3135,7 @@ def ham_S2y_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Delta5_prmS2y = etaKminus1**2*(-a**2*(3*Delta1**2*Delta1_prmS2y - 3*Delta1*Delta2_prmS2y - 3*Delta1_prmS2y*Delta2 + 3*Delta3_prmS2y)/3 + a*a_prmS2y*(-2*Delta1**3 + 6*Delta1*Delta2 - 6*Delta3)/3 + (4*Delta1**3*Delta1_prmS2y - 4*Delta1**2*Delta2_prmS2y - 8*Delta1*Delta1_prmS2y*Delta2 + 4*Delta1*Delta3_prmS2y + 4*Delta1_prmS2y*Delta3 + 4*Delta2*Delta2_prmS2y - 4*Delta4_prmS2y)/(2*etaKminus1) - etaKminus1_prmS2y*(Delta1**4 - 4*Delta1**2*Delta2 + 4*Delta1*Delta3 + 2*Delta2**2 - 4*Delta4)/(2*etaKminus1**2) - (5*Delta1**4*Delta1_prmS2y - 5*Delta1**3*Delta2_prmS2y - 15*Delta1**2*Delta1_prmS2y*Delta2 + 5*Delta1**2*Delta3_prmS2y + 10*Delta1*Delta1_prmS2y*Delta3 + 10*Delta1*Delta2*Delta2_prmS2y - 5*Delta1*Delta4_prmS2y + 5*Delta1_prmS2y*Delta2**2 - 5*Delta1_prmS2y*Delta4 - 5*Delta2*Delta3_prmS2y - 5*Delta2_prmS2y*Delta3)/(5*etaKminus1**2) + etaKminus1_prmS2y*(2*Delta1**5 - 10*Delta1**3*Delta2 + 10*Delta1**2*Delta3 + 10*Delta1*Delta2**2 - 10*Delta1*Delta4 - 10*Delta2*Delta3)/(5*etaKminus1**3)) + etaKminus1*etaKminus1_prmS2y*(256*EMgamma/5 + 2*a**2*(-Delta1**3 + 3*Delta1*Delta2 - 3*Delta3)/3 + 2*eta*(-221/6 + 41*np.pi**2/32) - 4237/30 + 512*np.log(2)/5 + 2275*np.pi**2/256 + (Delta1**4 - 4*Delta1**2*Delta2 + 4*Delta1*Delta3 + 2*Delta2**2 - 4*Delta4)/etaKminus1 - 2*(Delta1**5 - 5*Delta1**3*Delta2 + 5*Delta1**2*Delta3 + 5*Delta1*Delta2**2 - 5*Delta1*Delta4 - 5*Delta2*Delta3)/(5*etaKminus1**2))
     Delta5l_prmS2y = 128*etaKminus1*etaKminus1_prmS2y/5
     logarg_prmS2y = u*(Delta1_prmS2y + u*(Delta2_prmS2y + u*(Delta3_prmS2y + u*(Delta4_prmS2y + u*(Delta5l_prmS2y*np.log(u) + Delta5_prmS2y)))))
-    Deltaucalib_prmS2y = eta*(Delta0_prmS2y + logarg_prmS2y/(logarg + 1))
+    Deltaucalib_prmS2y = eta*(Delta0_prmS2y + logarg_prmS2y*np.sign(logarg + 1)/np.abs(logarg + 1))
     Deltaucalibprime_prmS2y = eta*logarg_prmS2y*u**2*(Delta1 + u*(2*Delta2 + u*(3*Delta3 + u*(4*Delta4 + u*(5*Delta5 + 5*Delta5l*np.log(u))))))/(logarg + 1)**2 - eta*u**2*(Delta1_prmS2y + u*(2*Delta2_prmS2y + u*(3*Delta3_prmS2y + u*(4*Delta4_prmS2y + u*(5*Delta5l_prmS2y*np.log(u) + 5*Delta5_prmS2y)))))/(logarg + 1)
     Deltaubar_prmS2y = 2*a*a_prmS2y*u**2 + etaKminus1_prmS2y*(-2*u - 1/etaKminus1)/etaKminus1**2 - etaKminus1_prmS2y/etaKminus1**3
     Deltaubarprime_prmS2y = -4*a*a_prmS2y*u**3 + 2*etaKminus1_prmS2y*u**2/etaKminus1**2
@@ -3145,7 +3145,7 @@ def ham_S2y_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Deltat_prmS2y = Deltau_prmS2y*r**2
     Deltar_prmS2y = Deltat_prmS2y*Dinv
     Lambt_prmS2y = (Deltat*a**2*sin2theta_prmS2y + 2*Deltat*a*a_prmS2y*sin2theta + Deltat_prmS2y*a**2*sin2theta - 2*w2*w2_prmS2y)*np.sign(Deltat*a**2*sin2theta - w2**2)
-    csi_prmS2y = -w2_prmS2y*np.sqrt(Deltar*Deltat)/w2**2 + np.sqrt(Deltar*Deltat)*(Deltar*Deltat_prmS2y/2 + Deltar_prmS2y*Deltat/2)/(Deltar*Deltat*w2)
+    csi_prmS2y = (Deltar*Deltat_prmS2y + Deltar_prmS2y*Deltat)*np.sign(Deltar*Deltat)/(2*w2*np.sqrt(np.abs(Deltar*Deltat))) - w2_prmS2y*np.sqrt(np.abs(Deltar*Deltat))/w2**2
     csi1_prmS2y = csi_prmS2y*(1 - np.abs(tortoise - 1))
     csi2_prmS2y = csi_prmS2y*(1/2 - np.sign(3/2 - tortoise)/2)
     prT_prmS2y = csi2_prmS2y*(n1*p1 + n2*p2 + n3*p3)
@@ -3225,7 +3225,7 @@ def ham_S2y_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Hs_prmS2y = Hso_prmS2y + Hss_prmS2y
     dSS_prmS2y = 1585.533*chi**2*chi_prmS2y*eta**2 - 123.0009*chi**2*chi_prmS2y*eta + 2323.56*chi*chi_prmS2y*eta**3 - 652.65*chi*chi_prmS2y*eta**2 + 37.1964*chi_prmS2y*eta
     Heff_prmS2y = -Hd_prmS2y + Hns_prmS2y + Hs_prmS2y + 2*S2y*dSS*eta*u**4 + dSS_prmS2y*eta*u**4*(S1x**2 + S1y**2 + S1z**2 + S2x**2 + S2y**2 + S2z**2)
-    Hreal_prmS2y = Heff_prmS2y*eta/np.sqrt(eta*(2*Heff - 2) + 1)
+    Hreal_prmS2y = Heff_prmS2y*eta*np.sign(Heff)/np.sqrt(eta*(2*np.abs(Heff) - 2) + 1)
     return Hreal_prmS2y
 
 def ham_S2z_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z):
@@ -3298,7 +3298,7 @@ def ham_S2z_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Delta5 = etaKminus1*etaKminus1*(np.true_divide(-4237,60)+np.true_divide(128,5)*EMgamma+np.true_divide(2275,512)*np.pi*np.pi-np.true_divide(1,3)*a*a*(Delta1*Delta1*Delta1-3*Delta1*Delta2+3*Delta3)-(Delta1*Delta1*Delta1*Delta1*Delta1-5*Delta1*Delta1*Delta1*Delta2+5*Delta1*Delta2*Delta2+5*Delta1*Delta1*Delta3-5*Delta2*Delta3-5*Delta1*Delta4)/(5*etaKminus1*etaKminus1)+(Delta1*Delta1*Delta1*Delta1-4*Delta1*Delta1*Delta2+2*Delta2*Delta2+4*Delta1*Delta3-4*Delta4)/(2*etaKminus1)+np.true_divide(256,5)*np.log(2)+(np.true_divide(41,32)*np.pi*np.pi-np.true_divide(221,6))*eta)
     Delta5l = etaKminus1*etaKminus1*np.true_divide(64,5)
     logarg = u*(Delta1+u*(Delta2+u*(Delta3+u*(Delta4+u*(Delta5+Delta5l*np.log(u))))))
-    Deltaucalib = 1+eta*(Delta0+np.log1p(logarg))
+    Deltaucalib = 1+eta*(Delta0+np.log(np.abs(1+logarg)))
     Deltaucalibprime = -eta*u*u*(Delta1+u*(2*Delta2+u*(3*Delta3+u*(4*Delta4+u*(5*(Delta5+Delta5l*np.log(u)))))))/(1+logarg)
     Deltaubar = a*a*u*u+(2*u+1/etaKminus1)/etaKminus1
     Deltaubarprime = -2*a*a*u*u*u-2*u*u/(etaKminus1)
@@ -3308,7 +3308,7 @@ def ham_S2z_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Deltat = r*r*Deltau
     Deltar = Deltat*Dinv
     Lambt = np.abs(w2*w2-a*a*Deltat*sin2theta)
-    csi = np.sqrt(Deltar*Deltat)/w2
+    csi = np.sqrt(np.abs(Deltar*Deltat))/w2
     csi1 = 1+(1-np.abs(1-tortoise))*(csi-1)
     csi2 = 1+(np.true_divide(1,2)-np.true_divide(1,2)*np.sign(np.true_divide(3,2)-tortoise))*(csi-1)
     prT = csi2*(p1*n1+p2*n2+p3*n3)
@@ -3389,7 +3389,7 @@ def ham_S2z_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Hs = Hso+Hss
     dSS = 528.511*chi*chi*chi*eta*eta-41.0003*chi*chi*chi*eta+1161.78*chi*chi*eta*eta*eta-326.325*chi*chi*eta*eta+37.1964*chi*eta+706.958*eta*eta*eta-36.0272*eta+6.06807
     Heff = Hs+Hns-Hd+dSS*eta*u*u*u*u*(S1x*S1x+S1y*S1y+S1z*S1z+S2x*S2x+S2y*S2y+S2z*S2z)
-    Hreal = np.sqrt(1+2*eta*(Heff-1))
+    Hreal = np.sqrt(1+2*eta*(np.abs(Heff)-1))
 
     sigmastar3_prmS2z = m1/m2
     sigma3_prmS2z = 1
@@ -3432,7 +3432,7 @@ def ham_S2z_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Delta5_prmS2z = etaKminus1**2*(-a**2*(3*Delta1**2*Delta1_prmS2z - 3*Delta1*Delta2_prmS2z - 3*Delta1_prmS2z*Delta2 + 3*Delta3_prmS2z)/3 + a*a_prmS2z*(-2*Delta1**3 + 6*Delta1*Delta2 - 6*Delta3)/3 + (4*Delta1**3*Delta1_prmS2z - 4*Delta1**2*Delta2_prmS2z - 8*Delta1*Delta1_prmS2z*Delta2 + 4*Delta1*Delta3_prmS2z + 4*Delta1_prmS2z*Delta3 + 4*Delta2*Delta2_prmS2z - 4*Delta4_prmS2z)/(2*etaKminus1) - etaKminus1_prmS2z*(Delta1**4 - 4*Delta1**2*Delta2 + 4*Delta1*Delta3 + 2*Delta2**2 - 4*Delta4)/(2*etaKminus1**2) - (5*Delta1**4*Delta1_prmS2z - 5*Delta1**3*Delta2_prmS2z - 15*Delta1**2*Delta1_prmS2z*Delta2 + 5*Delta1**2*Delta3_prmS2z + 10*Delta1*Delta1_prmS2z*Delta3 + 10*Delta1*Delta2*Delta2_prmS2z - 5*Delta1*Delta4_prmS2z + 5*Delta1_prmS2z*Delta2**2 - 5*Delta1_prmS2z*Delta4 - 5*Delta2*Delta3_prmS2z - 5*Delta2_prmS2z*Delta3)/(5*etaKminus1**2) + etaKminus1_prmS2z*(2*Delta1**5 - 10*Delta1**3*Delta2 + 10*Delta1**2*Delta3 + 10*Delta1*Delta2**2 - 10*Delta1*Delta4 - 10*Delta2*Delta3)/(5*etaKminus1**3)) + etaKminus1*etaKminus1_prmS2z*(256*EMgamma/5 + 2*a**2*(-Delta1**3 + 3*Delta1*Delta2 - 3*Delta3)/3 + 2*eta*(-221/6 + 41*np.pi**2/32) - 4237/30 + 512*np.log(2)/5 + 2275*np.pi**2/256 + (Delta1**4 - 4*Delta1**2*Delta2 + 4*Delta1*Delta3 + 2*Delta2**2 - 4*Delta4)/etaKminus1 - 2*(Delta1**5 - 5*Delta1**3*Delta2 + 5*Delta1**2*Delta3 + 5*Delta1*Delta2**2 - 5*Delta1*Delta4 - 5*Delta2*Delta3)/(5*etaKminus1**2))
     Delta5l_prmS2z = 128*etaKminus1*etaKminus1_prmS2z/5
     logarg_prmS2z = u*(Delta1_prmS2z + u*(Delta2_prmS2z + u*(Delta3_prmS2z + u*(Delta4_prmS2z + u*(Delta5l_prmS2z*np.log(u) + Delta5_prmS2z)))))
-    Deltaucalib_prmS2z = eta*(Delta0_prmS2z + logarg_prmS2z/(logarg + 1))
+    Deltaucalib_prmS2z = eta*(Delta0_prmS2z + logarg_prmS2z*np.sign(logarg + 1)/np.abs(logarg + 1))
     Deltaucalibprime_prmS2z = eta*logarg_prmS2z*u**2*(Delta1 + u*(2*Delta2 + u*(3*Delta3 + u*(4*Delta4 + u*(5*Delta5 + 5*Delta5l*np.log(u))))))/(logarg + 1)**2 - eta*u**2*(Delta1_prmS2z + u*(2*Delta2_prmS2z + u*(3*Delta3_prmS2z + u*(4*Delta4_prmS2z + u*(5*Delta5l_prmS2z*np.log(u) + 5*Delta5_prmS2z)))))/(logarg + 1)
     Deltaubar_prmS2z = 2*a*a_prmS2z*u**2 + etaKminus1_prmS2z*(-2*u - 1/etaKminus1)/etaKminus1**2 - etaKminus1_prmS2z/etaKminus1**3
     Deltaubarprime_prmS2z = -4*a*a_prmS2z*u**3 + 2*etaKminus1_prmS2z*u**2/etaKminus1**2
@@ -3442,7 +3442,7 @@ def ham_S2z_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Deltat_prmS2z = Deltau_prmS2z*r**2
     Deltar_prmS2z = Deltat_prmS2z*Dinv
     Lambt_prmS2z = (Deltat*a**2*sin2theta_prmS2z + 2*Deltat*a*a_prmS2z*sin2theta + Deltat_prmS2z*a**2*sin2theta - 2*w2*w2_prmS2z)*np.sign(Deltat*a**2*sin2theta - w2**2)
-    csi_prmS2z = -w2_prmS2z*np.sqrt(Deltar*Deltat)/w2**2 + np.sqrt(Deltar*Deltat)*(Deltar*Deltat_prmS2z/2 + Deltar_prmS2z*Deltat/2)/(Deltar*Deltat*w2)
+    csi_prmS2z = (Deltar*Deltat_prmS2z + Deltar_prmS2z*Deltat)*np.sign(Deltar*Deltat)/(2*w2*np.sqrt(np.abs(Deltar*Deltat))) - w2_prmS2z*np.sqrt(np.abs(Deltar*Deltat))/w2**2
     csi1_prmS2z = csi_prmS2z*(1 - np.abs(tortoise - 1))
     csi2_prmS2z = csi_prmS2z*(1/2 - np.sign(3/2 - tortoise)/2)
     prT_prmS2z = csi2_prmS2z*(n1*p1 + n2*p2 + n3*p3)
@@ -3522,7 +3522,7 @@ def ham_S2z_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y
     Hs_prmS2z = Hso_prmS2z + Hss_prmS2z
     dSS_prmS2z = 1585.533*chi**2*chi_prmS2z*eta**2 - 123.0009*chi**2*chi_prmS2z*eta + 2323.56*chi*chi_prmS2z*eta**3 - 652.65*chi*chi_prmS2z*eta**2 + 37.1964*chi_prmS2z*eta
     Heff_prmS2z = -Hd_prmS2z + Hns_prmS2z + Hs_prmS2z + 2*S2z*dSS*eta*u**4 + dSS_prmS2z*eta*u**4*(S1x**2 + S1y**2 + S1z**2 + S2x**2 + S2y**2 + S2z**2)
-    Hreal_prmS2z = Heff_prmS2z*eta/np.sqrt(eta*(2*Heff - 2) + 1)
+    Hreal_prmS2z = Heff_prmS2z*eta*np.sign(Heff)/np.sqrt(eta*(2*np.abs(Heff) - 2) + 1)
     return Hreal_prmS2z
 
 def ham_first_derivs(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z):
@@ -3538,4 +3538,4 @@ def ham_first_derivs(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, 
     S2x_deriv = ham_S2x_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z)
     S2y_deriv = ham_S2y_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z)
     S2z_deriv = ham_S2z_deriv(m1, m2, tortoise, x, y, z, p1, p2, p3, S1x, S1y, S1z, S2x, S2y, S2z)
-    return np.array([x_deriv[0],y_deriv[0],z_deriv[0],p1_deriv,p2_deriv,p3_deriv,S1x_deriv,S1y_deriv,S1z_deriv,S2x_deriv,S2y_deriv,S2z_deriv,x_deriv[1],y_deriv[1],z_deriv[1]])
+    return np.array([x_deriv[0],y_deriv[0],z_deriv[0],p1_deriv,p2_deriv,p3_deriv,S1x_deriv,S1y_deriv,S1z_deriv,S2x_deriv,S2y_deriv,S2z_deriv,x_deriv[1],y_deriv[1],z_deriv[1],x_deriv[2]])

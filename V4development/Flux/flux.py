@@ -12,13 +12,13 @@ def compute_flux(m1,m2,tortoise,q,p,S1,S2,omega,Hreal,NQC=1.,lMax = 8):
     flux = 0.
     omegasq = omega*omega
     v = np.cbrt(omega)
-    rcrossp = np.cross(q,p)
-    rcrosspmag = np.linalg.norm(rcrossp)
+    #rcrossp = np.cross(q,p)
+    #rcrosspmag = np.linalg.norm(rcrossp)
     m1hat = m1/(m1+m2)
     m2hat = m2/(m1+m2)
     S1_over_m12 = S1/m1hat/m1hat
     S2_over_m22 = S2/m2hat/m2hat
-    Lhat = rcrossp/rcrosspmag
+    #Lhat = rcrossp/rcrosspmag
     s1dotL = np.dot(S1_over_m12,Lhat)
     s2dotL = np.dot(S2_over_m22,Lhat)
     
