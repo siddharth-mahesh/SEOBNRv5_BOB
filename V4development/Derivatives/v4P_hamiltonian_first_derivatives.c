@@ -1,3 +1,4 @@
+#include math.h
 int ham_first_derivs(double dvalues[],double dcsi[],double m1,double m2,int tortoise,double values[]){
     double x = values[0]
     double y = values[1]

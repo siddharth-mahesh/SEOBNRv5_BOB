@@ -16,7 +16,6 @@ def compute_modes(m1=23., m2=10., a=-9.086823027135883e-03, chiA=-4.516044029838
     m1p3eta=-1+3*eta
     m1p3eta2 = m1p3eta*m1p3eta
     m1p3eta3 = m1p3eta2*m1p3eta
-    
     modes['delta22vh3'] = 7./3.
     modes['delta22vh6'] = -4.*(deltam*chiA + chiS*(1. - 2.*eta))/3. + (428.*np.pi)/105.
     modes['delta22v8'] = 0.
