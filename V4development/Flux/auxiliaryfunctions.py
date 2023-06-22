@@ -1,5 +1,4 @@
 import numpy as np
-from Derivatives.ham_and_csi_first_derivs import ham_first_derivs
 import Flux.modes as fm
 EMGamma = 0.577215664901532860606512090082402431
 
@@ -260,7 +259,7 @@ def CalcOmega(m1,m2,tortoise,q,p,S1,S2):
     #print("S2prime = " , np.matmul(R2,S2temp))
     #print("LNhatprime = " , np.matmul(R2,Lnhattemp))
     
-    ## No need to compute spherical momenta as we have analytical derivatives
+    ## Need to compute spherical momenta, set pr = 0 and recompute cart momenta to get analytical derivatives
     
     rpass = np.linalg.norm(qprime)
     thpass = np.arccos(qprime[0]/rpass)

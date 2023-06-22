@@ -1,4 +1,5 @@
 import numpy as np
+
 def compute_modes(m1=23., m2=10., a=-9.086823027135883e-03, chiA=-4.516044029838846e-02, chiS=1.506880542362110e-02):
     modes={}
     eta = (m1*m2)/(m1+m2)/(m1+m2)

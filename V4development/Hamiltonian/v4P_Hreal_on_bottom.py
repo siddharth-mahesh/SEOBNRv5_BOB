@@ -1,5 +1,5 @@
 import numpy as np
-def compute_v4P_Hreal(m1=23., m2=10., EMgamma=0.577215664901532860606512090082402431, tortoise=1, x=2.1242072413581923e+01, y=0., z=0., p1=0., p2=2.1696072000958128e-01, p3=1.0000000000000000e-03, S1x=4.8576675849403119e-03, S1y=9.7153351698806237e-03, S1z=-1.4573002754820936e-02, S2x=3.6730945821854912e-03, S2y=-4.5913682277318639e-03, S2z=5.5096418732782371e-03):
+def compute_v4P_Hreal(m1=23., m2=10., tortoise=1, x=2.1242072413581923e+01, y=0., z=0., p1=0., p2=2.1696072000958128e-01, p3=1.0000000000000000e-03, S1x=4.8576675849403119e-03, S1y=9.7153351698806237e-03, S1z=-1.4573002754820936e-02, S2x=3.6730945821854912e-03, S2y=-4.5913682277318639e-03, S2z=5.5096418732782371e-03):
     EMgamma = 0.577215664901532860606512090082402431
     M=m1+m2
     mu=m1*m2/M
@@ -56,6 +56,7 @@ def compute_v4P_Hreal(m1=23., m2=10., EMgamma=0.57721566490153286060651209008240
     w2=a*a+r*r
     Sigma=r*r+a*a*costheta*costheta
     Dinv=1+np.log(1+6*eta*u*u+2*(26-3*eta)*eta*u*u*u)
+    Dinvprime = -2*u*u*(12*eta*u + 6*(26 - 3*eta)*eta*u*u)/(1 + 6*eta*u*u + 2*(26 - 3*eta)*eta*u*u*u)
     omegatilde=2*a*r
     chi=(Skerr1*Lhat1+Skerr2*Lhat2+Skerr3*Lhat3)/(1-2*eta)+np.divide(1,2)*(Sperp1*Skerr1+Sperp2*Skerr2+Sperp3*Skerr3)/(Skerrmag*(1.-2.*eta))
     Kchi0=267.788*eta*eta*eta-126.687*eta*eta+10.2573*eta+1.7336
@@ -78,8 +79,10 @@ def compute_v4P_Hreal(m1=23., m2=10., EMgamma=0.57721566490153286060651209008240
     Deltatprime=2*r*Deltau+r*r*Deltauprime
     Deltat=r*r*Deltau
     Deltar=Deltat*Dinv
+    Deltarprime = Deltatprime*Dinv + Deltat*Dinvprime
     Lambdat=np.abs(w2*w2-a*a*Deltat*sin2theta)
     csi=np.sqrt(np.abs(Deltar*Deltat))/w2
+    csiprime = csi*((Deltatprime/Deltat + Deltarprime/Deltar)/2 - 2.*r/w2)
     csi1=1+(1-np.abs(1-tortoise))*(csi-1)
     csi2=1+(np.divide(1,2)-np.divide(1,2)*np.sign(np.divide(3,2)-tortoise))*(csi-1)
     prT=csi2*(p1*n1+p2*n2+p3*n3)

@@ -1,0 +1,47 @@
+## Prototype RHS Pseudocode
+
+-> Normalize masses
+
+m1hat = m1/(m1+m2)
+m2hat = 1 - m1hat
+
+-> Build Hamiltonian, csi and dcsi
+
+hreal = get_hreal()
+csi , dcsi = get_csi()
+
+-> Build T, Tinv, dT
+T = I + (csi-1)q*q/r^2
+Tinv = I - (csi-1)q*q/r^2/csi
+
+dTdx = {delta*q}(csi-1)/r^2 + ((csi') - 2(csi - 1))q*q*q/r^3 + 
+dpstardx = dTdx.p
+
+-> Build derivatives:
+    -> dHdx at constant p and tortoise 2.
+        -> build p
+            p = Tinv.pstar
+            dhdx = get_dHdx(x,p,...)
+    -> dHdpstar and dHds1 as normal with tortoise 1
+        dhd... = get_dHd...()
+
+-> Build xdot
+dxdt = T.dhdpstar
+
+-> build pdot
+    -> build pdot term1
+       dpdt1 = -T.dhdx
+    -> build pdot term2
+       dpstardx = dTdx.p
+       dpdt2a = dpstardx.T
+       dpdt2 = dpdt2a.dhdpstar
+    -> boild pdot term3
+       |L| = |r(x)p|
+       Omega = |r(x)dxdt|
+       dEdt = get_flux()
+       dpdt3 = (dEdt(LOmega)^-1)pstar
+
+-> build dsndt
+    dsndt = dhdsn(x)Sn
+
+

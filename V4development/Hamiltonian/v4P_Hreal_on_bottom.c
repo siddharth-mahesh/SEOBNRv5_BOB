@@ -56,6 +56,7 @@ float compute_v4P_Hreal(float m1,float m2,INT tortoise,float x,float y,float z,f
     float w2=a*a+r*r ;
     float Sigma=r*r+a*a*costheta*costheta ;
     float Dinv=1+log(1+6*eta*u*u+2*(26-3*eta)*eta*u*u*u) ;
+    float Dinvprime = -2*u*u*(12*eta*u + 6*(26 - 3*eta)*eta*u*u)/(1 + 6*eta*u*u + 2*(26 - 3*eta)*eta*u*u*u) ;
     float omegatilde=2*a*r ;
     float chi=(Skerr1*Lhat1+Skerr2*Lhat2+Skerr3*Lhat3)/(1-2*eta)+fdivide(1,2)*(Sperp1*Skerr1+Sperp2*Skerr2+Sperp3*Skerr3)/(Skerrmag*(1.-2.*eta)) ;
     float Kchi0=267.788*eta*eta*eta-126.687*eta*eta+10.2573*eta+1.7336 ;
@@ -78,8 +79,10 @@ float compute_v4P_Hreal(float m1,float m2,INT tortoise,float x,float y,float z,f
     float Deltatprime=2*r*Deltau+r*r*Deltauprime ;
     float Deltat=r*r*Deltau ;
     float Deltar=Deltat*Dinv ;
+    float Deltarprime = Deltatprime*Dinv + Deltat*Dinvprime ;
     float Lambdat=fabs(w2*w2-a*a*Deltat*sin2theta) ;
     float csi=sqrt(fabs(Deltar*Deltat))/w2 ;
+    float csiprime = csi*((Deltatprime/Deltat + Deltarprime/Deltar)/2 - 2.*r/w2) ;
     float csi1=1+(1-fabs(1-(float)tortoise))*(csi-1) ;
     float csi2=1+(fdivide(1,2)-fdivide(1,2)*sign(fdivide(3,2)-(float)tortoise))*(csi-1) ;
     float prT=csi2*(p1*n1+p2*n2+p3*n3) ;
