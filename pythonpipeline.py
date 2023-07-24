@@ -1,5 +1,5 @@
 import sys
-from v4P_Hamiltonian import v4P_compute_Hamiltonian
+from V4development.Hamiltonian.v4P_Hamiltonian import v4P_compute_Hamiltonian
 
 testham = v4P_compute_Hamiltonian
 
