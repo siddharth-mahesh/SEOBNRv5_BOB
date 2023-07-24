@@ -26,5 +26,5 @@ before_script:
 
 test:
   script:
-    - var = $(python -m pythonpipeline.py)
+    - var=$(python -m pythonpipeline.py)
     - exit var
