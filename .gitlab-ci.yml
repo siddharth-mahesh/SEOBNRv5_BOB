@@ -26,6 +26,5 @@ before_script:
 
 test:
   script:
-    - addpath("V4development/Hamiltonian")
     - var = $(python -m pythonpipeline.py)
     - exit var
