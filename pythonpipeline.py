@@ -15,8 +15,8 @@ from V4development.Hamiltonian.v4P_Hamiltonian import v4P_compute_Hamiltonian
 # Read in randomized values and Hamiltonian and corresponding perturbed terms as numpy arrays 
 fp_main = open(os.path.join("V4development","Hamiltonian","CI-HamiltonianTestMain.dat"),"rb")
 fp_pert = open(os.path.join("V4development","Hamiltonian","CI-HamiltonianTestPert.dat"),"rb")
-main_values = np.from_file(fp_main,np.float64)
-pert_values = np.from_file(fp_pert,np.float64)
+main_values = np.fromfile(fp_main,np.float64)
+pert_values = np.fromfile(fp_pert,np.float64)
 
 # For counting errors; use sys.exit(errors) to pass/fail the pipeline
 errors = 0
