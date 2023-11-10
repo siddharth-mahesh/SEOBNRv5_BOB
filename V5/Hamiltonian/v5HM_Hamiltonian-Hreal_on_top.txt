@@ -5,12 +5,12 @@ Heven = sp.sqrt(
     Aalign * (
         1 
         + pphi*pphi/r**2 
-        + (1 + Balignnp)*pr*pr 
+        + (1 + Balignnp)*prstar*prstar 
         + Bkerreqnp*pphi*pphi*ap**2/r**2 
         + Qalign
     )
 )
-SOcalib = eta*dSO*u*u*u*ap*pphi
+SOcalib = eta*dSO*ap*pphi*(u**3)
 dSO = -7.71251231383957 * am ** 3
         - 17.2294679794015 * am ** 2 * ap
         - 238.430383378296 * am ** 2 * eta
@@ -217,7 +217,7 @@ gam = (
     )
 )
 a6 = 41.7877875 - 3021.93382 * eta + 33414.4394 * eta**2 - 169019.14 * eta**3 + 329523.262 * eta**4
-eta = m1*m2/M**2
+eta = m1*m2/(M**2)
 delta = (m1-m2)/M
 M = m1+m2
 u = 1/r

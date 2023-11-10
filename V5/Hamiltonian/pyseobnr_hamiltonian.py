@@ -23,7 +23,7 @@ def evaluate_H(q,p, chi_1, chi_2, m_1, m_2,verbose = False):
         
         r = q[0]
         phi = q[1]
-
+        u = 1/r
         prst = p[0]
         L = p[1]
 
@@ -131,5 +131,5 @@ def evaluate_H(q,p, chi_1, chi_2, m_1, m_2,verbose = False):
         if not verbose:
             return H*nu,xi
         else:
-            return H*nu,xi,A,Bnp,Bnpa,Qq,Heven,Hodd,QSalign2,Qpm,Ga3,gam,gap,SOcalib
+            return H*nu,xi,A,Bnp,Bnpa,Qq,Heven,Hodd,QSalign2,Qpm,Ga3,gam,gap,SOcalib,u,nu,ap,am,r,phi,prst,L,chi_1,chi_2,m_1,m_2
 
