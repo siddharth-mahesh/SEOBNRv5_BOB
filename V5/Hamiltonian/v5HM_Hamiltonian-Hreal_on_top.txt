@@ -5,7 +5,7 @@ Heven = sp.sqrt(
     Aalign * (
         1 
         + pphi*pphi/r**2 
-        + (1 + Balignnp)*prstar*prstar 
+        + (1 + Balignnp)*pr*pr 
         + Bkerreqnp*pphi*pphi*ap**2/r**2 
         + Qalign
     )

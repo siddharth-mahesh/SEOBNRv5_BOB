@@ -1139,7 +1139,7 @@ def compute_extra_flm_terms(l, m, vh,f_coeffs_vh):
         extra_term = I*vh3 * vh3 * f_coeffs_vh[3,3][6]
     return extra_term
 
-def compute_rholm_single(nu, vs, vh, l, m, rho_coeffs, rho_coeffs_log, extra_coeffs, extra_coeffs_log, f_coeffs, f_coeffs_vh):
+def compute_rholm_single(nu, vs, vh, l, m, rho_coeffs, rho_coeffs_log, extra_coeffs, extra_coeffs_log, f_coeffs, f_coeffs_vh,verbose = False):
     """
     Compute the full \rho_{\ell m}​ contribution for a given mode
     """
@@ -1175,19 +1175,34 @@ def compute_rholm_single(nu, vs, vh, l, m, rho_coeffs, rho_coeffs_log, extra_coe
         rho_final = f_final
     else:
         rho_final += f_final
-    return rho_final
+    if not verbose:
+        return rho_final
+    else:
+        return rho_final, rho, f
 
-def compute_rholm(v, vh, nu,  rho_coeffs, rho_coeffs_log, extra_coeffs, extra_coeffs_log, f_coeffs, f_coeffs_vh):
+def compute_rholm(v, vh, nu,  rho_coeffs, rho_coeffs_log, extra_coeffs, extra_coeffs_log, f_coeffs, f_coeffs_vh,verbose = False):
     vs = zeros(PN_limit)
     vs[0] = 0
     vs[1] = v
     for i in range(2,PN_limit):
         vs[i] = v*vs[i-1]
     rholm = zeros([ell_max+1,ell_max+1],dtype = complex)
+    rho = zeros([ell_max+1,ell_max+1],dtype = complex)
+    f = zeros([ell_max+1,ell_max+1],dtype = complex)
     for l in range(2,ell_max+1):
         for m in range(1,l+1):
-            rholm[l,m] = compute_rholm_single(nu, vs,vh,l,m, rho_coeffs, rho_coeffs_log, extra_coeffs, extra_coeffs_log, f_coeffs, f_coeffs_vh)
-    return rholm
+            if not verbose:
+                rholm[l,m] = compute_rholm_single(nu, vs,vh,l,m, rho_coeffs, rho_coeffs_log, extra_coeffs, extra_coeffs_log, f_coeffs, f_coeffs_vh,verbose)
+            else:
+                rholmsingle,rhosingle,fsingle = compute_rholm_single(nu, vs,vh,l,m, rho_coeffs, rho_coeffs_log, extra_coeffs, extra_coeffs_log, f_coeffs, f_coeffs_vh,verbose)
+                rholm[l,m] = rholmsingle
+                rho[l,m] = rhosingle
+                f[l,m] = fsingle
+                
+    if not verbose:
+        return rholm
+    else:
+        return rholm, rho, f
 
 def  EOBFluxCalculateNewtonianMultipoleAbs(x, phi, l, m, params):
     """
@@ -1213,7 +1228,7 @@ def update_rho_coeffs(rho_coeffs, extra_coeffs):
                     rho_coeffs_new[l,m,i] = rho_coeffs[l,m,i] + temp
     return rho_coeffs_new
 
-def compute_flux(m1, m2, r, phi, pr, pphi, omega, omega_circ, H,chi1,chi2):
+def compute_flux(m1, m2, r, phi, pr, pphi, omega, omega_circ, H,chi1,chi2,verbose = False):
     """
     Compute the full flux. See Eq(43) in the .
     """
@@ -1240,7 +1255,7 @@ def compute_flux(m1, m2, r, phi, pr, pphi, omega, omega_circ, H,chi1,chi2):
     chiA = 0.5*(chi1 - chi2)
     chiS = 0.5*(chi1 + chi2)
     dm = (m1 - m2)/(m1 + m2)
-    a = .5
+    a = 0.
     # Assume that the spin params have already been updated appropriately
     rho_coeffs, rho_coeffs_log, f_coeffs, f_coeffs_vh = compute_rho_coeffs(nu,dm,a,chiS,chiA,1)
     
@@ -1314,8 +1329,11 @@ def compute_flux(m1, m2, r, phi, pr, pphi, omega, omega_circ, H,chi1,chi2):
     extra_coeffs[4,3,6] = h43_v6
     extra_coeffs[4,3,8] = h43_v8
     extra_coeffs_log[4,3,8] = h43_vlog8
-
-    rholm = compute_rholm(v, vh, nu,  rho_coeffs, rho_coeffs_log, extra_coeffs, extra_coeffs_log, f_coeffs, f_coeffs_vh)
+    
+    if not verbose:
+        rholm = compute_rholm(v, vh, nu,  rho_coeffs, rho_coeffs_log, extra_coeffs, extra_coeffs_log, f_coeffs, f_coeffs_vh,verbose)
+    else:
+        rholm, rho, f = compute_rholm(v, vh, nu,  rho_coeffs, rho_coeffs_log, extra_coeffs, extra_coeffs_log, f_coeffs, f_coeffs_vh,verbose)
     
     for l in range(2,ell_max+1):
         for m in range(1,l+1):
@@ -1335,4 +1353,7 @@ def compute_flux(m1, m2, r, phi, pr, pphi, omega, omega_circ, H,chi1,chi2):
             hlm = tail*Slm*hNewton*rholmPwrl
 
             flux += m*m*omega2*absolute(hlm)**2
-    return rholm#-flux/(8*pi)
+    if not verbose:
+        return -flux/(8*pi)
+    else:
+        return -flux/(8*pi), rholm, rho, f, Tlm, source1, source2, prefixes_abs

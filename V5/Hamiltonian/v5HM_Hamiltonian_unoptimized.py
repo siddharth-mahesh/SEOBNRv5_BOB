@@ -28,7 +28,7 @@ def v5HM_unoptimized_hamiltonian(m1, m2, r, phi, prstar, pphi, chi1, chi2,verbos
     Galigna3 = pphi*(delta*am*ap**2 - ap**3)/(4*r**2)
     dSO=-7.71251231383957*am**3-17.2294679794015*am**2*ap-238.430383378296*am**2*eta+69.5461667822545*am**2-10.5225438990315*am*ap**2+362.767393298729*am*ap*eta-85.8036338010274*am*ap-1254.66845939312*am*eta**2+472.431937787377*am*eta-39.742317057316*am-7.58458103577458*ap**3-42.7601129678844*ap**2*eta+18.1783435552183*ap**2-201.905934468847*ap*eta**2-90.5790079104259*ap*eta+49.6299175121658*ap+478.546231305475*eta**3+679.521769948995*eta**2-177.334831768076*eta-37.6897780220529
     SOcalib = eta*dSO*ap*pphi*(u**3)
-    Heven=np.sqrt(Aalign*(1+pphi*pphi/r**2+(1+Balignnp)*prstar*prstar+Bkerreqnp*pphi*pphi*ap**2/r**2+Qalign))
+    Heven=np.sqrt(Aalign*(1+pphi*pphi/r**2+(1+Balignnp)*pr*pr+Bkerreqnp*pphi*pphi*ap**2/r**2+Qalign))
     Hodd = (pphi*(gap*ap + delta*gam*am) + SOcalib + Galigna3)/(r**3 + ap**2*(r + 2))
     Heff = Hodd + Heven
     Hreal = np.sqrt(1 + 2*eta*(Heff - 1))

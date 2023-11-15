@@ -371,9 +371,9 @@ f41amp = ((rhoNS41)**4 + fspin41)*noneqcond + fspin41_limit*eqcond
 f55amp = f55
 f55 = ((rhoNS55)**5 + fspin55)*noneqcond + fspin55_limit*eqcond
 f54amp = (rho54)**5
-f53amp = ((rhoNS53)**5)*noneqcond
+f53amp = ((rhoNS53)**5)
 f52amp = (rho52)**5
-f51amp = ((rhoNS51)**5)*noneqcond
+f51amp = ((rhoNS51)**5)
 f66amp = (rho66)**6
 f65amp = (rhoNS65)**6
 f64amp = (rho64)**6
@@ -396,28 +396,87 @@ f83amp = (rhoNS83)**8
 f82amp = (rho82)**8
 f81amp = (rhoNS81)**8
 rho22 = 1 + 
-    vomega**2 * (sp.Rational(55, 84) * eta - sp.Rational(43, 42)) + 
-    vomega**3 * ((sp.Rational(2, 3) * eta - sp.Rational(2, 3)) * chi_S - sp.Rational(2, 3) * delta * chi_A) +
-    vomega**4 * (sp.Rational(19583, 42336) * eta**2 - sp.Rational(33025, 21168) * eta - sp.Rational(20555, 10584) +
-                (sp.Rational(1, 2) - 2 * eta) * chi_A**2 + delta * chi_A * chi_S + sp.Rational(1, 2) * chi_S**2) + 
-    vomega**5 * (delta * (sp.Rational(-19, 42) * eta - sp.Rational(34, 21)) * chi_A +
-                (sp.Rational(209, 126) * eta**2 + sp.Rational(49, 18) * eta - sp.Rational(34, 21)) * chi_S) + 
-    vomega**6 * (sp.Rational(10620745, 39118464) * eta**3 - sp.Rational(6292061, 3259872) * eta**2 +
-                sp.Rational(41, 192) * sp.pi**2 * eta - sp.Rational(48993925, 9779616) * eta -
-                sp.Rational(428, 105) * eulerlog2 + sp.Rational(1556919113, 122245200) +
-                delta * (sp.Rational(89, 126) - sp.Rational(781, 252) * eta) * chi_A * chi_S +
-                (-sp.Rational(27, 14) * eta**2 - sp.Rational(457, 504) * eta + sp.Rational(89, 252)) * chi_A**2 +
-                (sp.Rational(10, 9) * eta**2 - sp.Rational(1817, 504) * eta + sp.Rational(89, 252)) * chi_S**2) + 
-    vomega**7 * (delta * (sp.Rational(97865, 63504) * eta**2 + sp.Rational(50140, 3969) * eta + sp.Rational(18733, 15876)) * chi_A +
-                (sp.Rational(50803, 63504) * eta**3 - sp.Rational(245717, 63504) * eta**2 +
-                sp.Rational(74749, 5292) * eta + sp.Rational(18733, 15876)) * chi_S +
-                delta * chi_A**3 * (sp.Rational(1, 3) - sp.Rational(4, 3) * eta) +
-                delta * (2 * eta + 1) * chi_A * chi_S**2 +
-                (sp.Rational(-4, 1) * eta**2 - sp.Rational(3, 1) * eta + sp.Rational(1, 1)) * chi_A**2 * chi_S +
-                (eta + sp.Rational(1, 3)) * chi_S**3) + 
-    vomega**8 * (sp.Rational(9202, 2205) * eulerlog2 - sp.Rational(387216563023, 160190110080)) + 
-    vomega**10 * (sp.Rational(439877, 55566) * eulerlog2 - sp.Rational(16094530514677, 533967033600)) +
-    eta * (
+    vomega**2 * (
+        sp.Rational(55, 84) * eta 
+        - sp.Rational(43, 42)
+    ) + 
+    vomega**3 * (
+        (-2.0 * (chi_S + chi_A * delta - chi_S * eta)) / 3.0
+    ) +
+    vomega**4 * (
+        sp.Rational(19583, 42336) * eta**2 
+        - sp.Rational(33025, 21168) * eta 
+        - sp.Rational(20555, 10584) 
+        + (sp.Rational(1, 2) - 2 * eta) * chi_A**2 
+        + delta * chi_A * chi_S 
+        + sp.Rational(1, 2) * chi_S**2
+    ) + 
+    vomega**5 * (
+        delta * (
+            -sp.Rational(19, 42) * eta 
+            - sp.Rational(34, 21)
+        ) * chi_A +
+        (
+            sp.Rational(209, 126) * eta**2 
+            + sp.Rational(49, 18) * eta 
+            - sp.Rational(34, 21)
+        ) * chi_S
+    ) + 
+    vomega**6 * (
+        sp.Rational(10620745, 39118464) * eta**3 
+        - sp.Rational(6292061, 3259872) * eta**2 
+        + sp.Rational(41, 192) * sp.pi**2 * eta 
+        - sp.Rational(48993925, 9779616) * eta 
+        - sp.Rational(428, 105) * eulerlog2 
+        + sp.Rational(1556919113, 122245200) 
+        + delta * (
+            sp.Rational(89, 126) 
+            - sp.Rational(781, 252) * eta
+        ) * chi_A * chi_S 
+        + (
+            -sp.Rational(27, 14) * eta**2 
+            - sp.Rational(457, 504) * eta 
+            + sp.Rational(89, 252)
+        ) * chi_A**2 
+        + (
+            sp.Rational(10, 9) * eta**2 
+            - sp.Rational(1817, 504) * eta 
+            + sp.Rational(89, 252)
+        ) * chi_S**2
+    ) + 
+    vomega**7 * (
+        delta * (
+            sp.Rational(97865, 63504) * eta**2 
+            + sp.Rational(50140, 3969) * eta 
+            + sp.Rational(18733, 15876)
+        ) * chi_A 
+        + (
+            sp.Rational(50803, 63504) * eta**3 
+            - sp.Rational(245717, 63504) * eta**2 
+            + sp.Rational(74749, 5292) * eta 
+            + sp.Rational(18733, 15876)
+        ) * chi_S 
+        + delta * chi_A**3 * (
+            sp.Rational(1, 3) 
+            - sp.Rational(4, 3) * eta
+        ) 
+        + delta * (2 * eta + 1) * chi_A * chi_S**2 
+        + (
+            sp.Rational(-4, 1) * eta**2 
+            - sp.Rational(3, 1) * eta 
+            + sp.Rational(1, 1)
+        ) * chi_A**2 * chi_S 
+        + (eta + sp.Rational(1, 3)) * chi_S**3
+    ) 
+    + vomega**8 * (
+        sp.Rational(9202, 2205) * eulerlog2 
+        - sp.Rational(387216563023, 160190110080)
+    ) 
+    + vomega**10 * (
+        sp.Rational(439877, 55566) * eulerlog2 
+        - sp.Rational(16094530514677, 533967033600)
+    ) 
+    + eta * (
         21.2 * vomega**8 +
         -411 * vomega**10
     )
@@ -433,8 +492,15 @@ rhoNS21 = 1 +
         80 * vomega**10
     )
 rhoNS33 = 1 + 
-    vomega**2 * (sp.Rational(2, 3) * eta - sp.Rational(7, 6)) + 
-    vomega**4 * (-sp.Rational(6719, 3960) - sp.Rational(1861, 990) * eta + sp.Rational(149, 330) * eta * vomega**2) + 
+    vomega**2 * (
+        sp.Rational(2, 3) * eta 
+        - sp.Rational(7, 6)
+    ) + 
+    vomega**4 * (
+        -sp.Rational(6719, 3960) 
+        - sp.Rational(1861, 990) * eta 
+        + sp.Rational(149, 330) * eta**2
+    ) + 
     vomega**6 * (sp.Rational(3203101567, 227026800) + (-sp.Rational(129509, 25740) + sp.Rational(41, 192) * sp.pi**2) * eta -
                 sp.Rational(274621, 154440) * eta**2 + sp.Rational(12011, 46332) * eta**3 - sp.Rational(26, 7) * eulerlog3) + 
     vomega**8 * (-sp.Rational(57566572157, 8562153600) + sp.Rational(13, 3) * eulerlog3) + 
@@ -521,7 +587,8 @@ rhoNS31 = (
 rho44 = (
     1 
     + vomega**2 * (
-        (1614.0 - 5870.0 * eta 
+        (1614.0 
+         - 5870.0 * eta 
          + 2625.0 * eta**2
         ) / (1320.0 * (-1 + 3*eta))
     ) 
@@ -572,7 +639,7 @@ rho44 = (
         + sp.Rational(845198.0 , 190575.0) * eulerlog4
     ) 
     + vomega**10 * (
-        -sp.Rational(-17154485653213713419357 , 568432724020761600000) 
+        -sp.Rational(17154485653213713419357 , 568432724020761600000) 
         + sp.Rational(22324502267 , 3815311500) * eulerlog4
     ) 
     + eta * (
@@ -591,12 +658,34 @@ rhoNS43 = 1 +
         -3.69 * vomega**6 +
         18.5 * vomega**8
     )
-rho42 = 1 + 
-    ((285 * eta**2 - 3530 * eta + 1146) / (1320 * (3 * eta - 1))) * vomega**2 - 
-    (vomega**3 / (15 * (1 - 3 * eta))) * ((78 * eta**2 - 59 * eta + 10) * chi_S + (10 - 21 * eta) * delta * chi_A) - 
-    ((-379526805 * eta**4 - 3047981160 * eta**3 + 1204388696 * eta**2 + 295834536 * eta - 114859044) /
-    (317116800 * (1 - 3 * eta)**2)) * vomega**4 + 
-    ((848238724511 / 219761942400) - (3142 / 3465) * eulerlog2v2) * vomega**6
+rho42 = (
+    1 
+    + vomega **2 * ( 
+        (1146.0 
+         - 3530.0 * eta 
+         + 285.0 * eta**2
+        ) / (1320.0 * (-1 + 3*eta))
+    )
+    + vomega ** 3 * (
+        (
+            chi_A * (10.0 - 21.0 * eta) * delta 
+            + chi_S * (10.0 - 59.0 * eta + 78.0 * eta**2)
+        ) / (15.0 * (-1 + 3*eta))
+    )
+    + vomega ** 4 * (
+        (
+            -114859044.0
+            + 295834536.0 * eta
+            + 1204388696.0 * eta**2
+            - 3047981160.0 * eta**3
+            - 379526805.0 * eta**4
+        ) / (317116800.0 * (-1 + 3*eta)**2)
+    )
+    + vomega ** 6 *(
+        848238724511.0 / 219761942400.
+        -(3142.0 / 3465.0)*eulerlog2
+    )
+)
 rhoNS41 = 1 + 
     (
         (
@@ -616,7 +705,7 @@ rhoNS41 = 1 +
     ) * vomega**4 + 
     (
         sp.Rational(1227423222031, 1758095539200)
-        - sp.Rational(1571, 6930) * eulerlog1v2
+        - sp.Rational(1571, 6930) * eulerlog1
     ) * vomega**6
     
 rhoNS55 = 1 + 
@@ -794,6 +883,26 @@ fspin21_limit = (
         (sp.Rational(9487, 504) * eta**2 - sp.Rational(1636, 21) * eta + sp.Rational(4163, 126)) * (chi_A * chi_S)
     )
 )
+fspin33amp = (
+    vomega**3 * (
+        ((sp.Rational(19, 2) * eta - 2) * chi_A * deltainv)
+        + ((sp.Rational(5, 2) * eta - 2) * chi_S)
+    )
+    + vomega**4 * (
+        (sp.Rational(3, 2) - 6 * eta) * chi_A**2
+        + (3 - 12 * eta) * (chi_A * chi_S * deltainv)
+        + sp.Rational(3, 2) * chi_S**2
+    )
+    + vomega**5 * (
+        ((sp.Rational(407, 30) * eta**2 - sp.Rational(593, 60) * eta + sp.Rational(2, 3)) * chi_A * deltainv)
+        + ((sp.Rational(241, 30) * eta**2 + sp.Rational(11, 20) * eta + sp.Rational(2, 3)) * chi_S)
+    )
+    + vomega**6 * (
+        (-12 * eta**2 + sp.Rational(11, 2) * eta - sp.Rational(7, 4)) * chi_A**2
+        + (44 * eta**2 - eta - sp.Rational(7, 2)) * (chi_A * chi_S * deltainv)
+        + (6 * eta**2 - sp.Rational(27, 2) * eta - sp.Rational(7, 4)) * chi_S**2
+    )
+)
 fspin33 = (
     vomega**3 * (
         ((sp.Rational(19, 2) * eta - 2) * chi_A * deltainv)
@@ -815,44 +924,19 @@ fspin33 = (
     )
     + sp.I * ((Omega*Hreal)**2 * (sp.Rational(7339, 540) * eta - sp.Rational(81, 20)) * chi_A * deltainv + (sp.Rational(593, 108) * eta - sp.Rational(81, 20)) * chi_S)
 )
-fspin33amp = (
-    vomega**3 * (
-        ((sp.Rational(19, 2) * eta - 2) * chi_A * deltainv)
-        + ((sp.Rational(5, 2) * eta - 2) * chi_S)
-    )
-    + vomega**4 * (
-        (sp.Rational(3, 2) - 6 * eta) * chi_A**2
-        + (3 - 12 * eta) * (chi_A * chi_S * deltainv)
-        + sp.Rational(3, 2) * chi_S**2
-    )
-    + vomega**5 * (
-        ((sp.Rational(407, 30) * eta**2 - sp.Rational(593, 60) * eta + sp.Rational(2, 3)) * chi_A * deltainv)
-        + ((sp.Rational(241, 30) * eta**2 + sp.Rational(11, 20) * eta + sp.Rational(2, 3)) * chi_S)
-    )
-    + vomega**6 * (
-        (-12 * eta**2 + sp.Rational(11, 2) * eta - sp.Rational(7, 4)) * chi_A**2
-        + (44 * eta**2 - eta - sp.Rational(7, 2)) * (chi_A * chi_S * deltainv)
-        + (6 * eta**2 - sp.Rational(27, 2) * eta - sp.Rational(7, 4)) * chi_S**2
-    )    
-)
+fspin33amp_limit =  vomega**3 * ( (sp.Rational(19, 2) * eta - 2) * chi_A)
+    + vomega**4 * ( (3 - 12 * eta) * (chi_A * chi_S) )
+    + vomega**5 * ((sp.Rational(407, 30) * eta**2 - sp.Rational(593, 60) * eta + sp.Rational(2, 3)) * chi_A)
+    + vomega**6 * ( (44 * eta**2 - eta - sp.Rational(7, 2)) * (chi_A * chi_S))
 fspin33_limit = vomega**3 * ( (sp.Rational(19, 2) * eta - 2) * chi_A)
     + vomega**4 * ( (3 - 12 * eta) * (chi_A * chi_S) )
     + vomega**5 * ((sp.Rational(407, 30) * eta**2 - sp.Rational(593, 60) * eta + sp.Rational(2, 3)) * chi_A)
     + vomega**6 * ( (44 * eta**2 - eta - sp.Rational(7, 2)) * (chi_A * chi_S))
     + sp.I * (Omega*Hreal)**2 * (sp.Rational(7339, 540) * eta - sp.Rational(81, 20)) * chi_A
-fspin33amp_limit = (
-    vomega**3 * ( (sp.Rational(19, 2) * eta - 2) * chi_A)
-    + vomega**4 * ( (3 - 12 * eta) * (chi_A * chi_S) )
-    + vomega**5 * ((sp.Rational(407, 30) * eta**2 - sp.Rational(593, 60) * eta + sp.Rational(2, 3)) * chi_A)
-    + vomega**6 * ( (44 * eta**2 - eta - sp.Rational(7, 2)) * (chi_A * chi_S))
-)
 fspin31 = vomega**3 * (
-    (sp.Rational(11, 2) * eta - 2) * chi_A * deltainv
-    + (sp.Rational(13, 2) * eta - 2) * chi_S
-)
-fspin31_limit = vomega**3 * (
-    (sp.Rational(11, 2) * eta - 2) * chi_A
-)
+            chi_A * deltainv * (-4.0 + 11.0 * eta) + chi_S * (-4.0 + 13.0 * eta)
+        ) / (2.0)
+fspin31_limit = vomega**3 * (-chi_A * 5.0 / 8.0)
 fspin43 = (
     vomega / (1 - 2 * eta) * (sp.Rational(5, 2) * eta * chi_S - sp.Rational(5, 2) * eta * chi_A * deltainv)
     + vomega**3 / (1 - 2 * eta) * (
@@ -883,16 +967,30 @@ fspin41_limit =(
 )
 fspin55 = (
     (
-        (sp.Rational(-70, 3) * eta / ((-1 + 2 * eta))
-        + sp.Rational(110, 3) * eta**2 / ((-1 + 2 * eta))
-        + sp.Rational(10, 3) / ((-1 + 2 * eta))) * (chi_A * deltainv)
-        + (sp.Rational(10, 3) / ((-1 + 2 * eta))
-        - 10 * eta / (-1 + 2 * eta)
-        + 10*eta**2 / (-1 + 2 * eta)) * chi_S
+        (
+            -70 * eta / (3*(-1 + 2 * eta))
+            + 110 * eta**2 / (3*(-1 + 2 * eta))
+            + 10 / (3*(-1 + 2 * eta))
+        ) * (chi_A * deltainv)
+        + (
+            10 / (3*(-1 + 2 * eta))
+            - 10 * eta / (-1 + 2 * eta)
+            + 10*eta**2 / (-1 + 2 * eta)
+        ) * chi_S
     ) * vomega**3
-    + (sp.Rational(5, 2) * delta**2 * chi_A**2
-    + sp.Rational(5, 1) * delta * chi_A * chi_S
-    + sp.Rational(5, 2) * chi_S**2) * vomega**4
+    + (
+        sp.Rational(5, 2) * chi_S**2
+        + (
+            -5.0 / (-1.0 + 2.0 * eta)
+            + 30.0 * eta / (-1.0 + 2.0 * eta)
+            - 40.0 * eta**2 / (-1.0 + 2.0 * eta)
+        ) * chi_A * chi_S * deltainv
+        + (
+            -5.0 / (2.0 * (-1.0 + 2.0 * eta))
+            + 15.0 * eta / (-1.0 + 2.0 * eta)
+            - 20.0 * eta**2 / (-1.0 + 2.0 * eta)
+        ) * chi_A**2
+    ) * vomega**4
 )
 
 fspin55_limit = (
@@ -901,6 +999,13 @@ fspin55_limit = (
         + sp.Rational(110, 3) * eta**2 / ((-1 + 2 * eta))
         + sp.Rational(10, 3) / ((-1 + 2 * eta))) * (chi_A)
     ) * vomega**3
+    + (
+        (
+            -5.0 / (-1.0 + 2.0 * eta)
+            + 30.0 * eta / (-1.0 + 2.0 * eta)
+            - 40.0 * eta**2 / (-1.0 + 2.0 * eta)
+        ) * chi_A * chi_S    
+    ) * vomega**4
 )
 
 delta22 = (
