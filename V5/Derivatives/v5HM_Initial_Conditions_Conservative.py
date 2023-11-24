@@ -1,8 +1,6 @@
 import numpy as np
-def v5HM_unoptimized_IC_cons(u, params,verbose = False):
-    r , pphi = u[0],u[1]
-    phi = 0
-    m1 , m2, chi1, chi2 = params[0], params[1], params[2], params[3]
+def v5HM_unoptimized_IC_cons(m1,m2,r,pphi,chi1,chi2):
+    prstar = 0
     u = 1/r
     
     M = m1+m2
@@ -84,7 +82,4 @@ def v5HM_unoptimized_IC_cons(u, params,verbose = False):
     Hodd_prmr_preq0 = (Galigna3_prmr_preq0 + SOcalib_prmr_preq0 + am*delta*gam + ap*gap + pphi*(am*delta*gam_prmr_preq0 + ap*gap_prmr_preq0))/(ap**2*(r + 2) + r**3)
     Heff_prmr_preq0 = Heven_prmr_preq0 + Hodd_prmr_preq0
     Hreal_prmr_preq0 = Heff_prmr_preq0*eta/np.sqrt(eta*(2*Heff - 2) + 1)
-    if not verbose:
-        return np.array([Hreal_prmr_preq0,Hreal_prmpphi_preq0])
-    else:
-        return Hreal,xi,Aalign,Balignnp,Bkerreqnp,Qalign,Heven,Hodd,QalignSS,Qnos,Galigna3,gam,gap,SOcalib,u,eta,ap,am,r,phi,prstar,pphi,chi1,chi2,m1,m2
+    return np.array([Hreal_prmr_preq0, Hreal_prmpphi_preq0])

@@ -155,7 +155,7 @@ def v5HM_unoptimized_dH_dpphi(m1, m2, r, phi, prstar, pphi, chi1, chi2,verbose =
         return Hreal_prmpphi
     else:
         return Hreal,xi,Aalign,Balignnp,Bkerreqnp,Qalign,Heven,Hodd,QalignSS,Qnos,Galigna3,gam,gap,SOcalib,u,eta,ap,am,r,phi,prstar,pphi,chi1,chi2,m1,m2
-def v5HM_unoptimized_omega_circ(m1, m2, r, phi, pphi, chi1, chi2,verbose = False):
+def v5HM_unoptimized_omega_circ(m1, m2, r, pphi, chi1, chi2,verbose = False):
     u = 1/r
     
     M = m1+m2
@@ -233,3 +233,4 @@ def v5HM_unoptimized_omega_circ(m1, m2, r, phi, pphi, chi1, chi2,verbose = False
         return Hreal_prmpphi_preq0
     else:
         return Hreal,xi,Aalign,Balignnp,Bkerreqnp,Qalign,Heven,Hodd,QalignSS,Qnos,Galigna3,gam,gap,SOcalib,u,eta,ap,am,r,phi,pphi,chi1,chi2,m1,m2
+def v5HM_unoptimized_dH_dr_circ(m1, m2, r, pphi, chi1, chi2,verbose = False):
