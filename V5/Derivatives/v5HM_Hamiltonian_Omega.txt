@@ -16,11 +16,11 @@ am = (m1*chi1-m2*chi2)/M
 
 ap = (m1*chi1+m2*chi2)/M
 
-Qnosterm3 = (0**8)*(u*eta*(-sp.Rational(35772,175)+sp.Rational(21668992,45)*sp.log(2)+sp.Rational(6591861,350)*sp.log(3)-sp.Rational(27734375,126)*sp.log(5))+u**2*(-6*eta**4+sp.Rational(24,7)*eta**3+eta**2*(sp.Rational(870976,525)+sp.Rational(703189497728,33075)*sp.log(2)+sp.Rational(332067403089,39200)*sp.log(3)-sp.Rational(13841287201,4320)*sp.log(7)-sp.Rational(468490234375,42336)*sp.log(5))+eta*(-sp.Rational(2222547,2450)-sp.Rational(1347019456,525)*sp.log(2)+sp.Rational(278690984375,169344)*sp.log(5)+sp.Rational(13841287201,17280)*sp.log(7)-sp.Rational(346536085761,156800)*sp.log(3)))+sp.Rational(5994461,12700800)*sp.pi*eta*u**(sp.Rational(5,2)))
+Qnosterm3 = (prstar**8)*(u*eta*(-sp.Rational(35772,175)+sp.Rational(21668992,45)*sp.log(2)+sp.Rational(6591861,350)*sp.log(3)-sp.Rational(27734375,126)*sp.log(5))+u**2*(-6*eta**4+sp.Rational(24,7)*eta**3+eta**2*(sp.Rational(870976,525)+sp.Rational(703189497728,33075)*sp.log(2)+sp.Rational(332067403089,39200)*sp.log(3)-sp.Rational(13841287201,4320)*sp.log(7)-sp.Rational(468490234375,42336)*sp.log(5))+eta*(-sp.Rational(2222547,2450)-sp.Rational(1347019456,525)*sp.log(2)+sp.Rational(278690984375,169344)*sp.log(5)+sp.Rational(13841287201,17280)*sp.log(7)-sp.Rational(346536085761,156800)*sp.log(3)))+sp.Rational(5994461,12700800)*sp.pi*eta*u**(sp.Rational(5,2)))
 
-Qnosterm2 = (0**6)*(u**2*(6*eta**3-sp.Rational(27,5)*eta**2+eta*(-sp.Rational(827,3)-sp.Rational(2358912,25)*sp.log(2)+sp.Rational(1399437,50)*sp.log(3)+sp.Rational(390625,18)*sp.log(5)))+u**3*(-14*eta**4+188*eta**3+eta**2*(sp.Rational(154229,75)-sp.Rational(4998308864,1575)*sp.log(2)+sp.Rational(26171875,18)*sp.log(5)-sp.Rational(45409167,350)*sp.log(3))+eta*(-sp.Rational(860317,1050)+sp.Rational(305146624,945)*sp.log(2)+sp.Rational(35643726,175)*sp.log(3)-sp.Rational(52468750,189)*sp.log(5)))-sp.Rational(2723471,756000)*sp.pi*eta*u**(sp.Rational(7,2)))
+Qnosterm2 = (prstar**6)*(u**2*(6*eta**3-sp.Rational(27,5)*eta**2+eta*(-sp.Rational(827,3)-sp.Rational(2358912,25)*sp.log(2)+sp.Rational(1399437,50)*sp.log(3)+sp.Rational(390625,18)*sp.log(5)))+u**3*(-14*eta**4+188*eta**3+eta**2*(sp.Rational(154229,75)-sp.Rational(4998308864,1575)*sp.log(2)+sp.Rational(26171875,18)*sp.log(5)-sp.Rational(45409167,350)*sp.log(3))+eta*(-sp.Rational(860317,1050)+sp.Rational(305146624,945)*sp.log(2)+sp.Rational(35643726,175)*sp.log(3)-sp.Rational(52468750,189)*sp.log(5)))-sp.Rational(2723471,756000)*sp.pi*eta*u**(sp.Rational(7,2)))
 
-Qnosterm1 = (0**4)*(2*(4-3*eta)*eta*u**2+u**3*(10*eta**3-131*eta**2+eta*(-sp.Rational(4348,15)+sp.Rational(496256,45)*sp.log(2)-sp.Rational(33048,5)*sp.log(3)))+u**4*((792-sp.Rational(615,32)*sp.pi**2)*eta**3+eta**2*(-sp.Rational(592,5)*sp.log(u)+sp.Rational(31633,512)*sp.pi**2-sp.Rational(1184,5)*sp.EulerGamma+sp.Rational(45683,105)+sp.Rational(33693536,105)*sp.log(2)-sp.Rational(6396489,70)*sp.log(3)-sp.Rational(9765625,126)*sp.log(5))+eta*(sp.Rational(5428,105)*sp.log(u)+sp.Rational(1249177,1050)-sp.Rational(93031,1536)*sp.pi**2+sp.Rational(10856,105)*sp.EulerGamma-sp.Rational(4396376,105)*sp.log(2)+sp.Rational(9765625,504)*sp.log(5)-sp.Rational(601911,280)*sp.log(3)))+sp.Rational(88703,1890)*sp.pi*eta*u**(sp.Rational(9,2)))
+Qnosterm1 = (prstar**4)*(2*(4-3*eta)*eta*u**2+u**3*(10*eta**3-131*eta**2+eta*(-sp.Rational(4348,15)+sp.Rational(496256,45)*sp.log(2)-sp.Rational(33048,5)*sp.log(3)))+u**4*((792-sp.Rational(615,32)*sp.pi**2)*eta**3+eta**2*(-sp.Rational(592,5)*sp.log(u)+sp.Rational(31633,512)*sp.pi**2-sp.Rational(1184,5)*sp.EulerGamma+sp.Rational(45683,105)+sp.Rational(33693536,105)*sp.log(2)-sp.Rational(6396489,70)*sp.log(3)-sp.Rational(9765625,126)*sp.log(5))+eta*(sp.Rational(5428,105)*sp.log(u)+sp.Rational(1249177,1050)-sp.Rational(93031,1536)*sp.pi**2+sp.Rational(10856,105)*sp.EulerGamma-sp.Rational(4396376,105)*sp.log(2)+sp.Rational(9765625,504)*sp.log(5)-sp.Rational(601911,280)*sp.log(3)))+sp.Rational(88703,1890)*sp.pi*eta*u**(sp.Rational(9,2)))
 
 Qnos = Qnosterm1+Qnosterm2+Qnosterm3
 
@@ -32,7 +32,7 @@ Anons = 7680.0*r**4*(-5416406.59541186*eta**2+28.0*eta*(1920.0*a6+733955.3074630
 
 xi = sp.sqrt(Dnons)*(Anons+ap**2*u*u)/(1+ap**2*u*u)
 
-pr = 0/xi
+pr = prstar/xi
 
 QalignSS = ((pr**4)/(r**3))*(ap**2*(-5*eta*eta+eta*sp.Rational(165,32)+sp.Rational(25,32))+delta*ap*am*(eta*sp.Rational(45,8)-sp.Rational(5,16))+am**2*(-eta*eta*sp.Rational(15,8)+eta*sp.Rational(75,32)-sp.Rational(15,32)))
 

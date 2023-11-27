@@ -1,5 +1,5 @@
 import numpy as np
-def v5HM_unoptimized_hamiltonian(m1, m2, r, phi, prstar, pphi, chi1, chi2,verbose = False):
+def v5HM_unoptimized_hamiltonian(m1, m2, r, prstar, pphi, chi1, chi2,verbose = False):
     u = 1/r
     M = m1+m2
     delta = (m1-m2)/M
