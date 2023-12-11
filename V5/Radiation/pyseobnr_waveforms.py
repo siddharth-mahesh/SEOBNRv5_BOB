@@ -1354,6 +1354,27 @@ def compute_flux(m1, m2, r, phi, pr, pphi, omega, omega_circ, H,chi1,chi2,verbos
 
             flux += m*m*omega2*absolute(hlm)**2
     if not verbose:
-        return -flux/(8*pi)
+        return flux/(8*pi)
     else:
-        return -flux/(8*pi), rholm, rho, f, Tlm, source1, source2, prefixes_abs
+        return flux/(8*pi), rholm, rho, f, Tlm, source1, source2, prefixes_abs
+
+def RR_force(m1, m2, q, p, omega, omega_circ, H, chi1, chi2):
+    """
+    Compute the RR force in polar coordinates, from the flux
+    """
+    r = q[0]
+    phi = q[1]
+    pr = p[0]
+    pphi = p[1]
+    M = m1+m2
+    nu = m1*m2/(M*M)
+    # Note the multiplication of H by nu!
+    flux = compute_flux(m1, m2, r, phi, pr, pphi, omega, omega_circ, nu*H,chi1,chi2)
+    flux /= nu
+    f_over_om = flux/omega
+    Fr = -pr / pphi * f_over_om
+    Fphi = -f_over_om
+    return Fr, Fphi
+
+
+

@@ -15,7 +15,7 @@ def v5HM_initial_conditions(M,q,S1,S2,f):
     params_cons = np.array([m1,m2,chi1,chi2,Omega_start]) 
     sol_cons = root(IC_cons,sol_cons_guess,args = params_cons,tol = 6e-12) 
     r , pphi = sol_cons.x[0] , sol_cons.x[1] 
-    params_diss = np.array([r,pphi,m1,m2,chi1,chi2]) 
+    params_diss = np.array([m1,m2,r,pphi,chi1,chi2]) 
     prstar_bracket = [-3e-2,0] 
     prstar_sol = root_scalar(IC_diss, args = params_diss, bracket = prstar_bracket, xtol = 1e-12, rtol = 1e-10) 
     prstar = prstar_sol.root 
