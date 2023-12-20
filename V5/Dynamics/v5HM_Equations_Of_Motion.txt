@@ -1,0 +1,9 @@
+rdot = (xi/eta)*dHdprstar(m1,m2,r,prstar,pphi,chi1,chi2)
+phidot = Omega
+prstardot = (1/eta)*(-xi*dHdr(m1,m2,r,prstar,pphi,chi1,chi2) + prstar*F_phi/pphi)
+pphidot = F_phi/eta
+F_phi = flux(m1, m2, r, phi, prstar, pphi, chi1, chi2,Omega,Omega_circ,H)/Omega
+Omega = (1/eta)*dHdpphi(m1,m2,r,prstar,pphi,chi1,chi2)
+Omega_circ = (1/eta)*dHdpphi_preq0(m1,m2,r,pphi,chi1,chi2)
+H , xi = Hamiltonian(m1,m2,r,prstar,pphi,chi1,chi2)
+eta = m1*m2/(m1 + m2)/(m1 + m2)
