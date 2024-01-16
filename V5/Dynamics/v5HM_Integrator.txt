@@ -1,0 +1,55 @@
+
+sys = odeiv2.system(v5HM_unoptimized_RHS,None,4,[m1,m2,chi1,chi2])
+T = odeiv2.step_rk8pd
+s = odeiv2.pygsl_lite_odeiv2_step(T,4)
+atol = 1e-11
+rtol = 1e-12
+c = odeiv2.pygsl_lite_odeiv2_control(atol,rtol,a_y = 1,a_dydt = 1,None)
+e = odeiv2.pygsl_lite_odeiv2_evolve(4)
+
+y_init = v5HM_unoptimized_initial_conditions(M,q,chi1,chi2,f)
+Omega_0 = M*4.925491025543575903411922162094833998e-6*sp.pi*f
+h = 2*sp.pi/5/Omega_0
+nu = q/(1 + q)/(1 + q)
+
+prims = []
+times = []
+omega_previous = Omega_0
+omega_peak = False
+prstar_peak = False
+times.append(0.)
+prims.append(y_init)
+
+y = y_init
+t = 0.
+
+t1 = 2.e9
+
+Deltatns = nu^{10.051322*nu - 1/5}( 55565.2392nu**3 - 9793.17619nu**2 - 1056.87385nu - 59.62318 )
+
+while t < t1:
+    status, t, h, y = e.apply(c,s,sys,t,t1,h,y)
+    if status != errno.GSL_SUCCESS:
+            print("break status", status)
+            break
+    prims.append(y)
+    times.append(t)
+    
+
+    if r < = 6:
+
+        rhs = v5HM_unoptimized_RHS(t,y,m1,m2,chi1,chi2)
+        drdt = rhs[0]
+        dphidt = rhs[1]
+        dprstardt = rhs[2]
+
+        if dphidt < omega_previous:
+            omega_peak = True
+            break
+
+        if drdt > 0:
+            break
+
+        if dprdt > 0:
+            prstar_peak = True
+            break
