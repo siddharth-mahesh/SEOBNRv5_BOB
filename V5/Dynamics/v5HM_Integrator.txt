@@ -1,4 +1,6 @@
 
+m1,m2,y_init,Omega0,h,rstop,risco,Deltat,af,Mf,h22NR,omega22NR = v5HM_unoptimized_initial_conditions(M,q,chi1,chi2,f)
+
 sys = odeiv2.system(v5HM_unoptimized_RHS,None,4,[m1,m2,chi1,chi2])
 T = odeiv2.step_rk8pd
 s = odeiv2.pygsl_lite_odeiv2_step(T,4)
@@ -6,13 +8,6 @@ atol = 1e-11
 rtol = 1e-12
 c = odeiv2.pygsl_lite_odeiv2_control(atol,rtol,a_y = 1,a_dydt = 1,None)
 e = odeiv2.pygsl_lite_odeiv2_evolve(4)
-
-y_init = v5HM_unoptimized_initial_conditions(M,q,chi1,chi2,f)
-Omega_0 = M*4.925491025543575903411922162094833998e-6*sp.pi*f
-h = 2*sp.pi/5/Omega_0
-nu = q/(1 + q)/(1 + q)
-m1 = q/(1 + q)
-m2 = 1/(1 + q)
 
 prims = []
 times = []
@@ -22,96 +17,60 @@ prstar_peak = False
 times.append(0.)
 prims.append(y_init)
 
-y = y_init
-t = 0.
+while t < 2.0e9:
+    status, t, h, y = e.apply(c,s,sys,t,t1,h,y)
+    if status != errno.GSL_SUCCESS:
+            print("break status", status)
+            break
+    prims.append(y)
+    times.append(t)
+    
 
-t1 = 2.e9
+    if r < = 6:
+        rhs = v5HM_unoptimized_RHS(t,y,m1,m2,chi1,chi2)
+        drdt = rhs[0]
+        dphidt = rhs[1]
+        dprstardt = rhs[2]
+        if dphidt < omega_previous:
+                omega_peak = True
+                break
+        if drdt > 0:
+                break    
+        if dprdt > 0:
+            prstar_peak = True
+            break
+        if r < rstop:
+            break
+        if r < 3:
+            phidot_circ = v5HM_unoptimized_circular_omega(m1,m2,r,pphi,chi1,chi2)
+            if phidot_circ > 1:
+                break
+        omega_previous = omega    
 
-ap = chi1*m1 + chi2*m2
-am = chi1*m1 - chi2*m2
-Deltatns = nu ** (-1. / 5. + 10.0513217 * nu) * (-59.62318 + -1056.87385 * nu - 9793.17619 * nu ** 2 + 55565.2392 * nu ** 3)
-Deltats = nu ** (-1. / 5.) * ( 8.39238879807543 * am ** 2 * ap - 16.9056858928167 * am ** 2 * nu + 7.23410583477034 * am ** 2 + 6.38975598319936 * am * ap ** 2 + 179.569824846781 * am * ap * nu - 40.6063653476775 * am * ap + 144.253395844761 * am * nu ** 2 - 90.1929138487509 * am * nu + 14.2203101910927 * am - 6.78913884987037 * ap ** 4 + 5.39962303470497 * ap ** 3 - 132.224950777226 * ap ** 2 * nu + 49.8016443361381 * ap ** 2 + 384.201018794943 * ap * nu ** 2 - 141.253181790353 * ap * nu + 17.5710132409988 * ap)
-Deltat = Deltatns + Deltats
-atot = m1*m1*chi1 + m2*m2*chi2
-aeff = atot + .474046*nu*(chi1 + chi2)
-Z1eff = 1 + (np.cbrt(1 - aeff*aeff))*(np.cbrt(1 + aeff) + np.cbrt(1 - aeff))
-Z2eff = np.sqrt(3*aeff*aeff + Z1eff*Z1eff)
-rISCOeff = 3 + Z2eff - np.sign(aeff)*sqrt((3 - Z1eff)*(3 + Z1eff + Z2eff))
-LISCOeff = (2/3/np.sqrt(3))*(1 + 2*np.sqrt(3*rISCOeff - 1))
-EISCOeff = np.sqrt(1 - 2/(3*rISCOeff))
-k = np.zeros([4,5])
-k[0,0] = -5.97723
-k[0,1] = 3.39221
-k[0,2] = 4.48865
-k[0,3] = -5.77101
-k[0,4] = -13.0459
-k[1,0] = 35.1278
-k[1,1] = -72.9336
-k[1,2] = -86.0036
-k[1,3] = 93.7371
-k[1,4] = 200.975
-k[2,0] = -146.822
-k[2,1] = 387.184
-k[2,2] = 447.009
-k[2,3] = -467.383
-k[2,4] = -884.339
-k[3,0] = 223.911
-k[3,1] = -648.502
-k[3,2] = -697.177
-k[3,3] = 753.738
-k[3,4] = 1166.89
+t = np.array(times)
+dynamics = np.array(prims)
+step_back_time = 250.
+if omega_peak:
+    t_desired = t[-1] - step_back_time - 50
+else:
+    t_desired = t[-1] - step_back_time
 
-NRfactor = 0
-nu_2plusi = nu*nu
-for i in range(len(k)):
-    atot_j = 1 
-    for j in range(len(k[i])):
-        NRfactor += k[i,j]*nu_2pi*aeff_j
-        atot_j *= atot
-    nu_2plusi *= nu
-l = np.abs(LISCOeff - 2*atot*(EISCOeff - 1) + NRfactor)
-af = atot + nu*l
-Z1 = 1 + (np.cbrt(1 - af*af))*(np.cbrt(1 + af) + np.cbrt(1 - af))
-Z2 = np.sqrt(3*af*af + Z1*Z1)
-rISCO = 3 + Z2 - np.sign(af)*sqrt((3 - Z1f)*(3 + Z1f + Z2f))
-rstop = -1
-if Deltat > 0:
-    rstop = 0.98*rISCO
-Shat = (m1*m1*chi1 + m2*m2*chi2)/(m1*m1 + m2*m2)
-Shat2 = Shat*Shat
-Shat3 = Shat2*Shat
-Shat4 = Shat3*Shat
-nu2 = nu*nu
-nu3 = nu2*nu
-nu4 = nu3*nu
-sqrt1m4nu = np.sqrt(1. - 4.*nu)
-Deltachi = chi1-chi2
-Deltachi2 = Deltachi*Deltachi
-a2 = 0.5609904135313374 
-a3 = -0.84667563764404
-a4 = 3.145145224278187
-Erad_nu_0 = a4*nu4 + a3*nu3 + a2*nu2 + (1. - 2.*np.sqrt(2.)/3.)*nu
-b1 = -0.2091189048177395
-b2 = -0.19709136361080587
-b3 = -0.1588185739358418
-b5 = 2.9852925538232014
-f20 = 4.271313308472851
-f30 = 31.08987570280556
-f50 = 1.5673498395263061
-f10 = 1.8083565298668276
-f21 = 0.
-d10 = -0.09803730445895877
-d11 = -3.2283713377939134
-d20 = 0.01118530335431078
-d30 = -0.01978238971523653
-d31 = -4.91667749015812
-f11 = 15.738082204419655
-f31 = -243.6299258830685
-f51 = -0.5808669012986468
-bfin1 = b1*(f10 + f11*nu + (16. - 16.*f10 - 4.*f11)*nu2)
-bfin2 = b2*(f20 + f21*nu + (16. - 16.*f20 - 4.*f21)*nu2)
-bfin3 = b3*(f30 + f31*nu + (16. - 16.*f30 - 4.*f31)*nu2)
-bfin5 = b5*(f50 + f51*nu + (16. - 16.*f50 - 4.*f51)*nu2)
-Erad_eq_Shat = (0.128*bfin3*Shat3 + 0.211*bfin2*Shat2 + 0.346*bfin1*Shat + 1.)/(1 - 0.212*bfin5*Shat)
-Erad_nu_Shat = Erad_nu_0*Erad_eq_Shat
-Erad_nu_Shat = Erad_nu_0*Erad_eq_Shat
+coarse_fine_separation_idx = np.argmin(np.abs(t - t_desired))
+
+dynamics_coarse = np.c_(t[:coarse_fine_separation_idx],dynamics[:coarse_fine_separation_idx])
+dynamics_fine_prelim = np.c_(t[coarse_fine_separation_idx:],dynamics[coarse_fine_separation_idx:])
+
+dynamics_coarse = augment_dynamics(dynamics_coarse,m1,m2,chi1,chi2)
+dynamics_fine_prelim = augment_dynamics(dynamics_fine,m1,m2,chi1,chi2)
+
+t_peak = None
+
+if omega_peak:
+    interpolant = CubicSpline(dynamics_fine_prelim[:,0],dynamics_fine_prelim[:,6])
+    t_peak = iterative_refinement(interpolant.derivative(),[dynamics_fine_prelim[0,0],dynamics_fine[-1,0]])
+if pr_peak:
+    interpolant = CubicSpline(dynamics_fine_prelim[:,0],dynamics_fine_prelim[:,3])
+    t_peak = iterative_refinement(interpolant.derivative(),[dynamics_fine_prelim[-1,0] - 10, dynamics_fine[-1,0]])
+
+dynamics_fine = interpolate_dynamics(dynamics_fine_prelim[:,:5],omega_peak,step_back_time)
+dynamics_fine = augment_dynamics(dynamics_fine,m1,m2,chi1,chi2)
