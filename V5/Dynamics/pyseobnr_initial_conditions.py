@@ -119,4 +119,4 @@ def computeIC_opt(omega, chi_1, chi_2, m_1, m_2, **kwargs):
         )
     # Now do the dissipative bit: solve for pr
     pr0 = res_diss.root
-    return [r0, 0., pphi0, pr0]
+    return [r0, 0., pr0, pphi0]
