@@ -14,7 +14,8 @@ def v5HM_integrator(M,q,chi1,chi2,f):
     s = odeiv2.pygsl_lite_odeiv2_step(T,4) 
     atol = 1e-11 
     rtol = 1e-12 
-    c = odeiv2.pygsl_lite_odeiv2_control(atol,rtol,a_y = 1,a_dydt = 1,None) 
+    _control = odeiv2.pygsl_lite_odeiv2_control 
+    c = _control.__init__(self,atol,rtol,a_y = 1,a_dydt = 1,None) 
     e = odeiv2.pygsl_lite_odeiv2_evolve(4) 
      
     prims = [] 
