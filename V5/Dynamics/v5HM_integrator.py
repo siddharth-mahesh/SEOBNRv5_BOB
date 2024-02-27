@@ -2,6 +2,7 @@ import numpy as np
 from scipy.interpolate import CubicSpline
 from Dynamics.v5HM_Equations_Of_Motion import v5HM_unoptimized_rhs
 from Dynamics.v5HM_Initial_Conditions import v5HM_initial_conditions 
+from Dynamics.v5HM_auxiliary_functions import augment_dynamics, iterative_refinement, interpolate_dynamics 
 import pygsl_lite.errno as errno
 import pygsl_lite.odeiv2 as odeiv2
 def v5HM_integrator(M,q,chi1,chi2,f):
@@ -33,7 +34,7 @@ def v5HM_integrator(M,q,chi1,chi2,f):
         times.append(t) 
      
      
-        if r < = 6: 
+        if r <= 6: 
             rhs = v5HM_unoptimized_RHS(t,y,m1,m2,chi1,chi2) 
             drdt = rhs[0] 
             dphidt = rhs[1] 
