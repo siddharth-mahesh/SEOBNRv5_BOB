@@ -5,8 +5,9 @@ from Derivatives.v5HM_Hamiltonian_Derivatives_unoptimized import v5HM_unoptimize
 from Derivatives.v5HM_Hamiltonian_Derivatives_unoptimized import v5HM_unoptimized_dH_dprstar as dHdprstar
 from Derivatives.v5HM_Hamiltonian_Derivatives_unoptimized import v5HM_unoptimized_dH_dr as dHdr
 from Hamiltonian.v5HM_Hamiltonian_unoptimized import v5HM_unoptimized_hamiltonian as Hamiltonian
-def v5HM_unoptimized_rhs(t,y,m1,m2,chi1,chi2,verbose = False):
+def v5HM_unoptimized_rhs(t,y,params,verbose = False):
     r , phi , prstar , pphi = y[0] , y[1] , y[2] , y[3]
+    m1 , m2 , chi1 , chi2 = params[0] , params[1] , params[2] , params[3]
     eta = m1*m2/(m1 + m2)/(m1 + m2)
     H , xi = Hamiltonian(m1,m2,r,prstar,pphi,chi1,chi2)
     Omega_circ = (1/eta)*dHdpphi_preq0(m1,m2,r,pphi,chi1,chi2)
