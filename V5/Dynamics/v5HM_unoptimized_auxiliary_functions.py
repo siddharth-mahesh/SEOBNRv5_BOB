@@ -42,7 +42,7 @@ def iterative_refinement(var_dot, interval, peak_pr = False):
 
 def interpolate_dynamics(dynamics_fine, omega_peak = None, step_back = 250):
     res = []
-    n = len(dyn_fine)
+    n = len(dynamics_fine)
     
     if omega_peak:
         t_start_fine = max(omega_peak - step_back, dynamics_fine[0,0])
