@@ -31,7 +31,7 @@ def iterative_refinement(var_dot, interval, peak_pr = False):
         minima = argrelmin(abs_var_dot, order = 3)[0]
         
         if len(minima) > 0:
-            result = t_array_fine(minima[0])
+            result = t_array_fine[minima[0]]
             interval = [ max(left,result - 10*dt) , min(right,result + 10*dt)]
         else:
             if peak_pr:
