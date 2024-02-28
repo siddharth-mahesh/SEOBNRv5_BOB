@@ -13,7 +13,7 @@ def augment_dynamics(dynamics, m1, m2, chi1, chi2):
     N = dynamics.shape[0]
     for i in range(N):
         dyn = dynamics[i]
-        Hreal = H(m1,m2,dyn[1],dyn[3],dyn[4],chi1,chi2)
+        Hreal,xi = H(m1,m2,dyn[1],dyn[3],dyn[4],chi1,chi2)
         Omega = omega(m1,m2,dyn[1],dyn[3],dyn[4],chi1,chi2)/eta
         Omega_c = omega_circ(m1,m2,dyn[1],dyn[4],chi1,chi2)/eta
         result.append([Hreal,Omega,Omega_c])
