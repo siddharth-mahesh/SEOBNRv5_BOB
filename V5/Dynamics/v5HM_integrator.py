@@ -31,6 +31,7 @@ def v5HM_integrator(M,q,chi1,chi2,f):
     times.append(0.) 
     prims.append(y_init) 
     t = times[0] 
+    y = prims[0] 
     tmax = 2.0e9 
     while t < tmax: 
         status, t, h, y = e.apply(c,s,sys,t,tmax,h,y) 
