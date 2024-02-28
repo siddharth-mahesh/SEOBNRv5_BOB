@@ -29,7 +29,7 @@ while t < tmax:
     
     r = y[0]
     if r <= 6:
-        rhs = v5HM_unoptimized_rhs(t,y,m1,m2,chi1,chi2)
+        rhs = v5HM_unoptimized_rhs(t,y,[m1,m2,chi1,chi2])
         drdt = rhs[0]
         dphidt = rhs[1]
         dprstardt = rhs[2]
@@ -44,7 +44,7 @@ while t < tmax:
         if r < rstop:
             break
         if r < 3:
-            phidot_circ = v5HM_unoptimized_circular_omega(m1,m2,r,pphi,chi1,chi2)
+            phidot_circ = v5HM_unoptimized_omega_circ(m1,m2,r,pphi,chi1,chi2)
             if phidot_circ > 1:
                 break
         omega_previous = omega    

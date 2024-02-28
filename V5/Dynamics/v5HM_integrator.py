@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.interpolate import CubicSpline
+from Derivatives.v5HM_Hamiltonian_Derivatives_unoptimized import v5HM_unoptimized_omega_circ
 from Dynamics.v5HM_Equations_Of_Motion import v5HM_unoptimized_rhs
 from Dynamics.v5HM_Initial_Conditions import v5HM_unoptimized_initial_conditions 
 from Dynamics.v5HM_unoptimized_auxiliary_functions import augment_dynamics, iterative_refinement, interpolate_dynamics 
@@ -43,7 +44,7 @@ def v5HM_integrator(M,q,chi1,chi2,f):
      
         r = y[0] 
         if r <= 6: 
-            rhs = v5HM_unoptimized_rhs(t,y,m1,m2,chi1,chi2) 
+            rhs = v5HM_unoptimized_rhs(t,y,[m1,m2,chi1,chi2]) 
             drdt = rhs[0] 
             dphidt = rhs[1] 
             dprstardt = rhs[2] 
@@ -58,7 +59,7 @@ def v5HM_integrator(M,q,chi1,chi2,f):
             if r < rstop: 
                 break 
             if r < 3: 
-                phidot_circ = v5HM_unoptimized_circular_omega(m1,m2,r,pphi,chi1,chi2) 
+                phidot_circ = v5HM_unoptimized_omega_circ(m1,m2,r,pphi,chi1,chi2) 
                 if phidot_circ > 1: 
                     break 
             omega_previous = omega 
