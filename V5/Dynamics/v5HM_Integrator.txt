@@ -38,7 +38,7 @@ while t < tmax:
                 break
         if drdt > 0:
                 break    
-        if dprdt > 0:
+        if dprstardt > 0:
             prstar_peak = True
             break
         if r < rstop:

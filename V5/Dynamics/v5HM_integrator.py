@@ -53,7 +53,7 @@ def v5HM_integrator(M,q,chi1,chi2,f):
                     break 
             if drdt > 0: 
                     break 
-            if dprdt > 0: 
+            if dprstardt > 0: 
                 prstar_peak = True 
                 break 
             if r < rstop: 
