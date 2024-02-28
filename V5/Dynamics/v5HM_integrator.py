@@ -86,9 +86,9 @@ def v5HM_integrator(M,q,chi1,chi2,f):
     if omega_peak: 
         interpolant = CubicSpline(dynamics_fine_prelim[:,0],dynamics_fine_prelim[:,6]) 
         t_peak = iterative_refinement(interpolant.derivative(),[dynamics_fine_prelim[0,0],dynamics_fine[-1,0]]) 
-    if pr_peak: 
+    if prstar_peak: 
         interpolant = CubicSpline(dynamics_fine_prelim[:,0],dynamics_fine_prelim[:,3]) 
-        t_peak = iterative_refinement(interpolant.derivative(),[dynamics_fine_prelim[-1,0] - 10, dynamics_fine[-1,0]]) 
+        t_peak = iterative_refinement(interpolant.derivative(),[dynamics_fine_prelim[-1,0] - 10, dynamics_fine[-1,0]],prstar_peak) 
      
     dynamics_fine = interpolate_dynamics(dynamics_fine_prelim[:,:5],omega_peak,step_back_time) 
     dynamics_fine = augment_dynamics(dynamics_fine,m1,m2,chi1,chi2) 
