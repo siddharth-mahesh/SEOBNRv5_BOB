@@ -43,6 +43,7 @@ def v5HM_integrator(M,q,chi1,chi2,f):
         times.append(t) 
      
         r = y[0] 
+        pphi = y[3] 
         if r <= 6: 
             rhs = v5HM_unoptimized_rhs(t,y,[m1,m2,chi1,chi2]) 
             drdt = rhs[0] 
