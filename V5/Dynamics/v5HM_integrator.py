@@ -13,7 +13,7 @@ class control_y_new(_control):
         super().__init__(eps_abs, eps_rel, a_y, a_dydt, None)
 def v5HM_integrator(M,q,chi1,chi2,f):
      
-    m1,m2,chi1,chi2,y_init,Omega0,h,rstop,risco,Deltat,af,Mf,h22NR,omega22NR = v5HM_unoptimized_initial_conditions(M,q,chi1,chi2,f) 
+    m1,m2,chi1,chi2,y_init,Omega_0,h,rstop,risco,Deltat,af,Mf,h22NR,omega22NR = v5HM_unoptimized_initial_conditions(M,q,chi1,chi2,f) 
      
     sys = odeiv2.system(v5HM_unoptimized_rhs,None,4,[m1,m2,chi1,chi2]) 
     T = odeiv2.step_rk8pd 
