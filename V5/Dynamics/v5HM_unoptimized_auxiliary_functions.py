@@ -27,7 +27,7 @@ def iterative_refinement(var_dot, interval, peak_pr = False):
     for n in range(2):
         dt /= 10
         t_array_fine = np.arange(interval[0],interval[1],dt)
-        abs_var_dot = np.abs(var_dot)
+        abs_var_dot = np.abs(var_dot(t_array_fine))
         minima = argrelmin(abs_var_dot, order = 3)[0]
         
         if len(minima) > 0:
