@@ -79,7 +79,7 @@ def v5HM_integrator(M,q,chi1,chi2,f):
     dynamics_fine_prelim = np.c_[t[coarse_fine_separation_idx:],dynamics[coarse_fine_separation_idx:]] 
      
     dynamics_coarse = augment_dynamics(dynamics_coarse,m1,m2,chi1,chi2) 
-    dynamics_fine_prelim = augment_dynamics(dynamics_fine,m1,m2,chi1,chi2) 
+    dynamics_fine_prelim = augment_dynamics(dynamics_fine_prelim,m1,m2,chi1,chi2) 
      
     t_peak = None 
      
