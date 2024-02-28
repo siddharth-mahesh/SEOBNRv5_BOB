@@ -5,6 +5,12 @@ from Dynamics.v5HM_Initial_Conditions import v5HM_unoptimized_initial_conditions
 from Dynamics.v5HM_unoptimized_auxiliary_functions import augment_dynamics, iterative_refinement, interpolate_dynamics 
 import pygsl_lite.errno as errno
 import pygsl_lite.odeiv2 as odeiv2
+_control = odeiv2.pygsl_lite_odeiv2_control
+class control_y_new(_control):
+    def __init__(self, eps_abs, eps_rel):
+        a_y = 1
+        a_dydt = 1
+        super().__init__(eps_abs, eps_rel, a_y, a_dydt, None)
 def v5HM_integrator(M,q,chi1,chi2,f):
      
     m1,m2,chi1,chi2,y_init,Omega0,h,rstop,risco,Deltat,af,Mf,h22NR,omega22NR = v5HM_unoptimized_initial_conditions(M,q,chi1,chi2,f) 
@@ -14,8 +20,7 @@ def v5HM_integrator(M,q,chi1,chi2,f):
     s = odeiv2.pygsl_lite_odeiv2_step(T,4) 
     atol = 1e-11 
     rtol = 1e-12 
-    _control = odeiv2.pygsl_lite_odeiv2_control 
-    c = _control.__init__(atol,rtol,1,1,None) 
+    c = control_y_new(atol,rtol) 
     e = odeiv2.pygsl_lite_odeiv2_evolve(4) 
      
     prims = [] 
