@@ -51,7 +51,7 @@ def interpolate_dynamics(dynamics_fine, omega_peak = None, step_back = 250):
         t_new = np.arange(dynamics_fine[0,0], dynamics_fine[-1,0], 0.1)
     
     for i in range(1, dynamics_fine.shape[1]):
-        interpolant = CubicSpline(dynamics_fine[:,0], dynamics_fine[:,1])
+        interpolant = CubicSpline(dynamics_fine[:,0], dynamics_fine[:,i])
         res.append(interpolant(t_new))
     
     res = np.array(res)
