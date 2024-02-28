@@ -47,7 +47,7 @@ while t < tmax:
             phidot_circ = v5HM_unoptimized_omega_circ(m1,m2,r,pphi,chi1,chi2)
             if phidot_circ > 1:
                 break
-        omega_previous = omega    
+        omega_previous = dphidt    
 
 t = np.array(times)
 dynamics = np.array(prims)
