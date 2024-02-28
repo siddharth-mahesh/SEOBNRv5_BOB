@@ -5,7 +5,7 @@ from scipy.interpolate import CubicSpline
 from Hamiltonian.v5HM_unoptimized_hamiltonian import v5HM_unoptimized_hamiltonian as H
 from Derivatives.v5HM_Hamiltonian_Derivatives_unoptimized import v5HM_unoptimized_dH_dpphi as omega
 from Derivatives.v5HM_Hamiltonian_Derivatives_unoptimized import v5HM_unoptimized_omega_circ as omega_circ
-
+from Radiation.v5HM_unoptimized_waveform import v5HM_unoptimized_waveform as hlm
 
 def augment_dynamics(dynamics, m1, m2, chi1, chi2):
     result = []
@@ -58,3 +58,19 @@ def interpolate_dynamics(dynamics_fine, omega_peak = None, step_back = 250):
     res_transposed = res.T
     
     return np.c_[t_new,res_transposed]
+
+def get_waveforms_inspiral(m1,m2,augmented_dynamics,chi1,chi2):
+    nu = m1*m2/(m1 + m2)/(m1 + m2)
+    N = augmented_dynamics.shape[0]
+    h22 = []
+    for i in range(N):
+        r = augmented_dynamics[i,1]
+        phi = augmented_dynamics[i,2]
+        prstar = augmented_dynamics[i,3]
+        pphi = augmented_dynamics[i,4]
+        Hreal = augmented_dynamics[i,5]
+        Omega = augmented_dynamics[i,6]
+        Omega_circ = augmented_dynamics[i,7]
+        h22.append(hlm(m1,m2,r,phi,prstar,pphi,chi1,chi2,Hreal,Omega,Omega_circ))
+    h22 = np.array(h22)
+    return np.c_[augmented_dynamics[:,0],h22]
