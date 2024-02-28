@@ -55,6 +55,6 @@ def interpolate_dynamics(dynamics_fine, omega_peak = None, step_back = 250):
         res.append(interpolant(t_new))
     
     res = np.array(res)
-    res_transprosed = res.T
+    res_transposed = res.T
     
     return np.c_[t_new,res_transposed]
