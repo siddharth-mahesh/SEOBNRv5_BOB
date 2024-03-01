@@ -46,7 +46,7 @@ def interpolate_dynamics(dynamics_fine, omega_peak = None, step_back = 250):
     
     if omega_peak:
         t_start_fine = max(omega_peak - step_back, dynamics_fine[0,0])
-        t_new = np.arange(t_start, peak_omega, 0.1)
+        t_new = np.arange(t_start_fine, peak_omega, 0.1)
     else:
         t_new = np.arange(dynamics_fine[0,0], dynamics_fine[-1,0], 0.1)
     
