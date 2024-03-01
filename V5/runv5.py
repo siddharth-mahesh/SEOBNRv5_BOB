@@ -70,8 +70,8 @@ for i in range(4):
         prims_pert_interp = np.interp(dynamics_trusted[:,0],dynamics_pert[:,0],dynamics_pert[:,i+1])
         for j in range(N):
             prim_trusted = dynamics_trusted[j,i+1]
-            prim_pert = dynamics_pert[j,i+1]
-            prim_ours = dynamics_pert[j,i+1]
+            prim_pert = prims_pert_interp[j]
+            prim_ours = prims_ours_interp[j]
             
             errs_trusted_pert[j,i+1] = np.abs( (prim_trusted - prim_pert)/( prim_trusted )  )
             errs_trusted_ours[j,i+1] = np.abs( (prim_trusted - prim_ours)/( prim_trusted )  )
