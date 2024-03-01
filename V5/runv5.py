@@ -22,7 +22,7 @@ chi1[3] *= -1
 chi2 = rng.random(4)
 chi2[0] = 0.0
 chi2[2] *= -1
-pert = (2*rng.integers(low = 0,high = 2,size = 4) - 1)*(3*rng.random(4) + 1)*1e-14
+pert = 1 + (2*rng.integers(low = 0,high = 2,size = 4) - 1)*(3*rng.random(4) + 1)*1e-14
 m1 = q/(1 + q)
 m2 = 1/(1 + q)
 
