@@ -26,16 +26,16 @@ pert = 1 + (2*rng.integers(low = 0,high = 2,size = 4) - 1)*(3*rng.random(4) + 1)
 m1 = q/(1 + q)
 m2 = 1/(1 + q)
 
-for i in range(4):
-    dynamics_coarse , dynamics_fine = v5HM(M,q[i],chi1[i],chi2[i],f)
-    times, modes, model = generate_modes_opt(q[i],chi1[i],chi2[i],Omega_0,debug = True)
-    timespert, modespert, modelpert = generate_modes_opt(q[i]*pert[i],chi1[i]*pert[i],chi2[i]*pert[i],Omega_0,debug = True)
+for k in range(4):
+    dynamics_coarse , dynamics_fine = v5HM(M,q[k],chi1[k],chi2[k],f)
+    times, modes, model = generate_modes_opt(q[k],chi1[k],chi2[k],Omega_0,debug = True)
+    timespert, modespert, modelpert = generate_modes_opt(q[k]*pert[k],chi1[k]*pert[k],chi2[k]*pert[k],Omega_0,debug = True)
     dynamics_ours = np.vstack((dynamics_coarse,dynamics_fine))
     dynamics_pyseobnr = model.dynamics
     dynamics_pyseobnr_pert = modelpert.dynamics
-    pyseobnr_dynamics_label = "./pyseobnr_dynamics_q"+str(q[i])+"_chi1_"+str(int(10*chi1[i]))+"_chi2"+str(int(10*chi2[i]))+".dat"
-    pyseobnrpert_dynamics_label = "./pyseobnrpertO14_dynamics_q"+str(q[i])+"_chi1_"+str(int(10*chi1[i]))+"_chi2"+str(int(10*chi2[i]))+".dat"
-    our_dynamics_label = "./our_dynamics_q"+str(q[i])+"_chi1_"+str(int(10*chi1[i]))+"_chi2"+str(int(10*chi2[i]))+".dat"
+    pyseobnr_dynamics_label = "./pyseobnr_dynamics_q"+str(q[k])+"_chi1_"+str(int(10*chi1[k]))+"_chi2"+str(int(10*chi2[k]))+".dat"
+    pyseobnrpert_dynamics_label = "./pyseobnrpertO14_dynamics_q"+str(q[k])+"_chi1_"+str(int(10*chi1[k]))+"_chi2"+str(int(10*chi2[k]))+".dat"
+    our_dynamics_label = "./our_dynamics_q"+str(q[k])+"_chi1_"+str(int(10*chi1[k]))+"_chi2"+str(int(10*chi2[k]))+".dat"
     np.savetxt(pyseobnr_dynamics_label,dynamics_pyseobnr)
     np.savetxt(pyseobnrpert_dynamics_label,dynamics_pyseobnr_pert)
     np.savetxt(our_dynamics_label,dynamics_ours)
@@ -76,8 +76,8 @@ for i in range(4):
             errs_trusted_pert[j,i+1] = np.abs( (prim_trusted - prim_pert)/( prim_trusted )  )
             errs_trusted_ours[j,i+1] = np.abs( (prim_trusted - prim_ours)/( prim_trusted )  )
         
-    err_trustedpert_label = "./err_trusted_pert_q"+str(q[i])+"_chi1_"+str(int(10*chi1[i]))+"_chi2"+str(int(10*chi2[i]))+".dat"
-    err_trustedours_label = "./err_trusted_ours_q"+str(q[i])+"_chi1_"+str(int(10*chi1[i]))+"_chi2"+str(int(10*chi2[i]))+".dat"
+    err_trustedpert_label = "./err_trusted_pert_q"+str(q[k])+"_chi1_"+str(int(10*chi1[k]))+"_chi2"+str(int(10*chi2[k]))+".dat"
+    err_trustedours_label = "./err_trusted_ours_q"+str(q[k])+"_chi1_"+str(int(10*chi1[k]))+"_chi2"+str(int(10*chi2[k]))+".dat"
     np.savetxt(err_trustedpert_label,errs_trusted_pert)
     np.savetxt(err_trustedours_label,errs_trusted_ours)
     
