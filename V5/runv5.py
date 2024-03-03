@@ -17,12 +17,12 @@ Omega_0 = M*Msol*np.pi*f
 
 q = rng.integers(low = 1,high = 8,size = 4)
 chi1 = rng.random(4)
-chi1[2] *= -1
+chi1[1] *= -1
 chi1[3] *= -1
 chi2 = rng.random(4)
-chi2[0] = 0.0
+chi2[1] *= -1 
 chi2[2] *= -1
-pert = 1 + (2*rng.integers(low = 0,high = 2,size = 4) - 1)*(3*rng.random(4) + 1)*1e-14
+pert = 1 + (2*rng.integers(low = 0,high = 2,size = 4) - 1)*(3*rng.random(4) + 1)*1e-10
 m1 = q/(1 + q)
 m2 = 1/(1 + q)
 
