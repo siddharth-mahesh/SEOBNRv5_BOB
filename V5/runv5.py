@@ -56,7 +56,7 @@ for j in range(N):
     errs_trusted_ours[j,0] = dynamics_trusted[j,0]
 for i in range(4):
     prims_ours_interp = np.interp(dynamics_trusted[:,0],dynamics_ours[:,0],dynamics_ours[:,i+1])
-    prims_pert_interp = np.interp(dynamics_trusted[:,0],dynamics_pert[:,0],dynamics_pert[:,i+1])
+    prims_pert_interp = np.interp(dynamics_trusted[:,0],dynamics_pyseobnr_pert[:,0],dynamics_pyseobnr_pert[:,i+1])
     for j in range(N):
         prim_trusted = dynamics_trusted[j,i+1]
         prim_pert = prims_pert_interp[j]
