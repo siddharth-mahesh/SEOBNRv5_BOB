@@ -18,7 +18,7 @@ Omega_0 = M*Msol*np.pi*f
 q = [2,1.5]
 chi1 = [.9,0.02]
 chi2 = [.5,0.01]
-pert = 1. + 4e-12
+pert = 1. + 4e-14
 
 for k in range(2):
     dynamics_coarse , dynamics_fine = v5HM(M,q[k],chi1[k],chi2[k],f)
