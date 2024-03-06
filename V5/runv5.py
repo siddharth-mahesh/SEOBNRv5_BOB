@@ -18,11 +18,11 @@ Omega_0 = M*Msol*np.pi*f
 q = [2,1.5]
 chi1 = [.9,0.02]
 chi2 = [.5,0.01]
-pert = 1. + 4e-10
+pert = 1. + 4e-12
 
 for k in range(2):
     dynamics_coarse , dynamics_fine = v5HM(M,q[k],chi1[k],chi2[k],f)
-    times, modes, model = generate_modes_opt(q[k],chi1,chi2[k],Omega_0,debug = True)
+    times, modes, model = generate_modes_opt(q[k],chi1[k],chi2[k],Omega_0,debug = True)
     timespert, modespert, modelpert = generate_modes_opt(q[k]*pert,chi1[k]*pert,chi2[k]*pert,Omega_0*pert,debug = True)
     dynamics_ours = np.vstack((dynamics_coarse,dynamics_fine))
     dynamics_pyseobnr = model.dynamics
@@ -57,7 +57,7 @@ for k in range(2):
         errs_trusted_ours[j,0] = dynamics_trusted[j,0]
     for i in range(4):
         prims_ours_interp = np.interp(dynamics_trusted[:,0],dynamics_ours[:,0],dynamics_ours[:,i+1])
-        prims_pert_interp = np.interp(dynamics_trusted[:,0],dynamics_pert[:,0],dynamics_pert[:,i+1])
+        prims_pert_interp = np.interp(dynamics_trusted[:,0],dynamics_pyseobnr_pert[:,0],dynamics_pyseobnr_pert[:,i+1])
         for j in range(N):
             prim_trusted = dynamics_trusted[j,i+1]
             prim_pert = prims_pert_interp[j]
