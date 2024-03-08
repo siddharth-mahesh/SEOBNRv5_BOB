@@ -10,17 +10,12 @@ f = 20
 Msol = 4.925491025543575903411922162094833998e-6
 Omega_0 = M*Msol*np.pi*f
 
-# Case 1: Random Mass Ratio; Random Aligned positive spins
-# Case 2: Random Mass Ratio; Random Aligned negative spins
-# Case 3: Random Mass Ratio; Spin1 positive, Spin2 negative
-# Case 4: Random Mass Ratio; Spin1 negative, Spin2 positive
-
-q = [2,1.5]
-chi1 = [.9,0.02]
-chi2 = [.5,0.01]
+q = [2,1.5,2]
+chi1 = [.9,0.02,0.1]
+chi2 = [.5,0.01,-0.1]
 pert = 1. + 4e-14
 
-for k in range(2):
+for k in range(3):
     dynamics_coarse , dynamics_fine = v5HM(M,q[k],chi1[k],chi2[k],f)
     times, modes, model = generate_modes_opt(q[k],chi1[k],chi2[k],Omega_0,debug = True)
     timespert, modespert, modelpert = generate_modes_opt(q[k]*pert,chi1[k]*pert,chi2[k]*pert,Omega_0*pert,debug = True)
