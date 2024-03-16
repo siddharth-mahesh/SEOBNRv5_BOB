@@ -13,7 +13,7 @@ class control_y_new(_control):
         super().__init__(eps_abs, eps_rel, a_y, a_dydt, None)
 def v5HM_BOB_integrator_calibration(m1,m2,chi1,chi2,y_init,Omega_0,a6,dSO,rstop):
      
-    sys = odeiv2.system(v5HM_unoptimized_rhs,None,4,[m1,m2,chi1,chi2,a6,dSO]) 
+    sys = odeiv2.system(v5HM_BOB_unoptimized_rhs_calibration,None,4,[m1,m2,chi1,chi2,a6,dSO]) 
     T = odeiv2.step_rk8pd 
     s = odeiv2.pygsl_lite_odeiv2_step(T,4) 
     atol = 1e-11 
