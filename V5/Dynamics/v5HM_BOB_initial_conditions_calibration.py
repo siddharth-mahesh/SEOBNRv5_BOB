@@ -15,19 +15,13 @@ def v5HM_BOB_unoptimized_initial_conditions_calibration(M,q,S1,S2,f,a6,dSO,Delta
     r_guess = Omega_0**(-2/3) 
     pphi_guess = Omega_0**(-1/3) 
     sol_cons_guess = np.array([r_guess,pphi_guess]) 
-    params_cons = np.array([m1,m2,chi1,chi2,Omega_0]) 
+    params_cons = np.array([m1,m2,chi1,chi2,a6,dSO,Omega_0]) 
     sol_cons = root(IC_cons,sol_cons_guess,args = params_cons,tol = 6e-12) 
     r , pphi = sol_cons.x[0] , sol_cons.x[1] 
-    params_diss = np.array([m1,m2,r,pphi,chi1,chi2]) 
+    params_diss = np.array([m1,m2,r,pphi,chi1,chi2,a6,dSO]) 
     prstar_bracket = [-3e-2,0] 
     prstar_sol = root_scalar(IC_diss, args = params_diss, bracket = prstar_bracket, xtol = 1e-12, rtol = 1e-10) 
     prstar = prstar_sol.root 
-     
-    ap = chi1*m1 + chi2*m2 
-    am = chi1*m1 - chi2*m2 
-    Deltatns = nu ** (-1. / 5. + 10.0513217 * nu) * (-59.62318 + -1056.87385 * nu - 9793.17619 * nu ** 2 + 55565.2392 * nu ** 3) 
-    Deltats = nu ** (-1. / 5.) * ( 8.39238879807543 * am ** 2 * ap - 16.9056858928167 * am ** 2 * nu + 7.23410583477034 * am ** 2 + 6.38975598319936 * am * ap ** 2 + 179.569824846781 * am * ap * nu - 40.6063653476775 * am * ap + 144.253395844761 * am * nu ** 2 - 90.1929138487509 * am * nu + 14.2203101910927 * am - 6.78913884987037 * ap ** 4 + 5.39962303470497 * ap ** 3 - 132.224950777226 * ap ** 2 * nu + 49.8016443361381 * ap ** 2 + 384.201018794943 * ap * nu ** 2 - 141.253181790353 * ap * nu + 17.5710132409988 * ap) 
-    Deltat = Deltatns + Deltats 
     atot = m1*m1*chi1 + m2*m2*chi2 
     aeff = atot + .474046*nu*(chi1 + chi2) 
     Z1eff = 1 + (np.cbrt(1 - aeff*aeff))*(np.cbrt(1 + aeff) + np.cbrt(1 - aeff)) 
