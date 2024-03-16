@@ -20,6 +20,19 @@ def augment_dynamics(dynamics, m1, m2, chi1, chi2):
     result = np.array(result)
     return np.c_[dynamics,result]
 
+def augment_dynamics_calib(dynamics, m1, m2, chi1, chi2,a6,dSO):
+    result = []
+    eta = m1*m2/(m1 + m2)/(m1 + m2)
+    N = dynamics.shape[0]
+    for i in range(N):
+        dyn = dynamics[i]
+        Hreal,xi = H(m1,m2,dyn[1],dyn[3],dyn[4],chi1,chi2,a6,dSO)
+        Omega = omega(m1,m2,dyn[1],dyn[3],dyn[4],chi1,chi2,a6,dSO)/eta
+        Omega_c = omega_circ(m1,m2,dyn[1],dyn[4],chi1,chi2,a6,dSO)/eta
+        result.append([Hreal,Omega,Omega_c])
+    result = np.array(result)
+    return np.c_[dynamics,result]
+
 def iterative_refinement(var_dot, interval, peak_pr = False):
     left = interval[0]
     right = interval[1]

@@ -1,5 +1,5 @@
 import numpy as np
-def v5HM_BOB_unoptimized_hamiltonian-calibration(m1, m2, r, prstar, pphi, chi1, chi2,a6,dSO,verbose = False):
+def v5HM_BOB_unoptimized_hamiltonian_calibration(m1, m2, r, prstar, pphi, chi1, chi2,a6,dSO,verbose = False):
     u = 1/r
     M = m1+m2
     delta = (m1-m2)/M
