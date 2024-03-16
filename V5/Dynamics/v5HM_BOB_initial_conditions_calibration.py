@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.optimize import root, root_scalar
 from Derivatives.v5HM_BOB_initial_conditions_conservative_calibration import v5HM_BOB_unoptimized_IC_cons_calibration as IC_cons
-from Derivatives.v5HM_BOB_initial_conditions_dissipative_calibration import v5HM_unoptimized_IC_diss_calibration as IC_diss
+from Derivatives.v5HM_BOB_initial_conditions_dissipative_calibration import v5HM_BOB_unoptimized_IC_diss_calibration as IC_diss
 def v5HM_BOB_unoptimized_initial_conditions_calibration(M,q,S1,S2,f,a6,dSO,Deltat):
     m1 = q/(1 + q) 
     m2 = 1/(1 + q) 
