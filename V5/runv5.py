@@ -27,7 +27,7 @@ for k in range(3):
     dSO = 0
     Deltat = 1
     m1,m2,chi1z,chi2z,y_init,Omega_0_calib,h,rstop,rISCO,af,Mf,h22NR,omega22NR = v5HM_IC_nocalib(M,q[k],chi1[k],chi2[k],f,a6,dSO,Deltat)
-    dynamics_coarse_nocalib , dynamics_fine_nocalib = v5HM_nocalib(m1,m2,chi1z,chi2z,y_init,Omega_0_calib,a6,dSO,rstop.h)
+    dynamics_coarse_nocalib , dynamics_fine_nocalib = v5HM_nocalib(m1,m2,chi1z,chi2z,y_init,Omega_0_calib,a6,dSO,rstop,h)
     dynamics_nocalib = np.vstack((dynamics_coarse_nocalib,dynamics_fine_nocalib))
     
     times, modes, model = generate_modes_opt(q[k],chi1[k],chi2[k],Omega_0,debug = True)
