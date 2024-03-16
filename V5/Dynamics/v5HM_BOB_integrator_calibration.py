@@ -2,7 +2,7 @@ import numpy as np
 from scipy.interpolate import CubicSpline
 from Derivatives.v5HM_BOB_unoptimized_hamiltonian_first_derivatives_calibration import v5HM_BOB_unoptimized_omega_circ_calibration
 from Dynamics.v5HM_BOB_equations_of_motion_calibration import v5HM_BOB_unoptimized_rhs_calibration 
-from Dynamics.v5HM_unoptimized_auxiliary_functions import augment_dynamics_calibration, iterative_refinement, interpolate_dynamics 
+from Dynamics.v5HM_unoptimized_auxiliary_functions import augment_dynamics_calib, iterative_refinement, interpolate_dynamics 
 import pygsl_lite.errno as errno
 import pygsl_lite.odeiv2 as odeiv2
 _control = odeiv2.pygsl_lite_odeiv2_control
@@ -75,8 +75,8 @@ def v5HM_BOB_integrator_calibration(m1,m2,chi1,chi2,y_init,Omega_0,a6,dSO,rstop)
     dynamics_coarse = np.c_[t[:coarse_fine_separation_idx],dynamics[:coarse_fine_separation_idx]] 
     dynamics_fine_prelim = np.c_[t[coarse_fine_separation_idx:],dynamics[coarse_fine_separation_idx:]] 
      
-    dynamics_coarse = augment_dynamics(dynamics_coarse,m1,m2,chi1,chi2,a6,dSO) 
-    dynamics_fine_prelim = augment_dynamics(dynamics_fine_prelim,m1,m2,chi1,chi2,a6,dSO) 
+    dynamics_coarse = augment_dynamics_calib(dynamics_coarse,m1,m2,chi1,chi2,a6,dSO) 
+    dynamics_fine_prelim = augment_dynamics_calib(dynamics_fine_prelim,m1,m2,chi1,chi2,a6,dSO) 
      
     t_peak = None 
      
@@ -88,82 +88,5 @@ def v5HM_BOB_integrator_calibration(m1,m2,chi1,chi2,y_init,Omega_0,a6,dSO,rstop)
         t_peak = iterative_refinement(interpolant.derivative(),[dynamics_fine_prelim[-1,0] - 10, dynamics_fine_prelim[-1,0]],prstar_peak) 
      
     dynamics_fine_interp = interpolate_dynamics(dynamics_fine_prelim[:,:5],t_peak,step_back_time) 
-    dynamics_fine = augment_dynamics(dynamics_fine_interp,m1,m2,chi1,chi2,a6,dSO) 
-     
-    sys = odeiv2.system(v5HM_unoptimized_rhs,None,4,[m1,m2,chi1,chi2,a6,dSO]) 
-    T = odeiv2.step_rk8pd 
-    s = odeiv2.pygsl_lite_odeiv2_step(T,4) 
-    atol = 1e-11 
-    rtol = 1e-12 
-    c = control_y_new(atol,rtol) 
-    e = odeiv2.pygsl_lite_odeiv2_evolve(4) 
-     
-    prims = [] 
-    times = [] 
-    omega_previous = Omega_0 
-    omega_peak = False 
-    prstar_peak = False 
-    times.append(0.) 
-    prims.append(y_init) 
-    t = times[0] 
-    y = prims[0] 
-    tmax = 2.0e9 
-    while t < tmax: 
-        status, t, h, y = e.apply(c,s,sys,t,tmax,h,y) 
-        if status != errno.GSL_SUCCESS: 
-                print("break status", status) 
-                break 
-        prims.append(y) 
-        times.append(t) 
-     
-        r = y[0] 
-        pphi = y[3] 
-        if r <= 6: 
-            rhs = v5HM_unoptimized_rhs(t,y,[m1,m2,chi1,chi2,a6,dSO]) 
-            drdt = rhs[0] 
-            dphidt = rhs[1] 
-            dprstardt = rhs[2] 
-            if dphidt < omega_previous: 
-                    omega_peak = True 
-                    break 
-            if drdt > 0: 
-                    break 
-            if dprstardt > 0: 
-                prstar_peak = True 
-                break 
-            if r < rstop: 
-                break 
-            if r < 3: 
-                phidot_circ = v5HM_BOB_unoptimized_omega_circ_calibration(m1,m2,r,pphi,chi1,chi2,a6,dSO) 
-                if phidot_circ > 1: 
-                    break 
-            omega_previous = dphidt 
-     
-    t = np.array(times) 
-    dynamics = np.array(prims) 
-    step_back_time = 250. 
-    if omega_peak: 
-        t_desired = t[-1] - step_back_time - 50 
-    else: 
-        t_desired = t[-1] - step_back_time 
-     
-    coarse_fine_separation_idx = np.argmin(np.abs(t - t_desired)) 
-     
-    dynamics_coarse = np.c_[t[:coarse_fine_separation_idx],dynamics[:coarse_fine_separation_idx]] 
-    dynamics_fine_prelim = np.c_[t[coarse_fine_separation_idx:],dynamics[coarse_fine_separation_idx:]] 
-     
-    dynamics_coarse = augment_dynamics_calibration(dynamics_coarse,m1,m2,chi1,chi2,a6,dSO) 
-    dynamics_fine_prelim = augment_dynamics_calibration(dynamics_fine_prelim,m1,m2,chi1,chi2,a6,dSO) 
-     
-    t_peak = None 
-     
-    if omega_peak: 
-        interpolant = CubicSpline(dynamics_fine_prelim[:,0],dynamics_fine_prelim[:,6]) 
-        t_peak = iterative_refinement(interpolant.derivative(),[dynamics_fine_prelim[0,0],dynamics_fine_prelim[-1,0]]) 
-    if prstar_peak: 
-        interpolant = CubicSpline(dynamics_fine_prelim[:,0],dynamics_fine_prelim[:,3]) 
-        t_peak = iterative_refinement(interpolant.derivative(),[dynamics_fine_prelim[-1,0] - 10, dynamics_fine_prelim[-1,0]],prstar_peak) 
-     
-    dynamics_fine_interp = interpolate_dynamics(dynamics_fine_prelim[:,:5],t_peak,step_back_time) 
-    dynamics_fine = augment_dynamics_calibration(dynamics_fine_interp,m1,m2,chi1,chi2,a6,dSO) 
+    dynamics_fine = augment_dynamics_calib(dynamics_fine_interp,m1,m2,chi1,chi2,a6,dSO) 
     return dynamics_coarse, dynamics_fine
