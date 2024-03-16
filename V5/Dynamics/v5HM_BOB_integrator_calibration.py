@@ -43,7 +43,7 @@ def v5HM_BOB_integrator_calibration(m1,m2,chi1,chi2,y_init,Omega_0,a6,dSO,rstop,
         r = y[0] 
         pphi = y[3] 
         if r <= 6: 
-            rhs = v5HM_unoptimized_rhs(t,y,[m1,m2,chi1,chi2,a6,dSO]) 
+            rhs = v5HM_BOB_unoptimized_rhs_calibration(t,y,[m1,m2,chi1,chi2,a6,dSO]) 
             drdt = rhs[0] 
             dphidt = rhs[1] 
             dprstardt = rhs[2] 
