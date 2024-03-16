@@ -1,7 +1,7 @@
 import numpy as np
 from Dynamics.v5HM_integrator import v5HM_integrator as v5HM
 from Dynamics.v5HM_BOB_integrator_calibration import v5HM_BOB_integrator_calibration as v5HM_nocalib
-from Dynamics.v5HM_initial_conditions_calibration import v5HM_unoptimized_initial_conditions_calibration as v5HM_IC_nocalib
+from Dynamics.v5HM_BOB_initial_conditions_calibration import v5HM_unoptimized_initial_conditions_calibration as v5HM_IC_nocalib
 from Dynamics.v5HM_unoptimized_auxiliary_functions import get_waveforms_inspiral as wf
 from pyseobnr.generate_waveform import generate_modes_opt
 
