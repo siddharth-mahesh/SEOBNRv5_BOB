@@ -3,8 +3,11 @@ import numpy as np
 from scipy.signal import argrelmin
 from scipy.interpolate import CubicSpline
 from Hamiltonian.v5HM_unoptimized_hamiltonian import v5HM_unoptimized_hamiltonian as H
+from Hamiltonian.v5HM_BOB_unoptimized_hamiltonian_calibration import v5HM_BOB_unoptimized_hamiltonian_calibration as H_calib
 from Derivatives.v5HM_Hamiltonian_Derivatives_unoptimized import v5HM_unoptimized_dH_dpphi as omega
 from Derivatives.v5HM_Hamiltonian_Derivatives_unoptimized import v5HM_unoptimized_omega_circ as omega_circ
+from Derivatives.v5HM_BOB_unoptimized_hamiltonian_first_derivatives_calibration import v5HM_BOB_unoptimized_dH_dpphi_calibration as omega_calib
+from Derivatives.v5HM_BOB_unoptimized_hamiltonian_first_derivatives_calibration import v5HM_BOB_unoptimized_omega_circ_calibration as omega_circ_calib
 from Radiation.v5HM_unoptimized_waveform import v5HM_unoptimized_waveform as hlm
 
 def augment_dynamics(dynamics, m1, m2, chi1, chi2):
@@ -26,9 +29,9 @@ def augment_dynamics_calib(dynamics, m1, m2, chi1, chi2,a6,dSO):
     N = dynamics.shape[0]
     for i in range(N):
         dyn = dynamics[i]
-        Hreal,xi = H(m1,m2,dyn[1],dyn[3],dyn[4],chi1,chi2,a6,dSO)
-        Omega = omega(m1,m2,dyn[1],dyn[3],dyn[4],chi1,chi2,a6,dSO)/eta
-        Omega_c = omega_circ(m1,m2,dyn[1],dyn[4],chi1,chi2,a6,dSO)/eta
+        Hreal,xi = H_calib(m1,m2,dyn[1],dyn[3],dyn[4],chi1,chi2,a6,dSO)
+        Omega = omega_calib(m1,m2,dyn[1],dyn[3],dyn[4],chi1,chi2,a6,dSO)/eta
+        Omega_c = omega_circ_calib(m1,m2,dyn[1],dyn[4],chi1,chi2,a6,dSO)/eta
         result.append([Hreal,Omega,Omega_c])
     result = np.array(result)
     return np.c_[dynamics,result]
