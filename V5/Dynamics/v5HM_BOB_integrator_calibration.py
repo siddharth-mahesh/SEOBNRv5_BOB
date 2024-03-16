@@ -11,7 +11,7 @@ class control_y_new(_control):
         a_y = 1
         a_dydt = 1
         super().__init__(eps_abs, eps_rel, a_y, a_dydt, None)
-def v5HM_BOB_integrator_calibration(m1,m2,chi1,chi2,y_init,Omega_0,a6,dSO,rstop):
+def v5HM_BOB_integrator_calibration(m1,m2,chi1,chi2,y_init,Omega_0,a6,dSO,rstop,h_init):
      
     sys = odeiv2.system(v5HM_BOB_unoptimized_rhs_calibration,None,4,[m1,m2,chi1,chi2,a6,dSO]) 
     T = odeiv2.step_rk8pd 
@@ -30,6 +30,7 @@ def v5HM_BOB_integrator_calibration(m1,m2,chi1,chi2,y_init,Omega_0,a6,dSO,rstop)
     prims.append(y_init) 
     t = times[0] 
     y = prims[0] 
+    h = h_init 
     tmax = 2.0e9 
     while t < tmax: 
         status, t, h, y = e.apply(c,s,sys,t,tmax,h,y) 
