@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.special import gamma, factorial, factorial2
-def v5HM_unoptimized_waveform(m1, m2, r, phi, prstar, pphi, chi1, chi2,Hreal,Omega,Omega_circ,verbose = False):
+def v5HM_unoptimized_waveform(m1, m2, r, phi, prstar, pphi, chi1, chi2, Hreal, Omega, Omega_circ, verbose = False):
     M = m1+m2
     eta = m1*m2/(M**2)
     TINYDOUBLE = 1e-100

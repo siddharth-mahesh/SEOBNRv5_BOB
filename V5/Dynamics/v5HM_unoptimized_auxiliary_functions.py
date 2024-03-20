@@ -2,6 +2,7 @@
 import numpy as np
 from scipy.signal import argrelmin
 from scipy.interpolate import CubicSpline
+from pygsl_lite import spline
 from Hamiltonian.v5HM_unoptimized_hamiltonian import v5HM_unoptimized_hamiltonian as H
 from Hamiltonian.v5HM_BOB_unoptimized_hamiltonian_calibration import v5HM_BOB_unoptimized_hamiltonian_calibration as H_calib
 from Derivatives.v5HM_Hamiltonian_Derivatives_unoptimized import v5HM_unoptimized_dH_dpphi as omega
@@ -90,3 +91,19 @@ def get_waveforms_inspiral(m1,m2,augmented_dynamics,chi1,chi2):
         h22.append(hlm(m1,m2,r,phi,prstar,pphi,chi1,chi2,Hreal,Omega,Omega_circ))
     h22 = np.array(h22)
     return np.c_[augmented_dynamics[:,0],h22]
+
+def interpolate_modes_fast(t_new,waveform_mode, dynamics):
+    n = len(waveform_mode)
+    orbital_phase = dynamics[:,2]
+    intrp_orbital_phase = spline.cspline(n)
+    intrp_orbital_phase.init(dynamics[:,0],dynamics[:,2])
+    orbital_phase_intrp = intrp_orbital_phase.eval_e_vector(t_new)
+    intrp_real_mode, intrp_imag_mode = spline.cspline(n), spline.cspline(n)
+    h22_remove_phase_scaling = waveform_mode[:,1]*np.exp(1j*2*orbital_phase)
+    intrp_real_mode.init(waveform_mode[:,0],np.real(waveform_mode[:,1]))
+    intrp_imag_mode.init(waveform_mode[:,0],np.imag(waveform_mode[:,1]))
+    h22_real = intrp_real_mode.eval_e_vector(t_new)
+    h22_imag = intrp_imag_mode.eval_e_vector(t_new)
+    h22_rescaled = (h22_real + 1j*h22_imag)*np.exp(-1j*2*orbital_phase_intrp)
+    return np.c_[t_new,h22_rescaled]
+    
