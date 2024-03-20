@@ -120,10 +120,16 @@ else:
 
 omega_complex_norm = omega_complex/Mf
 omega_qnm = np.real(omega_complex_norm)
-tau = 1/(np.imag(omega_complex_norm))
+tau = -1/(np.imag(omega_complex_norm))
+print(tau)
 t_0 = 0
 times = np.arange(-30*tau + t_0,30*tau+t_0,0.1)
+print(times)
+omega22NR*=-1
+print(omega_qnm,omega22NR)
 hBOB_amp, hBOB_phase = v5HM_BOB_unoptimized_merger_ringdown(times,t_0,h22NR,omega22NR,omega_qnm,tau)
+
+print(hBOB_amp)
 
 np.savetxt("./hBOBamp.dat",hBOB_amp)
 np.savetxt("./hBOBphase.dat",hBOB_phase)
