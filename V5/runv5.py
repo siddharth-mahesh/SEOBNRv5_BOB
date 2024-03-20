@@ -1,10 +1,12 @@
 import numpy as np
-from Dynamics.v5HM_integrator import v5HM_integrator as v5HM
-from Dynamics.v5HM_BOB_integrator_calibration import v5HM_BOB_integrator_calibration as v5HM_nocalib
-from Dynamics.v5HM_BOB_initial_conditions_calibration import v5HM_BOB_unoptimized_initial_conditions_calibration as v5HM_IC_nocalib
-from Dynamics.v5HM_unoptimized_auxiliary_functions import get_waveforms_inspiral as wf
-from pyseobnr.generate_waveform import generate_modes_opt
+import qnm
+#from Dynamics.v5HM_integrator import v5HM_integrator as v5HM
+#from Dynamics.v5HM_BOB_integrator_calibration import v5HM_BOB_integrator_calibration as v5HM_nocalib
+#from Dynamics.v5HM_BOB_initial_conditions_calibration import v5HM_BOB_unoptimized_initial_conditions_calibration as v5HM_IC_nocalib
+#from Dynamics.v5HM_unoptimized_auxiliary_functions import get_waveforms_inspiral as wf
+#from pyseobnr.generate_waveform import generate_modes_opt
 
+"""
 M = 20
 f = 20
 Msol = 4.925491025543575903411922162094833998e-6
@@ -94,8 +96,37 @@ for k in range(3):
     np.savetxt(err_trustedours_label,errs_trusted_ours)
     np.savetxt(err_trustednocalib_label,errs_trusted_nocalib)
     
-    
-     
+"""
+
+from Radiation.v5HM_BOB_unoptimized_merger_ringdown import v5HM_BOB_unoptimized_merger_ringdown
+from Dynamics.v5HM_BOB_initial_conditions_calibration import v5HM_BOB_unoptimized_initial_conditions_calibration
+
+M = 20
+f = 20
+chi1 = 0.01
+chi2 = -0.01
+a6 = 0
+dSO = 0
+Deltat = -1
+
+m1,m2,chi1,chi2,y_init,Omega_0,h,rstop,rISCO,af,Mf,h22NR,omega22NR = v5HM_BOB_unoptimized_initial_conditions_calibration(M,q,S1,S2,f,a6,dSO,Deltat)
+if af > 0:
+    qnm_cache = qnm.modes_cache(s = -2, l = 2, m = 2, n= 0)
+    omega_complex, _, _ = qnm_cache(a = af, interp_only = True)
+else:
+    qnm_cache = qnm.modes_cache(s = -2, l = 2, m = -2, n= 0)
+    omega_complex, _, _ = qnm_cache(a = np.abs(af), interp_only = True)
+
+omega_complex_norm = omega_complex/Mf
+omega_qnm = np.real(omega_complex_norm)
+tau = 1/(np.imag(omega_complex_norm))
+t_0 = 0
+times = np.arange(-30*tau + t_0,30*tau+t_0,0.1)
+hBOB_amp, hBOB_phase = v5HM_BOB_unoptimized_merger_ringdown(times,t0,hNR,omegaNR,omegaQNM,tau)
+
+np.savetxt("./hBOBamp.dat",hBOB_amp)
+np.savetxt("./hBOBphase.dat",hBOB_phase)
+
             
     
     
