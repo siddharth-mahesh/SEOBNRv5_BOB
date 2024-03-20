@@ -102,9 +102,10 @@ from Radiation.v5HM_BOB_unoptimized_merger_ringdown import v5HM_BOB_unoptimized_
 from Dynamics.v5HM_BOB_initial_conditions_calibration import v5HM_BOB_unoptimized_initial_conditions_calibration
 
 M = 20
+q = 2
 f = 20
-chi1 = 0.01
-chi2 = -0.01
+S1 = 0.01
+S2 = -0.01
 a6 = 0
 dSO = 0
 Deltat = -1
@@ -122,7 +123,7 @@ omega_qnm = np.real(omega_complex_norm)
 tau = 1/(np.imag(omega_complex_norm))
 t_0 = 0
 times = np.arange(-30*tau + t_0,30*tau+t_0,0.1)
-hBOB_amp, hBOB_phase = v5HM_BOB_unoptimized_merger_ringdown(times,t0,hNR,omegaNR,omegaQNM,tau)
+hBOB_amp, hBOB_phase = v5HM_BOB_unoptimized_merger_ringdown(times,t_0,h22NR,omega22NR,omega_qnm,tau)
 
 np.savetxt("./hBOBamp.dat",hBOB_amp)
 np.savetxt("./hBOBphase.dat",hBOB_phase)
