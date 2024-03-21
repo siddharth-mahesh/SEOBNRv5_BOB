@@ -137,7 +137,7 @@ np.savetxt("./tBOB.dat",times_BOB)
 np.savetxt("./hBOBamp.dat",hBOB_amp)
 np.savetxt("./hBOBphase.dat",hBOB_phase)
 h22 = modes['2,2']
-np.savetxt("./h22eob.dat",h22)
+np.savetxt("./h22eob.dat",np.abs(h22))
 np.savetxt("./teob.dat",times)
             
     
