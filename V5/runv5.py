@@ -4,7 +4,7 @@ import qnm
 #from Dynamics.v5HM_BOB_integrator_calibration import v5HM_BOB_integrator_calibration as v5HM_nocalib
 #from Dynamics.v5HM_BOB_initial_conditions_calibration import v5HM_BOB_unoptimized_initial_conditions_calibration as v5HM_IC_nocalib
 #from Dynamics.v5HM_unoptimized_auxiliary_functions import get_waveforms_inspiral as wf
-#from pyseobnr.generate_waveform import generate_modes_opt
+from pyseobnr.generate_waveform import generate_modes_opt
 
 """
 M = 20
@@ -104,8 +104,11 @@ from Dynamics.v5HM_BOB_initial_conditions_calibration import v5HM_BOB_unoptimize
 M = 20
 q = 2
 f = 20
-S1 = 0.01
-S2 = -0.01
+Msol = 4.925491025543575903411922162094833998e-6
+Omega_0 = M*Msol*np.pi*f
+
+S1 = 0.
+S2 = 0.
 a6 = 0
 dSO = 0
 Deltat = -1
@@ -123,17 +126,19 @@ omega_qnm = np.real(omega_complex_norm)
 tau = -1/(np.imag(omega_complex_norm))
 print(tau)
 t_0 = 0
-times = np.arange(-30*tau + t_0,30*tau+t_0,0.1)
-print(times)
+times_BOB = np.arange(-30*tau + t_0,30*tau+t_0,0.1)
 omega22NR*=-1
 print(omega_qnm,omega22NR)
-hBOB_amp, hBOB_phase = v5HM_BOB_unoptimized_merger_ringdown(times,t_0,h22NR,omega22NR,omega_qnm,tau)
-
+hBOB_amp, hBOB_phase = v5HM_BOB_unoptimized_merger_ringdown(times_BOB,t_0,h22NR,omega22NR,omega_qnm,tau)
+times, modes, model = generate_modes_opt(q,chi1,chi2,Omega_0,debug = True)
 print(hBOB_amp)
 
+np.savetxt("./tBOB.dat",times_BOB)
 np.savetxt("./hBOBamp.dat",hBOB_amp)
 np.savetxt("./hBOBphase.dat",hBOB_phase)
-
+h22 = modes['2,2']
+np.savetxt("./h22eob.dat",h22)
+np.savetxt("./teob.dat",times)
             
     
     

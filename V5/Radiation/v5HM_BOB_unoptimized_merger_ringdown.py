@@ -7,6 +7,7 @@ def v5HM_BOB_unoptimized_merger_ringdown(t,t0,hNR,omegaNR,omegaQNM,tau):
     k = (OmegaQNM**4 - Omega0**4)/(1 - np.tanh((t0 - tp)/tau))
     kappam = (Omega0**4 - k*( 1 + np.tanh((t0 - tp)/tau) ))**(1/4)
     kappap = (Omega0**4 + k*( 1 - np.tanh((t0 - tp)/tau) ))**(1/4)
+    print(Omega0, kappap, kappam)
     Omega = ( Omega0**4 + k*( np.tanh((t - tp)/tau) - np.tanh((t0 - tp)/tau) ) )**(1/4)
     atanh_Omega0_kappam = np.divide(1,2)*np.log( (1 + Omega0/kappam)/(1 - Omega0/kappam) )
     atanh_Omega_kappam = np.divide(1,2)*np.log( (1 + Omega/kappam)/(1 - Omega/kappam) )
