@@ -1,12 +1,8 @@
 import numpy as np
 import qnm
-#from Dynamics.v5HM_integrator import v5HM_integrator as v5HM
-#from Dynamics.v5HM_BOB_integrator_calibration import v5HM_BOB_integrator_calibration as v5HM_nocalib
-#from Dynamics.v5HM_BOB_initial_conditions_calibration import v5HM_BOB_unoptimized_initial_conditions_calibration as v5HM_IC_nocalib
-#from Dynamics.v5HM_unoptimized_auxiliary_functions import get_waveforms_inspiral as wf
+from IMR.v5HM_BOB_generate_waveform_calibration import v5HM_BOB_generate_waveform_calibration as v5HM
 from pyseobnr.generate_waveform import generate_modes_opt
 
-"""
 M = 20
 f = 20
 Msol = 4.925491025543575903411922162094833998e-6
@@ -22,31 +18,28 @@ pert = 1. + 4e-14
 
 
 for k in range(3):
-    dynamics_coarse , dynamics_fine = v5HM(M,q[k],chi1[k],chi2[k],f)
-    dynamics_ours = np.vstack((dynamics_coarse,dynamics_fine))
     
     a6 = 0
     dSO = 0
-    Deltat = 1
-    m1,m2,chi1z,chi2z,y_init,Omega_0_calib,h,rstop,rISCO,af,Mf,h22NR,omega22NR = v5HM_IC_nocalib(M,q[k],chi1[k],chi2[k],f,a6,dSO,Deltat)
-    dynamics_coarse_nocalib , dynamics_fine_nocalib = v5HM_nocalib(m1,m2,chi1z,chi2z,y_init,Omega_0_calib,a6,dSO,rstop,h)
-    dynamics_nocalib = np.vstack((dynamics_coarse_nocalib,dynamics_fine_nocalib))
+    Deltat = 'BOB'
+    h22_nocalib = v5HM(M,q[k],chi1[k],chi2[k],f,a6,dSO,Deltat,2.4627455127717882e-05)
     
     times, modes, model = generate_modes_opt(q[k],chi1[k],chi2[k],Omega_0,debug = True)
-    timespert, modespert, modelpert = generate_modes_opt(q[k]*pert,chi1[k]*pert,chi2[k]*pert,Omega_0*pert,debug = True)
-    dynamics_pyseobnr = model.dynamics
-    dynamics_pyseobnr_pert = modelpert.dynamics
+    #timespert, modespert, modelpert = generate_modes_opt(q[k]*pert,chi1[k]*pert,chi2[k]*pert,Omega_0*pert,debug = True)
+    modes_22 = modes['2,2']
+    h22_v5HM = np.c_(times,modes_22)
     
-    pyseobnr_dynamics_label = f"./pyseobnr_dynamics_q_{qs[k]}_chi1_{chi1s[k]}_chi2_{chi2s[k]}.dat"
-    pyseobnrpert_dynamics_label = f"./pyseobnr_pertO14_dynamics_q_{qs[k]}_chi1_{chi1s[k]}_chi2_{chi2s[k]}.dat"
-    our_dynamics_label = f"./our_dynamics_q_{qs[k]}_chi1_{chi1s[k]}_chi2_{chi2s[k]}.dat"
-    nocalib_dynamics_label = f"./nocalib_dynamics_q_{qs[k]}_chi1_{chi1s[k]}_chi2_{chi2s[k]}.dat"
+    pyseobnr_h22_label = f"./pyseobnr_h22_q_{qs[k]}_chi1_{chi1s[k]}_chi2_{chi2s[k]}.dat"
+    #pyseobnrpert_dynamics_label = f"./pyseobnr_pertO14_dynamics_q_{qs[k]}_chi1_{chi1s[k]}_chi2_{chi2s[k]}.dat"
+    #our_dynamics_label = f"./our_dynamics_q_{qs[k]}_chi1_{chi1s[k]}_chi2_{chi2s[k]}.dat"
+    nocalib_h22_label = f"./nocalib_dynamics_q_{qs[k]}_chi1_{chi1s[k]}_chi2_{chi2s[k]}.dat"
     
-    np.savetxt(pyseobnr_dynamics_label,dynamics_pyseobnr)
-    np.savetxt(pyseobnrpert_dynamics_label,dynamics_pyseobnr_pert)
-    np.savetxt(our_dynamics_label,dynamics_ours)
-    np.savetxt(nocalib_dynamics_label,dynamics_ours)
+    np.savetxt(pyseobnr_h22_label,h22_v5HM)
+    #np.savetxt(pyseobnrpert_dynamics_label,dynamics_pyseobnr_pert)
+    #np.savetxt(our_dynamics_label,dynamics_ours)
+    np.savetxt(nocalib_h22_label,h22_nocalib)
 
+"""
     # find window of interpolation pts (i.e exclude points in trusted where np.interp would end up extrapolating)
     times_trusted = dynamics_pyseobnr[:,0]
     times_pert = dynamics_pyseobnr_pert[:,0]
@@ -95,8 +88,7 @@ for k in range(3):
     np.savetxt(err_trustedpert_label,errs_trusted_pert)
     np.savetxt(err_trustedours_label,errs_trusted_ours)
     np.savetxt(err_trustednocalib_label,errs_trusted_nocalib)
-    
-"""
+   
 
 from Radiation.v5HM_BOB_unoptimized_merger_ringdown import v5HM_BOB_unoptimized_merger_ringdown
 from Dynamics.v5HM_BOB_initial_conditions_calibration import v5HM_BOB_unoptimized_initial_conditions_calibration
@@ -139,6 +131,7 @@ np.savetxt("./hBOBphase.dat",hBOB_phase)
 h22 = modes['2,2']
 np.savetxt("./h22eob.dat",np.abs(h22))
 np.savetxt("./teob.dat",times)
-            
+    
+"""
     
     
