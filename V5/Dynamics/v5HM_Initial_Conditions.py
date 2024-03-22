@@ -30,10 +30,11 @@ def v5HM_unoptimized_initial_conditions(M,q,S1,S2,f):
     Deltat = Deltatns + Deltats 
     atot = m1*m1*chi1 + m2*m2*chi2 
     aeff = atot + .474046*nu*(chi1 + chi2) 
-    Z1eff = 1 + (np.cbrt(1 - aeff*aeff))*(np.cbrt(1 + aeff) + np.cbrt(1 - aeff)) 
-    Z2eff = np.sqrt(3*aeff*aeff + Z1eff*Z1eff) 
-    rISCOeff = 3 + Z2eff - np.sign(aeff)*np.sqrt((3 - Z1eff)*(3 + Z1eff + Z2eff)) 
-    LISCOeff = (2/3/np.sqrt(3))*(1 + 2*np.sqrt(3*rISCOeff - 1)) 
+    aeff_max1 = min(aeff,1) 
+    Z1eff = 1 + (np.cbrt(1 - aeff_max1*aeff_max1))*(np.cbrt(1 + aeff_max1) + np.cbrt(1 - aeff_max1)) 
+    Z2eff = np.sqrt(3*aeff_max1*aeff_max1 + Z1eff*Z1eff) 
+    rISCOeff = 3 + Z2eff - np.sign(aeff_max1)*np.sqrt((3 - Z1eff)*(3 + Z1eff + Z2eff)) 
+    LISCOeff = (2/(3*np.sqrt(3)))*(1 + 2*np.sqrt(3*rISCOeff - 2)) 
     EISCOeff = np.sqrt(1 - 2/(3*rISCOeff)) 
     k = np.zeros([4,5]) 
     k[0,0] = -5.97723 
@@ -58,14 +59,14 @@ def v5HM_unoptimized_initial_conditions(M,q,S1,S2,f):
     k[3,4] = 1166.89 
      
     NRfactor = 0 
-    nu_2plusi = nu*nu 
+    nu_i = 1 
     for i in range(len(k)): 
         aeff_j = 1 
         for j in range(len(k[i])): 
-            NRfactor += k[i,j]*nu_2plusi*aeff_j 
+            NRfactor += k[i,j]*nu_i*aeff_j 
             aeff_j *= aeff 
-        nu_2plusi *= nu 
-    ell = np.abs(LISCOeff - 2*atot*(EISCOeff - 1) + NRfactor) 
+        nu_i *= nu 
+    ell = np.abs(LISCOeff - 2*atot*(EISCOeff - 1) + nu*NRfactor) 
     af = atot + nu*ell 
     Z1f = 1 + (np.cbrt(1 - af*af))*(np.cbrt(1 + af) + np.cbrt(1 - af)) 
     Z2f = np.sqrt(3*af*af + Z1f*Z1f) 
