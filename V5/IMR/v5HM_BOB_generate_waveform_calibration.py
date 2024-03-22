@@ -43,7 +43,7 @@ def v5HM_BOB_generate_waveform_calibration(M,q,S1,S2,f,a6,dSO,Delta_t,dt,debug =
         omega_orb_ISCO = omega_zoomed_in(idx)
     Delta_t_attach = Delta_t
     if Delta_t == 'BOB':
-        Omega_QNM = omega_QNM/2
+        Omega_QNM = omega_qnm/2
         Omega_QNM4 = Omega_QNM * Omega_QNM * Omega_QNM * Omega_QNM
         Omega_0 = omega22NR/2
         Omega_04 = Omega_0 * Omega_0 * Omega_0 * Omega_0
