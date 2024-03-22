@@ -60,9 +60,9 @@ def v5HM_BOB_unoptimized_compute_nqc_coefficients(t_peak_strain, t_attach, h22_f
 
     P = np.zeros([2,2])
 
-    P[:, 0] = -intrp_p1.derivatives(t_attach)[1:-1]
+    P[:, 0] = -intrp_P1.derivatives(t_attach)[1:-1]
 
-    P[:, 1] = -intrp_p2.derivatives(t_attach)[1:-1]
+    P[:, 1] = -intrp_P2.derivatives(t_attach)[1:-1]
 
     intrp_amp = InterpolatedUnivariateSpline(time[left:right], amplitude[left:right])
 
