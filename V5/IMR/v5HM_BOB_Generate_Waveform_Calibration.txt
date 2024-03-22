@@ -3,6 +3,7 @@ if Delta_t == 'BOB':
     Deltat_init = -1
 dT = dt/M/4.925490947641266978197229498498379006e-6
 m1,m2,chi1,chi2,y_init,Omega_0,h_init,rstop,rISCO,af,Mf,h22NR,omega22NR = v5HM_BOB_unoptimized_initial_conditions_calibration(M,q,S1,S2,f,a6,dSO,Deltat_init)
+omeg22NR *= -1
 if af > 0:
     qnm_cache = qnm.modes_cache(s = -2, l = 2, m = 2, n= 0)
     omega_complex, _, _ = qnm_cache(a = af, interp_only = True)
@@ -12,7 +13,7 @@ else:
 
 omega_complex_norm = omega_complex/Mf
 omega_qnm = np.real(omega_complex_norm)
-tau = 1/(np.imag(omega_complex_norm))
+tau = -1./(np.imag(omega_complex_norm))
 dynamics_coarse, dynamics_fine = v5HM_BOB_integrator_calibration(m1,m2,chi1,chi2,y_init,Omega_0,a6,dSO,rstop,h_init)
 dynamics = np.vstack(dynamics_coarse,dynamics_fine)
 if rISCO < dynamics_fine[-1,1]:
