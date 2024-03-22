@@ -49,7 +49,7 @@ def v5HM_BOB_generate_waveform_calibration(M,q,S1,S2,f,a6,dSO,Delta_t,dt,debug =
         Omega_0 = omega22NR/2
         Omega_04 = Omega_0 * Omega_0 * Omega_0 * Omega_0
         omega_orb_ISCO4 = omega_orb_ISCO * omega_orb_ISCO * omega_orb_ISCO * omega_orb_ISCO
-        Deltat_t_attach = tau*bob_atanh( ( 2*(omega_orb_ISCO4)*(Omega_QNM4) - Omega_QNM4*Omega_QNM4 - Omega_04*Omega_04 ) / ( Omega_QNM4*Omega_QNM4 - Omega_04*Omega_04 ) ) - 2*tau*np.log(Omega_0/Omega_QNM)
+        Deltat_t_attach = tau*np.atanh( ( 2*(omega_orb_ISCO4)*(Omega_QNM4) - Omega_QNM4*Omega_QNM4 - Omega_04*Omega_04 ) / ( Omega_QNM4*Omega_QNM4 - Omega_04*Omega_04 ) ) - 2*tau*np.log(Omega_0/Omega_QNM)
     
     t_peak_strain = t_ISCO - Deltat_attach
     t_attach = t_peak_strain
