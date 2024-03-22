@@ -4,7 +4,8 @@ from Dynamics.v5HM_BOB_initial_conditions_calibration import v5HM_BOB_unoptimize
 from Dynamics.v5HM_BOB_integrator_calibration import v5HM_BOB_integrator_calibration
 from Dynamics.v5HM_unoptimized_auxiliary_functions import interpolate_modes_fast, get_waveforms_inspiral
 from IMR.v5HM_BOB_apply_nqc_corrections import v5HM_BOB_apply_nqc_correction
-from IMR.v5HM_BOB_compute_nqc_coefficients import v5HM_BOB_unoptimized_compute_nqc_coefficientsimport qnm
+from IMR.v5HM_BOB_compute_nqc_coefficients import v5HM_BOB_unoptimized_compute_nqc_coefficients
+import qnm
 from Radiation.v5HM_BOB_unoptimized_merger_ringdown import v5HM_BOB_unoptimized_merger_ringdown
 def v5HM_BOB_generate_waveform_calibration(M,q,S1,S2,f,a6,dSO,Delta_t,dt,debug = False):
     Deltat_init = Delta_t
