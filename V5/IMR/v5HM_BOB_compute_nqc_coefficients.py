@@ -48,11 +48,11 @@ def v5HM_BOB_unoptimized_compute_nqc_coefficients(t_peak_strain, t_attach, h22_f
 
     Q = np.zeros([3,3])
 
-    Q[:, 0] = intrp_Q1LM.derivatives(t_attach)[:-1]
+    Q[:, 0] = intrp_Q1.derivatives(t_attach)[:-1]
 
-    Q[:, 1] = intrp_Q2LM.derivatives(t_attach)[:-1]
+    Q[:, 1] = intrp_Q2.derivatives(t_attach)[:-1]
 
-    Q[:, 2] = intrp_Q3LM.derivatives(t_attach)[:-1]
+    Q[:, 2] = intrp_Q3.derivatives(t_attach)[:-1]
 
     intrp_P1 = InterpolatedUnivariateSpline(time[left:right], p1[left:right])
 
