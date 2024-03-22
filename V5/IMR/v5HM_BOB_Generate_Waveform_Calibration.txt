@@ -18,6 +18,7 @@ dynamics_coarse, dynamics_fine = v5HM_BOB_integrator_calibration(m1,m2,chi1,chi2
 dynamics = np.vstack((dynamics_coarse,dynamics_fine))
 if rISCO < dynamics_fine[-1,1]:
     t_ISCO = dynamics_fine[-1,0]
+    omega_orb_ISCO = dynamics_fine[-1.6]
 else:
     dt_isco = 0.001
     N = int((dynamics_fine[-1,0] - dynamics_fine[0,0]) / dt_isco)
