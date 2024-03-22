@@ -4,7 +4,7 @@ from Dynamics.v5HM_BOB_initial_conditions_calibration import v5HM_BOB_unoptimize
 from Dynamics.v5HM_BOB_integrator_calibration import v5HM_BOB_integrator_calibration
 from Dynamics.v5HM_unoptimized_auxiliary_functions import interpolate_modes_fast, get_waveforms_inspiral
 from IMR.v5HM_BOB_apply_nqc_corrections import v5HM_BOB_apply_nqc_correction
-import qnm
+from IMR.v5HM_BOB_compute_nqc_coefficients import v5HM_BOB_unoptimized_compute_nqc_coefficientsimport qnm
 from Radiation.v5HM_BOB_unoptimized_merger_ringdown import v5HM_BOB_unoptimized_merger_ringdown
 def v5HM_BOB_generate_waveform_calibration(M,q,S1,S2,f,a6,dSO,Delta_t,dt,debug = False):
     Deltat_init = Delta_t
@@ -57,7 +57,7 @@ def v5HM_BOB_generate_waveform_calibration(M,q,S1,S2,f,a6,dSO,Delta_t,dt,debug =
         t_attach = dynamics_fine[-1,0]
     h22_inspiral_plunge_fine = get_waveforms_inspiral(m1,m2,dynamics_fine,chi1,chi2)
     h22_inspiral_plunge_coarse = get_waveforms_inspiral(m1,m2,dynamics_coarse,chi1,chi2)
-    nqc_coefficients = v5HM_BOB_unoptimized_nqc_correction(t_peak_strain,t_attach,h22_inspiral_plunge_fine, dynamics_fine)
+    nqc_coefficients = v5HM_BOB_unoptimized_compute_nqc_coefficients(t_peak_strain,t_attach,h22_inspiral_plunge_fine, dynamics_fine, h22NR, omega22NR, omega_qnm, tau)
     h22_inspiral_plunge_combined = np.vstack((h22_inspiral_plunge_coarse,h22_inspiral_plunge_fine))
     h22_inspiral_plunge_NQC = v5HM_BOB_apply_nqc_correction(nqc_coefficients, h22_inspiral_plung_combined, dynamics)
     t_new = np.arange(dynamics[0,0], dynamics[-1,0], dT)
