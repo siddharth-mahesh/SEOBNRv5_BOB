@@ -7,7 +7,7 @@ from IMR.v5HM_BOB_apply_nqc_corrections import v5HM_BOB_apply_nqc_correction
 import qnm
 from Radiation.v5HM_BOB_unoptimized_merger_ringdown import v5HM_BOB_unoptimized_merger_ringdown
 def v5HM_BOB_generate_waveform_calibration(M,q,S1,S2,f,a6,dSO,Delta_t,dt,debug = False):
-    Deltat_init = Deltat
+    Deltat_init = Delta_t
     if Delta_t == 'BOB':
         Deltat_init = -1
     dT = dt/M/4.925490947641266978197229498498379006e-6
