@@ -3,8 +3,7 @@ from pygsl_lite import spline
 from Dynamics.v5HM_BOB_initial_conditions_calibration import v5HM_BOB_unoptimized_initial_conditions_calibration
 from Dynamics.v5HM_BOB_integrator_calibration import v5HM_BOB_integrator_calibration
 from Dynamics.v5HM_unoptimized_auxiliary_functions import interpolate_modes_fast
-from IMR.v5HM_BOB_apply_nqc_correction import v5HM_BOB_apply_nqc_correction
-from IMR.v5HM_BOB_compute_IMR_waveform import compute_IMR_waveform
+from IMR.v5HM_BOB_apply_nqc_correction import v5HM_BOB_apply_nqc_corrections
 import qnm
 from Radiation.v5HM_BOB_unoptimized_merger_ringdown import v5HM_BOB_unoptimized_merger_ringdown
 def v5HM_BOB_generate_waveform_calibration(M,q,S1,S2,f,a6,dSO,Delta_t,dt,debug = False):
