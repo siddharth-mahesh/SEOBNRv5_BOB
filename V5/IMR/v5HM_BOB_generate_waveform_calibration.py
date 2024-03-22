@@ -27,7 +27,7 @@ def v5HM_BOB_generate_waveform_calibration(M,q,S1,S2,f,a6,dSO,Delta_t,dt,debug =
     dynamics = np.vstack((dynamics_coarse,dynamics_fine))
     if rISCO < dynamics_fine[-1,1]:
         t_ISCO = dynamics_fine[-1,0]
-        omega_orb_ISCO = dynamics_fine[-1.6]
+        omega_orb_ISCO = dynamics_fine[-1,6]
     else:
         dt_isco = 0.001
         N = int((dynamics_fine[-1,0] - dynamics_fine[0,0]) / dt_isco)
