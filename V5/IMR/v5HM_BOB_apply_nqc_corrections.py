@@ -1,5 +1,5 @@
 import numpy as np
-def v5HM_BOB_apply_nqc_correction(nqc_corrections, h22_full, dynamics):
+def v5HM_BOB_apply_nqc_correction(nqc_coefficients, h22_full, dynamics):
     ai = nqc_coefficients['a']
 
     bi = nqc_coefficients['b']
