@@ -66,7 +66,7 @@ def v5HM_BOB_generate_waveform_calibration(M,q,S1,S2,f,a6,dSO,Delta_t,dt,debug =
     h22amp_inspiral_plunge = np.abs(h22_inspiral_plunge[:,1])
     h22phase_inspiral_plunge = np.unwrap(np.angle(h22_inspiral_plunge[:,1]))
     idx_match = np.argmin(np.abs(t_new - t_attach))
-    if t_new[idx_attach] > t_attach:
+    if t_new[idx_match] > t_attach:
         idx_match -= 1
     t_match = t_new[idx_match]
     ringdown_time = int(30*tau)
