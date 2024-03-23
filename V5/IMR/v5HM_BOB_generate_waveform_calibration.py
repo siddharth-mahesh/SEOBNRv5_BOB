@@ -68,6 +68,8 @@ def v5HM_BOB_generate_waveform_calibration(M,q,S1,S2,f,a6,dSO,Delta_t,dt,debug =
     idx_match = np.argmin(np.abs(t_new - t_attach))
     if t_new[idx_match] > t_attach:
         idx_match -= 1
+    if idx_match == len(t_new):
+        idx_match -= 1
     t_match = t_new[idx_match]
     ringdown_time = int(30*tau)
     t_BOB = np.arange(0,ringdown_time,dT) + (t_match + dT)
