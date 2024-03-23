@@ -27,7 +27,7 @@ for k in range(3):
     times, modes, model = generate_modes_opt(q[k],chi1[k],chi2[k],Omega_0,debug = True)
     #timespert, modespert, modelpert = generate_modes_opt(q[k]*pert,chi1[k]*pert,chi2[k]*pert,Omega_0*pert,debug = True)
     modes_22 = modes['2,2']
-    h22_v5HM = np.c_(times,modes_22)
+    h22_v5HM = np.c_[times,modes_22]
     
     pyseobnr_h22_label = f"./pyseobnr_h22_q_{qs[k]}_chi1_{chi1s[k]}_chi2_{chi2s[k]}.dat"
     #pyseobnrpert_dynamics_label = f"./pyseobnr_pertO14_dynamics_q_{qs[k]}_chi1_{chi1s[k]}_chi2_{chi2s[k]}.dat"
