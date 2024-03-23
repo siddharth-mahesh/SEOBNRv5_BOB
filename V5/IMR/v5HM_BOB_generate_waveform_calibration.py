@@ -41,7 +41,7 @@ def v5HM_BOB_generate_waveform_calibration(M,q,S1,S2,f,a6,dSO,Delta_t,dt,debug =
         intrp_omega.init(dynamics_fine[:,0], dynamics_fine[:,6])
         omega_zoomed_in = intrp_omega.eval_e_vector(zoom)
         idx = (np.abs(r_zoomed_in - rISCO)).argmin()
-        t_ISCO = zoom(idx)
+        t_ISCO = zoom[idx]
         omega_orb_ISCO = omega_zoomed_in(idx)
     Delta_t_attach = Delta_t
     if Delta_t == 'BOB':
