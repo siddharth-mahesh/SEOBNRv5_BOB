@@ -43,5 +43,5 @@ omegas_inspiral = [omega,omegaDot]
 amps_BOB, omegas_BOB = v5HM_BOB_unoptimized_nqc_terms(t_attach,t_peak_strain,h22NRpeak,omega22NRpeak,omegaQNM,tau)
 rhs_ai = np.array(amps_BOB) - np.array(amps_inspiral)
 rhs_bi = np.array(omegas_BOB) - np.array(omegas_inspiral)
-res_ai = np.linalg.solve(Q,amps)
-res_bi = np.linalg.solve(P,omegas)
+res_ai = np.linalg.solve(Q,rhs_ai)
+res_bi = np.linalg.solve(P,rhs_bi)

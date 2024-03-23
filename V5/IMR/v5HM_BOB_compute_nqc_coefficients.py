@@ -92,8 +92,8 @@ def v5HM_BOB_unoptimized_compute_nqc_coefficients(t_peak_strain, t_attach, h22_f
 
     rhs_bi = np.array(omegas_BOB) - np.array(omegas_inspiral)
 
-    res_ai = np.linalg.solve(Q,amps)
+    res_ai = np.linalg.solve(Q,rhs_ai)
 
-    res_bi = np.linalg.solve(P,omegas)
+    res_bi = np.linalg.solve(P,rhs_bi)
 
     return {"a": res_ai, "b" : res_bi}
