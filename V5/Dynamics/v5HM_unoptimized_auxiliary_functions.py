@@ -90,7 +90,7 @@ def get_waveforms_inspiral(m1,m2,augmented_dynamics,chi1,chi2):
         Omega_circ = augmented_dynamics[i,7]
         h22.append(hlm(m1,m2,r,phi,prstar,pphi,chi1,chi2,Hreal,Omega,Omega_circ))
     h22 = np.array(h22)
-    return np.c_[augmented_dynamics[:,0],h22]
+    return h22
 
 def interpolate_modes_fast(t_new,waveform_mode, dynamics):
     n = len(waveform_mode)
@@ -99,15 +99,12 @@ def interpolate_modes_fast(t_new,waveform_mode, dynamics):
     intrp_orbital_phase.init(dynamics[:,0],dynamics[:,2])
     orbital_phase_intrp = intrp_orbital_phase.eval_e_vector(t_new)
     intrp_real_mode, intrp_imag_mode = spline.cspline(n), spline.cspline(n)
-    h22_remove_phase_scaling = waveform_mode[:,1]*np.exp(1j*2*orbital_phase)
+    h22_remove_phase_scaling = waveform_mode*np.exp(1j*2*orbital_phase)
     h22_nophase_real = np.real(h22_remove_phase_scaling)
     h22_nophase_imag = np.imag(h22_remove_phase_scaling)
-    intrp_real_mode.init(np.abs(waveform_mode[:,0]),h22_nophase_real)
-    intrp_imag_mode.init(np.abs(waveform_mode[:,0]),h22_nophase_imag)
+    intrp_real_mode.init(dynamics[:,0],h22_nophase_real)
+    intrp_imag_mode.init(dynamics[:,0],h22_nophase_imag)
     h22_real = intrp_real_mode.eval_e_vector(t_new)
     h22_imag = intrp_imag_mode.eval_e_vector(t_new)
     h22_rescaled = (h22_real + 1j*h22_imag)*np.exp(-1j*2*orbital_phase_intrp)
-    return np.c_[t_new,h22_rescaled]    
-
-def bob_atanh(x):
-    return 0.5*np.log((1 - x)/(1 + x)) 
+    return h22_rescaled    

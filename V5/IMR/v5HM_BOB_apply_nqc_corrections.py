@@ -12,7 +12,7 @@ def v5HM_BOB_apply_nqc_correction(nqc_coefficients, h22_full, dynamics):
 
     rOmega = r * omega_orb
 
-    h22_mode = h22_full[:,1]
+    h22_mode = h22_full
 
     q1 = pr*pr / (rOmega*rOmega)
 
@@ -32,4 +32,4 @@ def v5HM_BOB_apply_nqc_correction(nqc_coefficients, h22_full, dynamics):
 
     h22_inspiral_plunge = h22_mode*N22
 
-    return np.c_[h22_full[:,0],h22_inspiral_plunge]
+    return h22_inspiral_plunge

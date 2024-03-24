@@ -22,9 +22,9 @@ def v5HM_BOB_unoptimized_compute_nqc_coefficients(t_peak_strain, t_attach, h22_f
 
     p2 = -p1 * pr * pr
 
-    amplitude = np.abs(h22_fine[:,1])
+    amplitude = np.abs(h22_fine)
 
-    phase = np.unwrap(np.angle(h22_fine[:,1]))
+    phase = np.unwrap(np.angle(h22_fine))
 
     idx = np.argmin(np.abs(time - t_attach))
 
