@@ -63,8 +63,8 @@ def v5HM_BOB_generate_waveform_calibration(M,q,S1,S2,f,a6,dSO,Delta_t,dt,debug =
     h22_inspiral_plunge_NQC = v5HM_BOB_apply_nqc_correction(nqc_coefficients, h22_inspiral_plunge_combined, dynamics)
     t_new = np.arange(dynamics[0,0], dynamics[-1,0], dT)
     h22_inspiral_plunge = interpolate_modes_fast(t_new,h22_inspiral_plunge_NQC, dynamics)
-    h22amp_inspiral_plunge = np.abs(h22_inspiral_plunge[:,1])
-    h22phase_inspiral_plunge = np.unwrap(np.angle(h22_inspiral_plunge[:,1]))
+    h22amp_inspiral_plunge = np.abs(h22_inspiral_plunge)
+    h22phase_inspiral_plunge = np.unwrap(np.angle(h22_inspiral_plunge))
     idx_match = np.argmin(np.abs(t_new - t_attach))
     if t_new[idx_match] > t_attach:
         idx_match -= 1
@@ -78,10 +78,9 @@ def v5HM_BOB_generate_waveform_calibration(M,q,S1,S2,f,a6,dSO,Delta_t,dt,debug =
     h22phase_match_inspiral_plunge = h22phase_inspiral_plunge[idx_match+1]
     h22phase_BOB = h22phase_BOB - h22phase_match_BOB + h22phase_match_inspiral_plunge
     h22_complex_BOB = h22amp_BOB*np.exp(1j*h22phase_BOB)
-    h22_BOB = np.c_[t_BOB,h22_complex_BOB]
     h22_IMR = np.vstack((h22_inspiral_plunge,h22_BOB))
-    h22_IMR[:,0] -= t_peak_strain
+    t_IMR = np.vstack((t_new[:idx_match],t_BOB)) - t_peak_strain
     if not debug:
-        return h22_IMR
+        return t_IMR, h22_IMR
     else:
-        return h22_IMR, h22_BOB, h22_inspiral_plunge_NQC, h22_inspiral_plunge_combined, dynamics
+        return t_IMR, h22_IMR, h22_BOB, h22_inspiral_plunge_NQC, h22_inspiral_plunge_combined, dynamics
