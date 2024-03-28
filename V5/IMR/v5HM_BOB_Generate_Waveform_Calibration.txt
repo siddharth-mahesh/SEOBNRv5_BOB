@@ -45,11 +45,12 @@ if Delta_t == 'BOB':
 t_peak_strain = t_ISCO - Delta_t_attach
 t_attach = t_peak_strain
 if t_peak_strain > dynamics_fine[-1,0]:
+    t_peak_strain = dynamics_fine[-1,0]
     t_attach = dynamics_fine[-1,0]
 h22_inspiral_plunge_fine = get_waveforms_inspiral(m1,m2,dynamics_fine,chi1,chi2)
 h22_inspiral_plunge_coarse = get_waveforms_inspiral(m1,m2,dynamics_coarse,chi1,chi2)
 nqc_coefficients = v5HM_BOB_unoptimized_compute_nqc_coefficients(t_peak_strain,t_attach,h22_inspiral_plunge_fine, dynamics_fine, h22NR, omega22NR, omega_qnm, tau)
-h22_inspiral_plunge_combined = np.vstack((h22_inspiral_plunge_coarse,h22_inspiral_plunge_fine))
+h22_inspiral_plunge_combined = np.concatenate((h22_inspiral_plunge_coarseh22_inspiral_plunge_fine))
 h22_inspiral_plunge_NQC = v5HM_BOB_apply_nqc_correction(nqc_coefficients, h22_inspiral_plunge_combined, dynamics)
 t_new = np.arange(dynamics[0,0], dynamics[-1,0], dT)
 h22_inspiral_plunge = interpolate_modes_fast(t_new,h22_inspiral_plunge_NQC, dynamics)
@@ -68,5 +69,5 @@ h22phase_match_BOB = h22phase_BOB[0]
 h22phase_match_inspiral_plunge = h22phase_inspiral_plunge[idx_match+1]
 h22phase_BOB = h22phase_BOB - h22phase_match_BOB + h22phase_match_inspiral_plunge
 h22_complex_BOB = h22amp_BOB*np.exp(1j*h22phase_BOB)
-h22_IMR = np.vstack((h22_inspiral_plunge,h22_BOB))
-t_IMR = np.vstack((t_new[:idx_match],t_BOB)) - t_peak_strain
+h22_IMR = np.concatenate((h22_inspiral_plunge[:idx_match+1],h22_complex_BOB))
+t_IMR = np.concatenate((t_new[:idx_match+1],t_BOB)) - t_peak_strain
