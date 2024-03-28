@@ -19,4 +19,4 @@ def v5HM_BOB_unoptimized_merger_ringdown(t,t0,hNR,omegaNR,omegaQNM,tau):
     h = (Ap/4/(Omega**2))*(1/np.cosh((t - tp)/tau))
     Phi = arctanp + arctanhp - arctanm - arctanhm
     phi = 2*Phi
-    return h,np.unwrap(phi)
+    return h,phi

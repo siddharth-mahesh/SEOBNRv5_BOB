@@ -17,7 +17,7 @@ chi2s = ["5","01","m1"]
 pert = 1. + 4e-14
 
 
-for k in range(3):
+for k in range(2):
     
     a6 = 0
     dSO = 0
