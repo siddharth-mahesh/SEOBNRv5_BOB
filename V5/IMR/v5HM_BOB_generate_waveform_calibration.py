@@ -84,10 +84,10 @@ def v5HM_BOB_generate_waveform_calibration(M,q,S1,S2,f,a6,dSO,Delta_t,dt,debug =
     h22phase_match_BOB = h22phase_BOB[0]
     h22phase_match_inspiral_plunge = h22phase_inspiral_plunge[idx_match+1]
     h22phase_BOB = h22phase_BOB - h22phase_match_BOB + h22phase_match_inspiral_plunge
-    h22_complex_BOB = h22amp_BOB*np.exp(1j*h22phase_BOB)
+    h22_complex_BOB = h22amp_BOB*np.exp(-1j*h22phase_BOB)
     h22_IMR = np.concatenate((h22_inspiral_plunge[:idx_match+1],h22_complex_BOB))
     t_IMR = np.concatenate((t_new[:idx_match+1],t_BOB)) - t_peak_strain
     if not debug:
         return t_IMR, h22_IMR
     else:
-        return t_IMR, h22_IMR, h22_complex_BOB, h22_inspiral_plunge, interpolate_modes_fast(t_new, h22_inspiral_plunge_combined, dynamics), dynamics
+        return t_IMR, h22_IMR, h22_BOB, h22_inspiral_plunge, interpolate_modes_fast(t_new, h22_inspiral_plunge_combined, dynamics), dynamics
