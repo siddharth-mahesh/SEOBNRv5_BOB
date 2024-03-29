@@ -74,16 +74,16 @@ Deltat_S = nu ** (-1.0 / 5 + 0 * nu) * (
     + 17.5710132409988 * ap
 )
 
-Deltat_v5HM = Delat_NS + Deltat_S
+Deltat_v5HM = Deltat_NS + Deltat_S
 
-t_nocalib, h22_nocalib, h22_BOB, h22_inspiral_plunge_NQC, h22_inspiral_plunge_combined, dynamics_BOB = v5HM(M,q[k],chi1[k],chi2[k],f,a6,dSO,Deltat_v5HM,2.4627455127717882e-05)
+t_nocalib, h22_nocalib, h22_BOB, h22_inspiral_plunge_NQC, h22_inspiral_plunge_combined, dynamics_BOB = v5HM(M,q,chi1,chi2,f,a6,dSO,Deltat_v5HM,2.4627455127717882e-05,debug = True)
 
 h22_save = np.c_[t_nocalib,np.real(h22_nocalib),-np.imag(h22_nocalib)]
 np.savetxt(f"h22_v5HMcalib_BOB_q_{qs}_chi1_{chi1s}_chi2_{chi2s}.dat",h22_save)
 np.savetxt(f"h22_v5HMcalib_BOB_inspiral_NQC_q_{qs}_chi1_{chi1s}_chi2_{chi2s}.dat",h22_inspiral_plunge_NQC)
 np.savetxt(f"h22_v5HMcalib_BOB_inspiral_no_NQC_q_{qs}_chi1_{chi1s}_chi2_{chi2s}.dat",h22_inspiral_plunge_combined)
 np.savetxt(f"v5HMcalib_BOB_inspiral_dynamics_q_{qs}_chi1_{chi1s}_chi2_{chi2s}.dat",dynamics_BOB)
-times, modes, model = generate_modes_opt(q[k],chi1[k],chi2[k],Omega_0,debug = True)
+times, modes, model = generate_modes_opt(q,chi1,chi2,Omega_0,debug = True)
 v5HM_save = np.c_[times,np.real(modes['2,2']),-np.imag(modes['2,2'])]
 np.savetxt(f"h22_v5HM_q_{qs}_chi1_{chi1s}_chi2_{chi2s}.dat",v5HM_save)
 np.savetxt(f"v5HM_inspiral_dynamics_q_{qs}_chi1_{chi1s}_chi2_{chi2s}.dat",model.dynamics)

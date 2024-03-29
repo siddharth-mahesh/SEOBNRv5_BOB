@@ -90,4 +90,4 @@ def v5HM_BOB_generate_waveform_calibration(M,q,S1,S2,f,a6,dSO,Delta_t,dt,debug =
     if not debug:
         return t_IMR, h22_IMR
     else:
-        return t_IMR, h22_IMR, h22_BOB, h22_inspiral_plunge, interpolate_modes_fast(t_new, h22_inspiral_plunge_combined, dynamics), dynamics
+        return t_IMR, h22_IMR, h22_complex_BOB, h22_inspiral_plunge, interpolate_modes_fast(t_new, h22_inspiral_plunge_combined, dynamics), dynamics
