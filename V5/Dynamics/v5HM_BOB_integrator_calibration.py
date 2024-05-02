@@ -1,8 +1,9 @@
 import numpy as np
 from scipy.interpolate import CubicSpline
-from Derivatives.v5HM_BOB_unoptimized_hamiltonian_first_derivatives_calibration import v5HM_BOB_unoptimized_omega_circ_calibration
-from Dynamics.v5HM_BOB_equations_of_motion_calibration import v5HM_BOB_unoptimized_rhs_calibration 
-from Dynamics.v5HM_unoptimized_auxiliary_functions import augment_dynamics_calib, iterative_refinement, interpolate_dynamics 
+from Derivatives.v5HM_BOB_optimized_omega import v5HM_BOB_optimized_omega
+from Derivatives.v5HM_BOB_optimized_hamiltonian_first_derivatives import v5HM_BOB_optimized_hamiltonian_first_derivatives
+from Dynamics.v5HM_BOB_optimized_rhs import v5HM_BOB_optimized_rhs
+from Dynamics.v5HM_optimized_auxiliary_functions import augment_dynamics, iterative_refinement, interpolate_dynamics
 import pygsl_lite.errno as errno
 import pygsl_lite.odeiv2 as odeiv2
 _control = odeiv2.pygsl_lite_odeiv2_control
@@ -13,7 +14,7 @@ class control_y_new(_control):
         super().__init__(eps_abs, eps_rel, a_y, a_dydt, None)
 def v5HM_BOB_integrator_calibration(m1,m2,chi1,chi2,y_init,Omega_0,a6,dSO,rstop,h_init):
      
-    sys = odeiv2.system(v5HM_BOB_unoptimized_rhs_calibration,None,4,[m1,m2,chi1,chi2,a6,dSO]) 
+    sys = odeiv2.system(v5HM_BOB_optimized_rhs,None,4,[m1,m2,chi1,chi2,a6,dSO]) 
     T = odeiv2.step_rk8pd 
     s = odeiv2.pygsl_lite_odeiv2_step(T,4) 
     atol = 1e-11 
@@ -43,7 +44,7 @@ def v5HM_BOB_integrator_calibration(m1,m2,chi1,chi2,y_init,Omega_0,a6,dSO,rstop,
         r = y[0] 
         pphi = y[3] 
         if r <= 6: 
-            rhs = v5HM_BOB_unoptimized_rhs_calibration(t,y,[m1,m2,chi1,chi2,a6,dSO]) 
+            rhs = v5HM_BOB_optimized_rhs(t,y,[m1,m2,chi1,chi2,a6,dSO]) 
             drdt = rhs[0] 
             dphidt = rhs[1] 
             dprstardt = rhs[2] 
@@ -58,7 +59,7 @@ def v5HM_BOB_integrator_calibration(m1,m2,chi1,chi2,y_init,Omega_0,a6,dSO,rstop,
             if r < rstop: 
                 break 
             if r < 3: 
-                phidot_circ = v5HM_BOB_unoptimized_omega_circ_calibration(m1,m2,r,pphi,chi1,chi2,a6,dSO) 
+                phidot_circ = v5HM_BOB_optimized_omega(m1,m2,r,pphi,chi1,chi2,a6,dSO) 
                 if phidot_circ > 1: 
                     break 
             omega_previous = dphidt 
@@ -76,8 +77,8 @@ def v5HM_BOB_integrator_calibration(m1,m2,chi1,chi2,y_init,Omega_0,a6,dSO,rstop,
     dynamics_coarse = np.c_[t[:coarse_fine_separation_idx],dynamics[:coarse_fine_separation_idx]] 
     dynamics_fine_prelim = np.c_[t[coarse_fine_separation_idx:],dynamics[coarse_fine_separation_idx:]] 
      
-    dynamics_coarse = augment_dynamics_calib(dynamics_coarse,m1,m2,chi1,chi2,a6,dSO) 
-    dynamics_fine_prelim = augment_dynamics_calib(dynamics_fine_prelim,m1,m2,chi1,chi2,a6,dSO) 
+    dynamics_coarse = augment_dynamics(dynamics_coarse,m1,m2,chi1,chi2,a6,dSO) 
+    dynamics_fine_prelim = augment_dynamics(dynamics_fine_prelim,m1,m2,chi1,chi2,a6,dSO) 
      
     t_peak = None 
      
@@ -89,5 +90,5 @@ def v5HM_BOB_integrator_calibration(m1,m2,chi1,chi2,y_init,Omega_0,a6,dSO,rstop,
         t_peak = iterative_refinement(interpolant.derivative(),[dynamics_fine_prelim[-1,0] - 10, dynamics_fine_prelim[-1,0]],prstar_peak) 
      
     dynamics_fine_interp = interpolate_dynamics(dynamics_fine_prelim[:,:5],t_peak,step_back_time) 
-    dynamics_fine = augment_dynamics_calib(dynamics_fine_interp,m1,m2,chi1,chi2,a6,dSO) 
+    dynamics_fine = augment_dynamics(dynamics_fine_interp,m1,m2,chi1,chi2,a6,dSO) 
     return dynamics_coarse, dynamics_fine

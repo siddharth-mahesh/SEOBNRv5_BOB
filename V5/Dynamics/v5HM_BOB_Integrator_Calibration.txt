@@ -1,5 +1,5 @@
 
-sys = odeiv2.system(v5HM_BOB_unoptimized_rhs_calibration,None,4,[m1,m2,chi1,chi2,a6,dSO])
+sys = odeiv2.system(v5HM_BOB_optimized_rhs,None,4,[m1,m2,chi1,chi2,a6,dSO])
 T = odeiv2.step_rk8pd
 s = odeiv2.pygsl_lite_odeiv2_step(T,4)
 atol = 1e-11
@@ -29,7 +29,7 @@ while t < tmax:
     r = y[0]
     pphi = y[3]
     if r <= 6:
-        rhs = v5HM_BOB_unoptimized_rhs_calibration(t,y,[m1,m2,chi1,chi2,a6,dSO])
+        rhs = v5HM_BOB_optimized_rhs(t,y,[m1,m2,chi1,chi2,a6,dSO])
         drdt = rhs[0]
         dphidt = rhs[1]
         dprstardt = rhs[2]
@@ -44,7 +44,7 @@ while t < tmax:
         if r < rstop:
             break
         if r < 3:
-            phidot_circ = v5HM_BOB_unoptimized_omega_circ_calibration(m1,m2,r,pphi,chi1,chi2,a6,dSO)
+            phidot_circ = v5HM_BOB_optimized_omega(m1,m2,r,pphi,chi1,chi2,a6,dSO)
             if phidot_circ > 1:
                 break
         omega_previous = dphidt    
@@ -62,8 +62,8 @@ coarse_fine_separation_idx = np.argmin(np.abs(t - t_desired))
 dynamics_coarse = np.c_[t[:coarse_fine_separation_idx],dynamics[:coarse_fine_separation_idx]]
 dynamics_fine_prelim = np.c_[t[coarse_fine_separation_idx:],dynamics[coarse_fine_separation_idx:]]
 
-dynamics_coarse = augment_dynamics_calib(dynamics_coarse,m1,m2,chi1,chi2,a6,dSO)
-dynamics_fine_prelim = augment_dynamics_calib(dynamics_fine_prelim,m1,m2,chi1,chi2,a6,dSO)
+dynamics_coarse = augment_dynamics(dynamics_coarse,m1,m2,chi1,chi2,a6,dSO)
+dynamics_fine_prelim = augment_dynamics(dynamics_fine_prelim,m1,m2,chi1,chi2,a6,dSO)
 
 t_peak = None
 
@@ -75,4 +75,4 @@ if prstar_peak:
     t_peak = iterative_refinement(interpolant.derivative(),[dynamics_fine_prelim[-1,0] - 10, dynamics_fine_prelim[-1,0]],prstar_peak)
 
 dynamics_fine_interp = interpolate_dynamics(dynamics_fine_prelim[:,:5],t_peak,step_back_time)
-dynamics_fine = augment_dynamics_calib(dynamics_fine_interp,m1,m2,chi1,chi2,a6,dSO)
+dynamics_fine = augment_dynamics(dynamics_fine_interp,m1,m2,chi1,chi2,a6,dSO)

@@ -1,0 +1,104 @@
+import numpy as np
+from pygsl_lite import spline
+from Dynamics.v5HM_BOB_initial_conditions_calibration import v5HM_BOB_unoptimized_initial_conditions_calibration
+from Dynamics.v5HM_BOB_integrator_calibration import v5HM_BOB_integrator_calibration
+from Dynamics.v5HM_unoptimized_auxiliary_functions import interpolate_modes_fast, get_waveforms_inspiral
+from IMR.v5HM_BOB_apply_nqc_corrections import v5HM_BOB_apply_nqc_correction
+from IMR.v5HM_BOB_compute_nqc_coefficients import v5HM_BOB_unoptimized_compute_nqc_coefficients
+import qnm
+from Radiation.v5HM_BOB_unoptimized_merger_ringdown import v5HM_BOB_unoptimized_merger_ringdown
+from scipy.interpolate import InterpolatedUnivariateSpline
+
+def v5HM_BOB_generate_waveform_calibration(M,q,S1,S2,f,a6,dSO,Delta_t,dt,debug = False):
+    Deltat_init = Delta_t
+    if Delta_t == 'BOB':
+        Deltat_init = -1
+    dT = dt/M/4.925490947641266978197229498498379006e-6
+    m1,m2,chi1,chi2,y_init,Omega_0,h_init,rstop,rISCO,af,Mf,h22NR,omega22NR = v5HM_BOB_unoptimized_initial_conditions_calibration(M,q,S1,S2,f,a6,dSO,Deltat_init)
+    omega22NR *= -1
+    if af > 0:
+        qnm_cache = qnm.modes_cache(s = -2, l = 2, m = 2, n= 0)
+        omega_complex, _, _ = qnm_cache(a = af, interp_only = True)
+    else:
+        qnm_cache = qnm.modes_cache(s = -2, l = 2, m = -2, n= 0)
+        omega_complex, _, _ = qnm_cache(a = np.abs(af), interp_only = True)
+    
+    omega_complex_norm = omega_complex/Mf
+    omega_qnm = np.real(omega_complex_norm)
+    tau = -1./(np.imag(omega_complex_norm))
+    dynamics_coarse, dynamics_fine = v5HM_BOB_integrator_calibration(m1,m2,chi1,chi2,y_init,Omega_0,a6,dSO,rstop,h_init)
+    dynamics = np.vstack((dynamics_coarse,dynamics_fine))
+    if rISCO < dynamics_fine[-1,1]:
+        t_ISCO = dynamics_fine[-1,0]
+        omega_orb_ISCO = dynamics_fine[-1,6]
+    else:
+        dt_isco = 0.001
+        N = int((dynamics_fine[-1,0] - dynamics_fine[0,0]) / dt_isco)
+        zoom = np.linspace(dynamics_fine[0,0],dynamics_fine[-1,0], N)
+        n = len(dynamics_fine)
+        intrp_r = spline.cspline(n)
+        intrp_r.init(dynamics_fine[:,0], dynamics_fine[:,1])
+        r_zoomed_in = intrp_r.eval_e_vector(zoom)
+        intrp_omega = spline.cspline(n)
+        intrp_omega.init(dynamics_fine[:,0], dynamics_fine[:,6])
+        omega_zoomed_in = intrp_omega.eval_e_vector(zoom)
+        idx = (np.abs(r_zoomed_in - rISCO)).argmin()
+        t_ISCO = zoom[idx]
+        omega_orb_ISCO = omega_zoomed_in[idx]
+    
+    h22_inspiral_plunge_fine = get_waveforms_inspiral(m1,m2,dynamics_fine,chi1,chi2)
+    h22_inspiral_plunge_coarse = get_waveforms_inspiral(m1,m2,dynamics_coarse,chi1,chi2)
+
+    Delta_t_attach = Delta_t
+    if Delta_t == 'BOB':
+        Omega_QNM = omega_qnm/2
+        Omega_QNM4 = Omega_QNM * Omega_QNM * Omega_QNM * Omega_QNM
+        Omega_0 = omega22NR/2
+        Omega_04 = Omega_0 * Omega_0 * Omega_0 * Omega_0
+        phase = np.unwrap(np.angle(h22_inspiral_plunge_fine))
+        intrp_phase = InterpolatedUnivariateSpline(dynamics_fine[:,0], phase)
+        Omega_eob = intrp_phase.derivatives(t_ISCO)[1]/2
+        if Omega_eob < Omega_0**2/Omega_QNM:
+            print("EOB ISCO frequency is less than BOB -inf asymptote")
+            exit(0)
+        Omega_eob_4 = Omega_eob * Omega_eob * Omega_eob * Omega_eob
+        Delta_t_attach = tau*np.arctanh( ( 2*(Omega_eob_4)*(Omega_QNM4) - Omega_QNM4*Omega_QNM4 - Omega_04*Omega_04 ) / ( Omega_QNM4*Omega_QNM4 - Omega_04*Omega_04 ) ) - 2*tau*np.log(Omega_0/Omega_QNM)
+    
+    t_peak_strain = t_ISCO - Delta_t_attach
+    t_attach = t_peak_strain
+    if t_peak_strain > dynamics_fine[-1,0]:
+        t_peak_strain = dynamics_fine[-1,0]
+        t_attach = dynamics_fine[-1,0]
+    nqc_coefficients = v5HM_BOB_unoptimized_compute_nqc_coefficients(t_peak_strain,t_attach,h22_inspiral_plunge_fine, dynamics_fine, h22NR, omega22NR, omega_qnm, tau)
+    h22_inspiral_plunge_combined = np.concatenate((h22_inspiral_plunge_coarse,h22_inspiral_plunge_fine))
+    h22_inspiral_plunge_NQC = v5HM_BOB_apply_nqc_correction(nqc_coefficients, h22_inspiral_plunge_combined, dynamics)
+    t_new = np.arange(dynamics[0,0], dynamics[-1,0], dT)
+    h22_inspiral_plunge = interpolate_modes_fast(t_new,h22_inspiral_plunge_NQC, dynamics)
+    h22amp_inspiral_plunge = np.abs(h22_inspiral_plunge)
+    h22phase_inspiral_plunge = np.unwrap(np.angle(h22_inspiral_plunge))
+    idx_match = np.argmin(np.abs(t_new - t_attach))
+    if t_new[idx_match] > t_attach:
+        idx_match -= 1
+    if idx_match == len(t_new) - 1:
+        idx_match -= 1
+    t_match = t_new[idx_match]
+    ringdown_time = int(30*tau)
+    t_BOB = np.arange(0,ringdown_time,dT) + (t_match + dT)
+    h22amp_BOB = np.zeros(len(t_BOB))
+    h22phase_BOB = np.zeros(len(t_BOB))
+    for i in range(len(t_BOB)):
+        amp_BOB, phase_BOB = v5HM_BOB_unoptimized_merger_ringdown(t_BOB[i],t_peak_strain,h22NR,omega22NR,omega_qnm,tau)
+        h22amp_BOB[i] = amp_BOB
+        h22phase_BOB[i] = phase_BOB
+    h22phase_BOB = np.sign(h22phase_inspiral_plunge[idx_match+1])*np.abs(np.unwrap(h22phase_BOB))
+    h22phase_match_BOB = h22phase_BOB[0]
+    h22phase_match_inspiral_plunge = h22phase_inspiral_plunge[idx_match+1]
+    h22phase_BOB = h22phase_BOB - h22phase_match_BOB + h22phase_match_inspiral_plunge
+    h22_complex_BOB = h22amp_BOB*np.exp(1j*h22phase_BOB)
+    h22_complex_inspiral_plunge = h22amp_inspiral_plunge*np.exp(1j*h22phase_inspiral_plunge)
+    h22_IMR = np.concatenate((h22_complex_inspiral_plunge[:idx_match+1],h22_complex_BOB))
+    t_IMR = np.concatenate((t_new[:idx_match+1],t_BOB)) - t_peak_strain
+    if not debug:
+        return t_IMR, h22_IMR
+    else:
+        return t_IMR, h22_IMR, h22_complex_BOB, h22_inspiral_plunge, interpolate_modes_fast(t_new, h22_inspiral_plunge_combined, dynamics), dynamics

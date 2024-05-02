@@ -1,9 +1,9 @@
 import numpy as np
 import qnm
-from IMR.v5HM_BOB_generate_waveform_calibration import v5HM_BOB_generate_waveform_calibration as v5HM
+from dynamics.v5HM_integrator import v5HM_integrator as v5HM
 from pyseobnr.generate_waveform import generate_modes_opt
 
-M = 20
+M = 50
 f = 20
 Msol = 4.925491025543575903411922162094833998e-6
 Omega_0 = M*Msol*np.pi*f
@@ -17,30 +17,23 @@ chi2s = ["5","01","m1"]
 pert = 1. + 4e-14
 
 
-for k in range(2):
+for k in range(3):
     
-    a6 = 0
-    dSO = 0
-    Deltat = 'BOB'
-    t_nocalib, h22_nocalib = v5HM(M,q[k],chi1[k],chi2[k],f,a6,dSO,Deltat,2.4627455127717882e-05)
-    h22_nocalib = np.c_[t_nocalib,np.real(h22_nocalib),-np.imag(h22_nocalib)]    
-
+    dynamics_coarse, dynamics_fine = v5HM(M,q[k],chi1[k],chi2[k],f)
+    dynamics_ours = np.vstack((dynamics_coarse,dynamics_fine))
+    
+     
     times, modes, model = generate_modes_opt(q[k],chi1[k],chi2[k],Omega_0,debug = True)
-    #timespert, modespert, modelpert = generate_modes_opt(q[k]*pert,chi1[k]*pert,chi2[k]*pert,Omega_0*pert,debug = True)
-    modes_22 = modes['2,2']
-    h22_v5HM = np.c_[times,np.real(modes_22),-np.imag(modes_22)]
+    timespert, modespert, modelpert = generate_modes_opt(q[k]*pert,chi1[k]*pert,chi2[k]*pert,Omega_0*pert,debug = True)
     
     pyseobnr_h22_label = f"./pyseobnr_h22_q_{qs[k]}_chi1_{chi1s[k]}_chi2_{chi2s[k]}.dat"
-    #pyseobnrpert_dynamics_label = f"./pyseobnr_pertO14_dynamics_q_{qs[k]}_chi1_{chi1s[k]}_chi2_{chi2s[k]}.dat"
-    #our_dynamics_label = f"./our_dynamics_q_{qs[k]}_chi1_{chi1s[k]}_chi2_{chi2s[k]}.dat"
-    nocalib_h22_label = f"./nocalib_h22_q_{qs[k]}_chi1_{chi1s[k]}_chi2_{chi2s[k]}.dat"
+    pyseobnrpert_dynamics_label = f"./pyseobnr_pertO14_dynamics_q_{qs[k]}_chi1_{chi1s[k]}_chi2_{chi2s[k]}.dat"
+    our_dynamics_label = f"./our_dynamics_q_{qs[k]}_chi1_{chi1s[k]}_chi2_{chi2s[k]}.dat"
     
     np.savetxt(pyseobnr_h22_label,h22_v5HM)
-    #np.savetxt(pyseobnrpert_dynamics_label,dynamics_pyseobnr_pert)
-    #np.savetxt(our_dynamics_label,dynamics_ours)
-    np.savetxt(nocalib_h22_label,h22_nocalib)
-
-"""
+    np.savetxt(pyseobnrpert_dynamics_label,dynamics_pyseobnr_pert)
+    np.savetxt(our_dynamics_label,dynamics_ours)
+    
     # find window of interpolation pts (i.e exclude points in trusted where np.interp would end up extrapolating)
     times_trusted = dynamics_pyseobnr[:,0]
     times_pert = dynamics_pyseobnr_pert[:,0]

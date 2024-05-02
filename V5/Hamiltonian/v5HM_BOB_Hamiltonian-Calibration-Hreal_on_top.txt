@@ -129,7 +129,6 @@ gam = (
             sp.Rational(103, 192) * nu**2 - sp.Rational(1, 32) * nu + sp.Rational(5, 64)
         )
     )
-a6 = 41.7877875 - 3021.93382 * nu + 33414.4394 * nu**2 - 169019.14 * nu**3 + 329523.262 * nu**4
 nu = m1*m2/(M**2)
 delta = (m1-m2)/M
 M = m1+m2

@@ -1,4 +1,4 @@
-flux = - (Omega**2/8/sp.pi)*(
+flux = - (Omega/8/sp.pi)*(
     2*2*h22amp**2
     + 1*1*h21amp**2
     + 3*3*h33amp**2

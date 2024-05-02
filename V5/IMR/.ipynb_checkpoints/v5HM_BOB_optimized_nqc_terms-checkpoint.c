@@ -1,0 +1,31 @@
+#include "SEOBNRBOB.h"
+int v5HM_BOB_optimized_nqc_terms(double damp[], double domega[], double t, doulbe t0, double hNR, double omegaNR, double omegaQNM, double tau){
+const double tmp0 = (1.0/(tau));
+const double tmp1 = 2*log(omegaNR/omegaQNM);
+const double tmp5 = (1.0/16.0)*((omegaNR)*(omegaNR)*(omegaNR)*(omegaNR));
+const double tmp24 = (1.0/((tau)*(tau)));
+const double tmp2 = tmp0*(t - t0 + tau*tmp1);
+const double tmp6 = tanh(tmp1);
+const double tmp9 = (1.0/16.0)*((omegaQNM)*(omegaQNM)*(omegaQNM)*(omegaQNM)) - tmp5;
+const double tmp12 = hNR*((omegaNR)*(omegaNR))*cosh(tmp1);
+const double tmp3 = cosh(tmp2);
+const double tmp7 = tanh(tmp2);
+const double tmp8 = 1 - tmp6;
+const double tmp16 = sinh(tmp2);
+const double tmp4 = (1.0/(tmp3));
+const double tmp10 = tmp9/tmp8;
+const double tmp17 = tmp16/((tmp3)*(tmp3));
+const double tmp18 = 1 - ((tmp7)*(tmp7));
+const double tmp11 = tmp10*(-tmp6 + tmp7) + tmp5;
+const double tmp13 = (1.0/sqrt(tmp11))*tmp12;
+const double tmp20 = tmp0*tmp10*tmp18;
+const double tmp21 = pow(tmp11, -1.5);
+const double tmp25 = 0.25*tmp10*tmp18*tmp24;
+const double tmp23 = tmp12*tmp21*tmp4;
+const double tmp15 = (1.0/4.0)*tmp13*tmp4;
+damp[0] = tmp15;
+damp[1] = -1.0/4.0*tmp0*tmp13*tmp17 - 0.125*tmp20*tmp23;
+damp[2] = 0.1875*pow(tmp11, -2.5)*tmp12*((tmp18)*(tmp18))*tmp24*tmp4*((tmp9)*(tmp9))/((tmp8)*(tmp8)) + tmp12*tmp17*tmp21*tmp25 + (1.0/2.0)*tmp13*((tmp16)*(tmp16))*tmp24/((tmp3)*(tmp3)*(tmp3)) - tmp15*tmp24 + tmp23*tmp25*tmp7;
+domega[0] = 2*pow(tmp11, 0.25);
+domega[1] = 0.5*pow(tmp11, -0.75)*tmp20;
+    return GSL_SUCCESS;

@@ -1,18 +1,18 @@
 import numpy as np
 from pygsl_lite import spline
-from Dynamics.v5HM_BOB_initial_conditions_calibration import v5HM_BOB_unoptimized_initial_conditions_calibration
+from Dynamics.v5HM_BOB_optimized_initial_conditions import v5HM_BOB_optimized_initial_conditions
 from Dynamics.v5HM_BOB_integrator_calibration import v5HM_BOB_integrator_calibration
-from Dynamics.v5HM_unoptimized_auxiliary_functions import interpolate_modes_fast, get_waveforms_inspiral
+from Dynamics.v5HM_optimized_auxiliary_functions import interpolate_modes_fast, get_waveforms_inspiral
 from IMR.v5HM_BOB_apply_nqc_corrections import v5HM_BOB_apply_nqc_correction
-from IMR.v5HM_BOB_compute_nqc_coefficients import v5HM_BOB_unoptimized_compute_nqc_coefficients
+from IMR.v5HM_BOB_compute_optimized_nqc_coefficients import v5HM_BOB_compute_optimized_nqc_coefficients
 import qnm
-from Radiation.v5HM_BOB_unoptimized_merger_ringdown import v5HM_BOB_unoptimized_merger_ringdown
+from Radiation.v5HM_BOB_optimized_merger_ringdown import v5HM_BOB_optimized_merger_ringdown
 def v5HM_BOB_generate_waveform_calibration(M,q,S1,S2,f,a6,dSO,Delta_t,dt,debug = False):
     Deltat_init = Delta_t
     if Delta_t == 'BOB':
         Deltat_init = -1
     dT = dt/M/4.925490947641266978197229498498379006e-6
-    m1,m2,chi1,chi2,y_init,Omega_0,h_init,rstop,rISCO,af,Mf,h22NR,omega22NR = v5HM_BOB_unoptimized_initial_conditions_calibration(M,q,S1,S2,f,a6,dSO,Deltat_init)
+    m1,m2,chi1,chi2,y_init,Omega_0,h_init,rstop,rISCO,af,Mf,h22NR,omega22NR = v5HM_BOB_optimized_initial_conditions(M,q,S1,S2,f,a6,dSO,Deltat_init)
     omega22NR *= -1
     if af > 0:
         qnm_cache = qnm.modes_cache(s = -2, l = 2, m = 2, n= 0)
@@ -59,7 +59,7 @@ def v5HM_BOB_generate_waveform_calibration(M,q,S1,S2,f,a6,dSO,Delta_t,dt,debug =
         t_attach = dynamics_fine[-1,0]
     h22_inspiral_plunge_fine = get_waveforms_inspiral(m1,m2,dynamics_fine,chi1,chi2)
     h22_inspiral_plunge_coarse = get_waveforms_inspiral(m1,m2,dynamics_coarse,chi1,chi2)
-    nqc_coefficients = v5HM_BOB_unoptimized_compute_nqc_coefficients(t_peak_strain,t_attach,h22_inspiral_plunge_fine, dynamics_fine, h22NR, omega22NR, omega_qnm, tau)
+    nqc_coefficients = v5HM_BOB_compute_optimized_nqc_coefficients(t_peak_strain,t_attach,h22_inspiral_plunge_fine, dynamics_fine, h22NR, omega22NR, omega_qnm, tau)
     h22_inspiral_plunge_combined = np.concatenate((h22_inspiral_plunge_coarse,h22_inspiral_plunge_fine))
     h22_inspiral_plunge_NQC = v5HM_BOB_apply_nqc_correction(nqc_coefficients, h22_inspiral_plunge_combined, dynamics)
     t_new = np.arange(dynamics[0,0], dynamics[-1,0], dT)
@@ -77,10 +77,12 @@ def v5HM_BOB_generate_waveform_calibration(M,q,S1,S2,f,a6,dSO,Delta_t,dt,debug =
     h22amp_BOB = np.zeros(len(t_BOB))
     h22phase_BOB = np.zeros(len(t_BOB))
     for i in range(len(t_BOB)):
-        amp_BOB, phase_BOB = v5HM_BOB_unoptimized_merger_ringdown(t_BOB[i],t_peak_strain,h22NR,omega22NR,omega_qnm,tau)
+        amp_BOB, phase_BOB = v5HM_BOB_optimized_merger_ringdown(t_BOB[i],t_peak_strain,h22NR,omega22NR,omega_qnm,tau)
+        if np.isnan(amp_BOB) or np.isnan(phase_BOB):
+            break
         h22amp_BOB[i] = amp_BOB
         h22phase_BOB[i] = phase_BOB
-    h22phase_BOB = np.sign(h22phase_inspiral_plunge[idx_match+1])*np.abs(np.unwrap(h22phase_BOB))
+    h22phase_BOB = np.sign(h22phase_inspiral_plunge[idx_match])*np.abs(np.unwrap(h22phase_BOB))
     h22phase_match_BOB = h22phase_BOB[0]
     h22phase_match_inspiral_plunge = h22phase_inspiral_plunge[idx_match+1]
     h22phase_BOB = h22phase_BOB - h22phase_match_BOB + h22phase_match_inspiral_plunge

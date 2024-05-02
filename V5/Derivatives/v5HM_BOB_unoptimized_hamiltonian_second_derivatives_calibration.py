@@ -4,7 +4,6 @@ def v5HM_BOB_unoptimized_dH_dr_dr_calibration(m1, m2, r, prstar, pphi, chi1, chi
     M = m1+m2
     delta = (m1-m2)/M
     nu = m1*m2/(M**2)
-    a6 = 41.7877875-3021.93382*nu+33414.4394*nu**2-169019.14*nu**3+329523.262*nu**4
     gam = (np.divide(1,4)+(pphi**2/r**2)*(np.divide(15,32)-np.divide(9,32)*nu)+(1/r)*(np.divide(11,32)*nu+np.divide(3,32))+(pphi**4/r**4)*(np.divide(75,256)*nu**2-np.divide(45,128)*nu-np.divide(105,256))+(pphi**2/r**3)*(-np.divide(613,768)*nu**2-np.divide(35,128)*nu-np.divide(59,256))+(1/r**2)*(np.divide(103,192)*nu**2-np.divide(1,32)*nu+np.divide(5,64)))
     gap = (np.divide(7,4)+(pphi**2/r**2)*(-np.divide(45,32)*nu-np.divide(15,32))+(1/r)*(np.divide(23,32)*nu-np.divide(3,32))+(pphi**4/r**4)*(np.divide(345,256)*nu**2+np.divide(75,128)*nu+np.divide(105,256))+(pphi**2/r**3)*(-np.divide(1591,768)*nu**2-np.divide(267,128)*nu+np.divide(59,256))+(1/r**2)*(np.divide(109,192)*nu**2-np.divide(177,32)*nu-np.divide(5,64)))
     am = (m1*chi1-m2*chi2)/M
@@ -101,7 +100,6 @@ def v5HM_BOB_unoptimized_dH_dr_dpphi_calibration(m1, m2, r, prstar, pphi, chi1, 
     M = m1+m2
     delta = (m1-m2)/M
     nu = m1*m2/(M**2)
-    a6 = 41.7877875-3021.93382*nu+33414.4394*nu**2-169019.14*nu**3+329523.262*nu**4
     gam = (np.divide(1,4)+(pphi**2/r**2)*(np.divide(15,32)-np.divide(9,32)*nu)+(1/r)*(np.divide(11,32)*nu+np.divide(3,32))+(pphi**4/r**4)*(np.divide(75,256)*nu**2-np.divide(45,128)*nu-np.divide(105,256))+(pphi**2/r**3)*(-np.divide(613,768)*nu**2-np.divide(35,128)*nu-np.divide(59,256))+(1/r**2)*(np.divide(103,192)*nu**2-np.divide(1,32)*nu+np.divide(5,64)))
     gap = (np.divide(7,4)+(pphi**2/r**2)*(-np.divide(45,32)*nu-np.divide(15,32))+(1/r)*(np.divide(23,32)*nu-np.divide(3,32))+(pphi**4/r**4)*(np.divide(345,256)*nu**2+np.divide(75,128)*nu+np.divide(105,256))+(pphi**2/r**3)*(-np.divide(1591,768)*nu**2-np.divide(267,128)*nu+np.divide(59,256))+(1/r**2)*(np.divide(109,192)*nu**2-np.divide(177,32)*nu-np.divide(5,64)))
     am = (m1*chi1-m2*chi2)/M

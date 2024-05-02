@@ -447,7 +447,7 @@ def v5HM_unoptimized_flux(m1, m2, r, phi, prstar, pphi, chi1, chi2,Hreal,Omega,O
     h21 = hN21*source_odd*T21*f21*np.exp(1j*delta21)
     h22amp = hN22amp*source_even*T22amp*f22amp
     h22 = hN22*source_even*T22*f22*np.exp(1j*delta22)
-    flux=-(Omega**2/8/np.pi)*(2*2*h22amp**2+1*1*h21amp**2+3*3*h33amp**2+2*2*h32amp**2+1*1*h31amp**2+4*4*h44amp**2+3*3*h43amp**2+2*2*h42amp**2+1*1*h41amp**2+5*5*h55amp**2+4*4*h54amp**2+3*3*h53amp**2+2*2*h52amp**2+1*1*h51amp**2+6*6*h66amp**2+5*5*h65amp**2+4*4*h64amp**2+3*3*h63amp**2+2*2*h62amp**2+1*1*h61amp**2+7*7*h77amp**2+6*6*h76amp**2+5*5*h75amp**2+4*4*h74amp**2+3*3*h73amp**2+2*2*h72amp**2+1*1*h71amp**2+8*8*h88amp**2+7*7*h87amp**2+6*6*h86amp**2+5*5*h85amp**2+4*4*h84amp**2+3*3*h83amp**2+2*2*h82amp**2+1*1*h81amp**2)
+    flux=-(Omega/8/np.pi)*(2*2*h22amp**2+1*1*h21amp**2+3*3*h33amp**2+2*2*h32amp**2+1*1*h31amp**2+4*4*h44amp**2+3*3*h43amp**2+2*2*h42amp**2+1*1*h41amp**2+5*5*h55amp**2+4*4*h54amp**2+3*3*h53amp**2+2*2*h52amp**2+1*1*h51amp**2+6*6*h66amp**2+5*5*h65amp**2+4*4*h64amp**2+3*3*h63amp**2+2*2*h62amp**2+1*1*h61amp**2+7*7*h77amp**2+6*6*h76amp**2+5*5*h75amp**2+4*4*h74amp**2+3*3*h73amp**2+2*2*h72amp**2+1*1*h71amp**2+8*8*h88amp**2+7*7*h87amp**2+6*6*h86amp**2+5*5*h85amp**2+4*4*h84amp**2+3*3*h83amp**2+2*2*h82amp**2+1*1*h81amp**2)
     if not verbose:
         return flux
     else:

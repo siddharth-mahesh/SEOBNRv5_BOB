@@ -2,7 +2,6 @@ u = 1/r
 M = m1+m2
 delta = (m1-m2)/M
 nu = m1*m2/(M**2)
-a6 = 41.7877875-3021.93382*nu+33414.4394*nu**2-169019.14*nu**3+329523.262*nu**4
 gam = (sp.Rational(1,4)+(pphi**2/r**2)*(sp.Rational(15,32)-sp.Rational(9,32)*nu)+(1/r)*(sp.Rational(11,32)*nu+sp.Rational(3,32))+(pphi**4/r**4)*(sp.Rational(75,256)*nu**2-sp.Rational(45,128)*nu-sp.Rational(105,256))+(pphi**2/r**3)*(-sp.Rational(613,768)*nu**2-sp.Rational(35,128)*nu-sp.Rational(59,256))+(1/r**2)*(sp.Rational(103,192)*nu**2-sp.Rational(1,32)*nu+sp.Rational(5,64)))
 gap = (sp.Rational(7,4)+(pphi**2/r**2)*(-sp.Rational(45,32)*nu-sp.Rational(15,32))+(1/r)*(sp.Rational(23,32)*nu-sp.Rational(3,32))+(pphi**4/r**4)*(sp.Rational(345,256)*nu**2+sp.Rational(75,128)*nu+sp.Rational(105,256))+(pphi**2/r**3)*(-sp.Rational(1591,768)*nu**2-sp.Rational(267,128)*nu+sp.Rational(59,256))+(1/r**2)*(sp.Rational(109,192)*nu**2-sp.Rational(177,32)*nu-sp.Rational(5,64)))
 am = (m1*chi1-m2*chi2)/M

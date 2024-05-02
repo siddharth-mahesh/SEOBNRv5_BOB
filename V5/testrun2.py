@@ -3,7 +3,7 @@ import qnm
 from IMR.v5HM_BOB_generate_waveform_calibration import v5HM_BOB_generate_waveform_calibration as v5HM
 from pyseobnr.generate_waveform import generate_modes_opt
 
-M = 20
+M = 50
 f = 20
 Msol = 4.925491025543575903411922162094833998e-6
 Omega_0 = M*Msol*np.pi*f
@@ -76,13 +76,13 @@ Deltat_S = nu ** (-1.0 / 5 + 0 * nu) * (
 
 Deltat_v5HM = Deltat_NS + Deltat_S
 
-t_nocalib, h22_nocalib, h22_BOB, h22_inspiral_plunge_NQC, h22_inspiral_plunge_combined, dynamics_BOB = v5HM(M,q,chi1,chi2,f,a6,dSO,'BOB',2.4627455127717882e-05,debug = True)
+t_nocalib, h22_nocalib, h22_BOB, h22_inspiral_plunge_NQC, h22_inspiral_plunge_combined, dynamics_BOB = v5HM(M,q,chi1,chi2,f,a6,dSO,Deltat_v5HM,2.4627455127717882e-05,debug = True)
 
 h22_save = np.c_[t_nocalib,np.real(h22_nocalib),-np.imag(h22_nocalib)]
-np.savetxt(f"h22_v5HMcaliba6dSO_BOBcalibDeltat_q_{qs}_chi1_{chi1s}_chi2_{chi2s}.dat",h22_save)
-np.savetxt(f"h22_v5HMcaliba6dSO_BOBcalibDeltat_inspiral_NQC_q_{qs}_chi1_{chi1s}_chi2_{chi2s}.dat",h22_inspiral_plunge_NQC)
-np.savetxt(f"h22_v5HMcaliba6dSO_BOBcalibDeltat_inspiral_no_NQC_q_{qs}_chi1_{chi1s}_chi2_{chi2s}.dat",h22_inspiral_plunge_combined)
-np.savetxt(f"v5HMcaliba6dSO_BOBcalibDeltat_inspiral_dynamics_q_{qs}_chi1_{chi1s}_chi2_{chi2s}.dat",dynamics_BOB)
+np.savetxt(f"h22_v5HMBOBopt_q_{qs}_chi1_{chi1s}_chi2_{chi2s}.dat",h22_save)
+np.savetxt(f"h22_v5HMBOBopt_inspiral_NQC_q_{qs}_chi1_{chi1s}_chi2_{chi2s}.dat",h22_inspiral_plunge_NQC)
+np.savetxt(f"h22_v5HMBOBopt_inspiral_no_NQC_q_{qs}_chi1_{chi1s}_chi2_{chi2s}.dat",h22_inspiral_plunge_combined)
+np.savetxt(f"v5HMBOBopt_inspiral_dynamics_q_{qs}_chi1_{chi1s}_chi2_{chi2s}.dat",dynamics_BOB)
 times, modes, model = generate_modes_opt(q,chi1,chi2,Omega_0,debug = True)
 v5HM_save = np.c_[times,np.real(modes['2,2']),-np.imag(modes['2,2'])]
 np.savetxt(f"h22_v5HM_q_{qs}_chi1_{chi1s}_chi2_{chi2s}.dat",v5HM_save)

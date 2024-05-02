@@ -15,6 +15,6 @@ def v5HM_BOB_unoptimized_IC_diss_calibration(prstar, params):
     Omega = omega(m1,m2,r,prstar,pphi,chi1,chi2,a6,dSO)/eta
     Omega_circ = omega_circ(m1,m2,r,pphi,chi1,chi2,a6,dSO)/eta
     dLdr = -d2Hdr2(m1,m2,r,prstar,pphi,chi1,chi2,a6,dSO)/d2Hdrdpphi(m1,m2,r,prstar,pphi,chi1,chi2,a6,dSO)
-    dLdt = flux(m1, m2, r, 0., prstar, pphi, chi1, chi2,Omega,Omega_circ,Hreal)/eta/Omega
+    dLdt = flux(m1, m2, r, 0., prstar, pphi, chi1, chi2,Hreal,Omega,Omega_circ)/eta/Omega
     rdot = dLdt/dLdr
     return rdot - dHdpr
