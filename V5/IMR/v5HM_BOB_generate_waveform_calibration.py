@@ -72,14 +72,12 @@ def v5HM_BOB_generate_waveform_calibration(M,q,S1,S2,f,a6,dSO,Delta_t,dt,debug =
     if idx_match == len(t_new) - 1:
         idx_match -= 1
     t_match = t_new[idx_match]
-    ringdown_time = int(30*tau)
+    ringdown_time = int(15*tau)
     t_BOB = np.arange(0,ringdown_time,dT) + (t_match + dT)
     h22amp_BOB = np.zeros(len(t_BOB))
     h22phase_BOB = np.zeros(len(t_BOB))
     for i in range(len(t_BOB)):
         amp_BOB, phase_BOB = v5HM_BOB_optimized_merger_ringdown(t_BOB[i],t_peak_strain,h22NR,omega22NR,omega_qnm,tau)
-        if np.isnan(amp_BOB) or np.isnan(phase_BOB):
-            break
         h22amp_BOB[i] = amp_BOB
         h22phase_BOB[i] = phase_BOB
     h22phase_BOB = np.sign(h22phase_inspiral_plunge[idx_match])*np.abs(np.unwrap(h22phase_BOB))
@@ -93,4 +91,4 @@ def v5HM_BOB_generate_waveform_calibration(M,q,S1,S2,f,a6,dSO,Delta_t,dt,debug =
     if not debug:
         return t_IMR, h22_IMR
     else:
-        return t_IMR, h22_IMR, h22_complex_BOB, h22_inspiral_plunge, interpolate_modes_fast(t_new, h22_inspiral_plunge_combined, dynamics), dynamics
+        return t_IMR, h22_IMR, h22_complex_BOB, h22_inspiral_plunge, interpolate_modes_fast(t_new, h22_inspiral_plunge_combined, dynamics), dynamics, tau
